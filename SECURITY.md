@@ -78,30 +78,31 @@ alter table presencas add constraint presencas_token_unique unique (token);
 
 ---
 
-## 2. Apps Script sem autenticação
+## 2. Apps Script — autenticação e chave (✅ implementado em `apps-script/Code.gs`)
 
-A URL `.../exec?action=enviarEmails` é pública e chamada em `no-cors`.
-Qualquer um com a URL pode disparar **envio de e-mails em massa** ou o sync repetidamente.
+Antes, a URL `.../exec?action=enviarEmails` era pública: qualquer um disparava
+**envio de e-mails em massa** ou o sync. O `apps-script/Code.gs` deste repo já corrige:
 
-Adicione um **segredo compartilhado** na chamada e valide no Apps Script:
+- **Chave `service_role` via Script Properties.** `Code.gs` usa a service_role (guardada
+  em Script Properties, chave `SUPABASE_SERVICE_KEY`), não a `anon`. Isso é **obrigatório**:
+  quando o RLS for fechado para `anon`, o `anon` perde o `PATCH` em `presencas`
+  (`email_enviado=true`) e o envio de e-mails quebraria se o Apps Script usasse a `anon`.
+- **Validação de identidade do gerente.** As ações `syncInscritos`/`enviarEmails` só rodam
+  se o parâmetro `email` corresponder a um gerente em `validadores` (função
+  `gerenteAutorizado`). O front (`dashboard.html`) já envia `&email=<gerente logado>`.
 
-```js
-// No Apps Script (doGet)
-function doGet(e) {
-  var SEGREDO = PropertiesService.getScriptProperties().getProperty('APP_SECRET');
-  if (e.parameter.k !== SEGREDO) {
-    return ContentService.createTextOutput('unauthorized');
-  }
-  // ... roteia e.parameter.action
-}
-```
+### O que você precisa fazer no Google/Supabase
+1. **Supabase → Settings → API** → copiar a chave **`service_role`**.
+2. **Apps Script → Project Settings → Script Properties** → criar
+   `SUPABASE_SERVICE_KEY` = (a service_role). **Nunca** cole essa chave no front/repo.
+3. Colar o conteúdo de `apps-script/Code.gs` no editor do Apps Script e **republicar**
+   a implantação (Deploy → Manage deployments → nova versão).
 
-E no front (`config.js` → `APPS_URL`), inclua `&k=SEGREDO` na chamada de `chamarAppsScript`.
-
-> Observação: como o segredo ficaria no JS do navegador, ele não é secreto de verdade.
-> O ideal é que **as ações do Apps Script exijam login do gerente** (ex.: passar o e-mail
-> autenticado e o Apps Script conferir contra a tabela `validadores`). O `k` acima serve
-> apenas para cortar abuso automatizado casual.
+> Limitação honesta: o e-mail do gerente sai do `localStorage` do navegador, então um
+> atacante que **já conheça um e-mail de gerente** poderia forjá-lo. Depois que o RLS
+> fechar a leitura de `validadores` para `anon` (item 1), esses e-mails deixam de ser
+> enumeráveis, o que torna o ataque bem mais difícil. A proteção definitiva é o
+> Supabase Auth (item 3).
 
 ---
 
