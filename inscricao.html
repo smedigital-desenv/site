@@ -132,6 +132,7 @@
 
     // Chama a função RPC consultar_inscricao (SECURITY DEFINER) — devolve só a
     // linha cujo e-mail E CPF batem, sem expor a tabela participantes. Veja SECURITY.md.
+    // Se a função ainda não existir no Supabase, faz fallback para a consulta antiga.
     fetch(SUPA_URL + "/rpc/consultar_inscricao", {
       method:  "POST",
       headers: { "apikey": SUPA_KEY, "Authorization": "Bearer " + SUPA_KEY, "Content-Type": "application/json" },
@@ -139,17 +140,40 @@
     })
     .then(function(r){ return r.json(); })
     .then(function(data) {
-      btn.disabled=false; btn.textContent="Consultar inscricao";
-      if (!Array.isArray(data) || data.length===0) {
-        msg.className="msg erro"; msg.innerHTML="Inscricao nao encontrada. Verifique o e-mail e CPF informados.";
-        return;
-      }
-      msg.className="msg";
-      mostrarConfirmacao(data[0]);
+      if (Array.isArray(data)) { finalizarBusca(data, btn, msg); return; }
+      // RPC indisponível (ex.: função ainda não criada) — usa consulta legada
+      return buscarLegado(email, cpf, btn, msg);
     })
     .catch(function(){
       btn.disabled=false; btn.textContent="Consultar inscricao";
       msg.className="msg erro"; msg.innerHTML="Erro de comunicacao. Tente novamente.";
+    });
+  }
+
+  function finalizarBusca(data, btn, msg) {
+    btn.disabled=false; btn.textContent="Consultar inscricao";
+    if (!data || data.length===0) {
+      msg.className="msg erro"; msg.innerHTML="Inscricao nao encontrada. Verifique o e-mail e CPF informados.";
+      return;
+    }
+    msg.className="msg";
+    mostrarConfirmacao(data[0]);
+  }
+
+  // Fallback compatível com o esquema antigo (enquanto a RPC não existe).
+  function buscarLegado(email, cpf, btn, msg) {
+    return fetch(
+      SUPA_URL + "/participantes?email=eq." + encodeURIComponent(email) +
+      "&cpf=eq." + encodeURIComponent(cpf) +
+      "&select=token,nome,email,qr_url,palestras(nome)&limit=1",
+      { headers: supaHeaders() }
+    )
+    .then(function(r){ return r.json(); })
+    .then(function(data) {
+      if (Array.isArray(data)) {
+        data = data.map(function(p){ p.palestra_nome = p.palestras ? p.palestras.nome : ""; return p; });
+      }
+      finalizarBusca(Array.isArray(data) ? data : [], btn, msg);
     });
   }
 
