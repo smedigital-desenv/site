@@ -60,9 +60,33 @@
   //   { naoAutorizado: true }   -> logou no Google mas não está na allowlist
   //   null                      -> sem sessão
   // Popula o localStorage (cache usado por menu.js e pelas páginas).
-  function carregarSessao() {
+  // Obtém a sessão de forma robusta: tenta getSession() e, se vier vazio,
+  // aguarda o evento de inicialização (onAuthStateChange) — evita a corrida
+  // em que getSession() é chamado antes de o cliente ler o storage.
+  function obterSessao() {
     return sb.auth.getSession().then(function(res) {
-      var session = res && res.data ? res.data.session : null;
+      var s = res && res.data ? res.data.session : null;
+      if (s) return s;
+      return new Promise(function(resolve) {
+        var settled = false;
+        var timer = setTimeout(function(){ finish(null); }, 2500);
+        var ref = sb.auth.onAuthStateChange(function(_event, session) {
+          if (session) finish(session);
+        });
+        function finish(session) {
+          if (settled) return;
+          settled = true;
+          clearTimeout(timer);
+          try { ref.data.subscription.unsubscribe(); } catch (e) {}
+          resolve(session);
+        }
+      });
+    });
+  }
+
+  function carregarSessao() {
+    console.log("[auth] localStorage keys:", Object.keys(localStorage).join(" | ") || "(vazio)");
+    return obterSessao().then(function(session) {
       console.log("[auth] getSession ->", session ? ("sessao de " + session.user.email) : "NENHUMA sessao no storage");
       if (!session || !session.user || !session.user.email) { return null; }
 
