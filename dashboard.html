@@ -817,9 +817,10 @@
     btn.disabled = true;
     btn.classList.add("loading");
 
-    // Usa fetch com mode no-cors para evitar bloqueio de CORS
-    // O Apps Script executa mesmo sem retornar resposta legível
-    fetch(APPS_URL + "?action=" + action, { mode: "no-cors" })
+    // Usa fetch com mode no-cors para evitar bloqueio de CORS.
+    // Envia o e-mail do gerente logado; o Apps Script valida contra validadores
+    // antes de executar acoes sensiveis (ver apps-script/Code.gs e SECURITY.md).
+    fetch(APPS_URL + "?action=" + action + "&email=" + encodeURIComponent(emailFiscal), { mode: "no-cors" })
       .then(function() {
         btn.classList.remove("loading");
         btn.classList.add("sucesso");
