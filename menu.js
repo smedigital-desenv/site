@@ -122,12 +122,12 @@
   // o menu — senão os itens de gerente não apareceriam (o perfil chega async).
   if (window.sessaoPronta && typeof window.sessaoPronta.then === "function") {
     window.sessaoPronta.then(function(user) {
-      if (user && user.email) {
+      if (user && user.email && !user.naoAutorizado) {
         emailFiscal = user.email;
         perfil      = user.perfil || "";
         nomeFiscal  = user.nome || user.email;
       } else {
-        emailFiscal = "";  // sem sessão válida → não renderiza menu
+        emailFiscal = "";  // sem sessão válida/autorizada → não renderiza menu
       }
       tentarRenderMenu();
     });
