@@ -48,9 +48,9 @@
 </head>
 <body>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="config.js?v=14"></script>
-<script src="auth.js?v=14"></script>
-<script src="menu.js?v=14"></script>
+<script src="config.js?v=15"></script>
+<script src="auth.js?v=15"></script>
+<script src="menu.js?v=15"></script>
 <div class="container">
   <div class="logo">
     <div class="logo-icon">
@@ -109,11 +109,11 @@
       msg.innerHTML = "E-mail nao autorizado. Fale com o gerente do evento.";
     }
     verificarSessao().then(function(user) {
-      if (user && user.email) {
-        iniciarSessao(user.email, user.nome || "");
-      } else if (user && user.naoAutorizado) {
+      if (user && user.naoAutorizado) {
         msg.className = "msg erro";
         msg.innerHTML = "E-mail nao autorizado. Fale com o gerente do evento.";
+      } else if (user && user.email) {
+        iniciarSessao(user.email, user.nome || "");
       }
     });
   };
