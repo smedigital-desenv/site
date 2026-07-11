@@ -46,6 +46,41 @@
     .btn-download{display:inline-flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:13px;border-radius:10px;margin-top:14px;background:rgba(34,197,94,.12);color:#86efac;border:1px solid rgba(34,197,94,.25);text-decoration:none;font-size:14px;font-weight:600;transition:background .2s;}
     .btn-download:hover{background:rgba(34,197,94,.2);}
     .btn-download svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+    /* ---- INGRESSO ---- */
+    .ingresso{background:#fff;color:#16181d;border-radius:18px;overflow:hidden;margin-bottom:16px;box-shadow:0 12px 34px rgba(0,0,0,.4);animation:fadeUp .25s ease both;}
+    .ing-head{background:linear-gradient(135deg,#1f4e79,#4f8ef7);color:#fff;padding:16px 22px;}
+    .ing-evento{font-size:10.5px;letter-spacing:1.2px;text-transform:uppercase;opacity:.9;}
+    .ing-tema{font-size:13px;font-weight:600;margin-top:3px;line-height:1.3;}
+    .ing-nome{font-size:21px;font-weight:700;letter-spacing:-.01em;margin:16px 22px 1px;}
+    .ing-sub{font-size:10.5px;color:#8a90a0;margin:0 22px 14px;text-transform:uppercase;letter-spacing:1px;}
+    .ing-body{padding:0 22px;}
+    .ing-palestra{font-size:15px;font-weight:600;color:#16181d;line-height:1.35;margin-bottom:3px;}
+    .ing-palestrante{font-size:13px;color:#5b6270;margin-bottom:16px;}
+    .ing-grid{display:flex;gap:8px;margin-bottom:14px;}
+    .ing-info{flex:1;}
+    .ing-info .k{font-size:9.5px;color:#9aa0aa;text-transform:uppercase;letter-spacing:.6px;}
+    .ing-info .v{font-size:14px;color:#16181d;font-weight:700;margin-top:2px;}
+    .ing-local{font-size:13.5px;color:#2a2e37;line-height:1.4;margin-bottom:8px;}
+    .ing-local .end{color:#8a90a0;font-size:12px;}
+    .ing-divider{position:relative;border-top:2px dashed #d5d9e0;margin:6px 22px;}
+    .ing-divider::before,.ing-divider::after{content:"";position:absolute;top:-12px;width:22px;height:22px;border-radius:50%;background:var(--bg);}
+    .ing-divider::before{left:-33px;}
+    .ing-divider::after{right:-33px;}
+    .ing-qr{text-align:center;padding:16px 22px 22px;}
+    .ing-qr img{width:200px;height:200px;background:#fff;border-radius:10px;}
+    .ing-token{font-family:'DM Mono',monospace;font-size:12px;color:#7a8090;margin-top:8px;letter-spacing:1.5px;}
+    .ing-foot{font-size:11px;color:#9aa0aa;margin-top:5px;}
+    .ing-baixar{display:inline-flex;align-items:center;justify-content:center;gap:8px;max-width:210px;width:100%;padding:11px;border-radius:9px;margin:14px auto 0;background:#eef3f8;color:#1f4e79;border:1px solid #d6e2ef;text-decoration:none;font-size:13px;font-weight:600;}
+    .ing-baixar svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+    .btn-print{width:100%;padding:13px;border-radius:11px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;font-weight:600;font-family:'DM Sans',sans-serif;cursor:pointer;margin-bottom:10px;display:flex;align-items:center;justify-content:center;gap:8px;}
+    .btn-print svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+    @media print{
+      body{background:#fff;padding:0;}
+      body::before,.logo,#tela-form,.btn-ghost,.btn-print,.ing-baixar,.menu-global{display:none!important;}
+      .container{max-width:100%;}
+      .ingresso{box-shadow:none;border:1px solid #ccc;page-break-inside:avoid;margin:0 0 14px;}
+      .ing-divider::before,.ing-divider::after{background:#fff;}
+    }
   </style>
 </head>
 <body>
@@ -80,6 +115,7 @@
       <p class="hint" id="rSub">Apresente o QR Code na entrada da sua palestra.</p>
     </div>
     <div id="listaSessoes"></div>
+    <button class="btn-print" onclick="window.print()"><svg viewBox="0 0 24 24"><path d="M6 9V2h12v7M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2M6 14h12v8H6z"/></svg>Imprimir ingresso(s)</button>
     <button class="btn btn-ghost" onclick="voltar()">Consultar outro</button>
   </div>
 </div>
@@ -154,35 +190,70 @@
     mostrarResultado(data);
   }
 
+  // Palestrantes por palestra (sufixo _M/_T/_N removido) — fonte: doc oficial.
+  var PALESTRANTES = {
+    "MOCHILA":"Ana Paula Silveira",
+    "ALFABETIZACAO":"Soraya Maria Romano Pacifico",
+    "ALEM_TELAS":"Vivian Caroline Coraucci",
+    "CRIANDO_PONTES":"Dra Margherita Midea Cuccovia, Andresa Andrade e Amanda Correa",
+    "DA_MEMORIA":"Jose Antonio Correa Lages",
+    "EDUCAR_CONVIVER":"Profa. Dra. Fabiana Maris Versuti",
+    "EDUC_ALIMENTAR":"Maria Fernanda Laus, Joyce Silva Moraes e Bruna Squassoni",
+    "GESTAO_DEMOCRATICA":"Bianca Correa",
+    "INFANCIA_ATIVIDADE":"Hugo Tourinho",
+    "EJA":"Erika Osakabe",
+    "PRETO_CAFE":"Dagoberto Jose Fonseca",
+    "QUEM_BRINCA":"Tatiana Noronha"
+  };
+  function palestranteDe(id) {
+    var base = String(id || "").replace(/_(M|T|N)\d*$/, "");
+    return PALESTRANTES[base] || "";
+  }
+
   function mostrarResultado(rows) {
     document.getElementById("rNome").textContent = rows[0].nome || "";
     document.getElementById("rSub").textContent =
       rows.length > 1
-        ? "Voce tem " + rows.length + " inscricoes. Cada palestra tem o seu proprio QR Code."
-        : "Apresente o QR Code na entrada da sua palestra.";
+        ? "Voce tem " + rows.length + " inscricoes. Guarde/imprima o ingresso de cada palestra."
+        : "Guarde ou imprima seu ingresso e apresente o QR Code na entrada.";
 
     var lista = document.getElementById("listaSessoes");
     lista.innerHTML = "";
     rows.forEach(function(p) {
       var per   = nomePeriodo(p.periodo, p.palestra_id);
       var hora  = p.hora || horaDoId(p.palestra_id);
-      var local = escapeHtml(p.local || "-") + (p.endereco ? '<br><span style="color:var(--muted);font-size:12px">'+escapeHtml(p.endereco)+'</span>' : '');
+      var pal   = palestranteDe(p.palestra_id);
       var img   = qrImgUrl(p.token);
 
-      var card = document.createElement("div");
-      card.className = "card";
-      card.innerHTML =
-        '<span class="badge-sessao">' + escapeHtml(per) + '</span>' +
-        '<div class="field-row"><span class="field-label">Palestra</span><span class="field-value">' + escapeHtml(p.palestra_nome || p.palestra_id) + '</span></div>' +
-        '<div class="field-row"><span class="field-label">Data</span><span class="field-value">21/07/2026</span></div>' +
-        '<div class="field-row"><span class="field-label">Horario</span><span class="field-value">' + escapeHtml(hora) + '</span></div>' +
-        '<div class="field-row"><span class="field-label">Local</span><span class="field-value">' + local + '</span></div>' +
-        '<div class="field-row"><span class="field-label">Token</span><span class="field-value" style="font-family:\'DM Mono\',monospace;font-size:13px">' + escapeHtml(p.token) + '</span></div>' +
-        '<div class="qr-wrap"><img src="' + img + '" alt="QR Code"></div>' +
-        '<a class="btn-download" href="' + img + '" target="_blank" rel="noopener">' +
-          '<svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>' +
-          'Abrir / baixar QR Code</a>';
-      lista.appendChild(card);
+      var t = document.createElement("div");
+      t.className = "ingresso";
+      t.innerHTML =
+        '<div class="ing-head">' +
+          '<div class="ing-evento">Congresso Municipal de Educacao &middot; 21/07/2026</div>' +
+          '<div class="ing-tema">Educar para COMviver &mdash; Ribeirao 170 anos</div>' +
+        '</div>' +
+        '<div class="ing-nome">' + escapeHtml(p.nome || "") + '</div>' +
+        '<div class="ing-sub">Credencial de acesso</div>' +
+        '<div class="ing-body">' +
+          '<div class="ing-palestra">' + escapeHtml(p.palestra_nome || p.palestra_id) + '</div>' +
+          (pal ? '<div class="ing-palestrante">com ' + escapeHtml(pal) + '</div>' : '') +
+          '<div class="ing-grid">' +
+            '<div class="ing-info"><div class="k">Data</div><div class="v">21/07</div></div>' +
+            '<div class="ing-info"><div class="k">Horario</div><div class="v">' + escapeHtml(hora) + '</div></div>' +
+            '<div class="ing-info"><div class="k">Periodo</div><div class="v">' + escapeHtml(per) + '</div></div>' +
+          '</div>' +
+          '<div class="ing-local"><strong>' + escapeHtml(p.local || "-") + '</strong>' +
+            (p.endereco ? '<br><span class="end">' + escapeHtml(p.endereco) + '</span>' : '') + '</div>' +
+        '</div>' +
+        '<div class="ing-divider"></div>' +
+        '<div class="ing-qr">' +
+          '<img src="' + img + '" alt="QR Code">' +
+          '<div class="ing-token">' + escapeHtml(p.token) + '</div>' +
+          '<div class="ing-foot">Apresente este QR Code na entrada</div>' +
+          '<a class="ing-baixar" href="' + img + '" target="_blank" rel="noopener">' +
+            '<svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>Baixar QR</a>' +
+        '</div>';
+      lista.appendChild(t);
     });
 
     document.getElementById("tela-form").style.display     = "none";
