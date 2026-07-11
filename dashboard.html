@@ -601,9 +601,15 @@
     atualizaStationBar();
   }
   function setStation() {
-    var v = document.getElementById("stationSelect").value;
-    if (v) localStorage.setItem("fiscal_palestra", v);
-    else   localStorage.removeItem("fiscal_palestra");
+    var el = document.getElementById("stationSelect");
+    var v  = el.value;
+    if (v) {
+      localStorage.setItem("fiscal_palestra", v);
+      localStorage.setItem("fiscal_palestra_nome", el.options[el.selectedIndex].text);
+    } else {
+      localStorage.removeItem("fiscal_palestra");
+      localStorage.removeItem("fiscal_palestra_nome");
+    }
     atualizaStationBar();
     if (buscaGlobalAtiva()) renderizarBuscaGlobal();
   }

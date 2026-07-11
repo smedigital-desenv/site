@@ -39,6 +39,9 @@
     .nome-destaque{font-size:22px;margin-top:10px;color:#fff;font-weight:600;}
     .resultado small{font-size:12px;font-weight:400;opacity:.8;}
     .spacer{height:24px;flex-shrink:0;}
+    .alerta-estacao{background:rgba(245,158,11,.12);color:#fcd34d;border:1px solid rgba(245,158,11,.3);border-radius:var(--radius);padding:13px 16px;font-size:13px;line-height:1.5;display:flex;gap:10px;align-items:flex-start;}
+    .alerta-estacao svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0;margin-top:1px;}
+    .btn-atencao{background:linear-gradient(135deg,#f59e0b,#f97316)!important;box-shadow:0 4px 20px rgba(245,158,11,.35)!important;}
   </style>
 </head>
 <body>
@@ -65,6 +68,7 @@
       <div class="card-title">Fiscal</div>
       <div class="field"><span class="field-label">Logado como</span><span class="field-value" id="fFiscal">-</span></div>
     </div>
+    <div class="alerta-estacao" id="alertaEstacao" style="display:none"></div>
     <div class="resultado" id="resultado"></div>
     <button class="btn btn-primary" id="btnValidar" onclick="validar()" disabled>Validar Presenca</button>
     <a href="fiscal.html" class="btn btn-novo" id="btnNovo">
@@ -212,9 +216,30 @@
     document.getElementById("fPalestra").textContent = d.palestraNome || d.palestra_id || "-";
     if (doCache) document.getElementById("tagCache").style.display="inline";
     palestraIdGlobal = d.palestraId || d.palestra_id || "";
+    checarEstacao();
 
     // Verifica se presença já foi registrada antes de habilitar o botão
     verificarPresencaExistente();
+  }
+
+  // Alerta quando a palestra do participante difere da estação do fiscal
+  // (definida no dashboard: "Estou na palestra"). Compartilhado via localStorage.
+  function checarEstacao() {
+    var station     = localStorage.getItem("fiscal_palestra") || "";
+    var stationNome = localStorage.getItem("fiscal_palestra_nome") || "";
+    var el  = document.getElementById("alertaEstacao");
+    var btn = document.getElementById("btnValidar");
+    if (station && palestraIdGlobal && palestraIdGlobal !== station) {
+      var palPart = document.getElementById("fPalestra").textContent;
+      el.innerHTML = '<svg viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><path d="M12 9v4M12 17h.01"/></svg>' +
+        '<div>Este participante está inscrito em <b>' + escapeHtml(palPart) + '</b>, diferente da sua estação' +
+        (stationNome ? ' (<b>' + escapeHtml(stationNome) + '</b>)' : '') + '.</div>';
+      el.style.display = "flex";
+      if (btn) btn.classList.add("btn-atencao");
+    } else {
+      el.style.display = "none";
+      if (btn) btn.classList.remove("btn-atencao");
+    }
   }
 
   function verificarPresencaExistente() {
@@ -250,6 +275,11 @@
   var palestraIdGlobal = "";
 
   function validar() {
+    var station = localStorage.getItem("fiscal_palestra") || "";
+    if (station && palestraIdGlobal && palestraIdGlobal !== station) {
+      var palPart = document.getElementById("fPalestra").textContent;
+      if (!confirm('Atenção: este participante está inscrito em "' + palPart + '", diferente da sua estação. Registrar a presença mesmo assim?')) return;
+    }
     var btn = document.getElementById("btnValidar");
     var res = document.getElementById("resultado");
     btn.disabled=true; btn.textContent="Registrando...";
