@@ -19,8 +19,8 @@
 
   // Itens visíveis para todos os perfis logados
   var itensBase = [
-    { href: "index.html",     icon: "M23 3a10.9 10.9 0 01-3.14 1.53 4.48 4.48 0 00-7.86 3v1A10.66 10.66 0 013 4s-4 9 5 13a11.64 11.64 0 01-7 2c9 5 20 0 20-11.5a4.5 4.5 0 00-.08-.83A7.72 7.72 0 0023 3z", label: "Validar" },
-    { href: "inscricao.html", icon: "M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2M12 11a4 4 0 100-8 4 4 0 000 8z",                                                                                                   label: "Inscrição" },
+    { href: "fiscal.html",    icon: "M23 3a10.9 10.9 0 01-3.14 1.53 4.48 4.48 0 00-7.86 3v1A10.66 10.66 0 013 4s-4 9 5 13a11.64 11.64 0 01-7 2c9 5 20 0 20-11.5a4.5 4.5 0 00-.08-.83A7.72 7.72 0 0023 3z", label: "Validar" },
+    { href: "index.html",     icon: "M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2M12 11a4 4 0 100-8 4 4 0 000 8z",                                                                                                   label: "Inscrição" },
     { href: "dashboard.html", icon: "M3 3h7v7H3zM14 3h7v7h-7zM14 14h7v7h-7zM3 14h7v7H3z",                                                                                                                      label: "Dashboard" },
   ];
 
@@ -33,7 +33,7 @@
   function renderMenu() {
 
     // Não exibe menu se não estiver logado (exceto na página de login)
-    if (!emailFiscal && paginaAtual !== "index.html") return;
+    if (!emailFiscal && paginaAtual !== "fiscal.html") return;
     if (!emailFiscal) return;
 
     var itens = itensBase.concat(perfil === "gerente" ? itensGerente : []);
@@ -106,7 +106,7 @@
     localStorage.removeItem(KEY_EMAIL);
     localStorage.removeItem(KEY_PERFIL);
     localStorage.removeItem(KEY_NOME);
-    window.location.href = "index.html";
+    window.location.href = "fiscal.html";
   };
 
   // Renderiza assim que o body estiver disponível

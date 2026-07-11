@@ -58,7 +58,7 @@
   window.logoutAuth = function() {
     limparCache();
     return sb.auth.signOut().catch(function(){}).then(function() {
-      window.location.href = "index.html";
+      window.location.href = "fiscal.html";
     });
   };
 
@@ -119,9 +119,9 @@
   // Guarda de página protegida. perfilReq opcional: "gerente".
   window.protegerPagina = function(perfilReq) {
     return window.verificarSessao().then(function(user) {
-      if (!user) { window.location.href = "index.html"; return null; }
-      if (user.naoAutorizado) { window.location.href = "index.html?erro=nao_autorizado"; return null; }
-      if (perfilReq && user.perfil !== perfilReq) { window.location.href = "index.html"; return null; }
+      if (!user) { window.location.href = "fiscal.html"; return null; }
+      if (user.naoAutorizado) { window.location.href = "fiscal.html?erro=nao_autorizado"; return null; }
+      if (perfilReq && user.perfil !== perfilReq) { window.location.href = "fiscal.html"; return null; }
       return user;
     });
   };
