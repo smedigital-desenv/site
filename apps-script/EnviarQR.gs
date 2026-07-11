@@ -184,26 +184,29 @@ function _enviarConfirmacao(p, cfg) {
   var cor       = cfg.cor || "#1f4e79";
 
   var html =
-    '<!DOCTYPE html><html><head><meta charset="UTF-8"></head>' +
-    '<body style="margin:0;padding:0;">' +
+    '<!DOCTYPE html><html><head><meta charset="UTF-8">' +
+    '<meta name="viewport" content="width=device-width, initial-scale=1">' +
+    '<meta name="x-apple-disable-message-reformatting">' +
+    '</head>' +
+    '<body style="margin:0;padding:0;-webkit-text-size-adjust:100%;">' +
     '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" bgcolor="#f4f4f4" style="background-color:#f4f4f4;">' +
     '<tr><td align="center" style="padding:24px 12px;">' +
       '<table role="presentation" width="600" cellpadding="0" cellspacing="0" bgcolor="#ffffff" style="width:600px;max-width:100%;background-color:#ffffff;border-radius:12px;overflow:hidden;font-family:Arial,Helvetica,sans-serif;">' +
-        '<tr><td bgcolor="' + cor + '" align="center" style="background-color:' + cor + ';padding:26px 24px;">' +
-          '<h1 style="color:#ffffff;font-size:19px;line-height:1.35;margin:0;font-family:Arial,Helvetica,sans-serif;">Confirmação de inscrição no Congresso</h1>' +
+        '<tr><td bgcolor="' + cor + '" align="center" style="background-color:' + cor + ';padding:26px 22px;">' +
+          '<h1 style="color:#ffffff;font-size:23px;line-height:1.3;margin:0;font-family:Arial,Helvetica,sans-serif;">Confirmação de inscrição no Congresso</h1>' +
         '</td></tr>' +
-        '<tr><td style="padding:28px 34px;font-family:Arial,Helvetica,sans-serif;color:#333333;font-size:15px;line-height:1.7;">' +
+        '<tr><td style="padding:26px 24px;font-family:Arial,Helvetica,sans-serif;color:#333333;font-size:17px;line-height:1.6;">' +
           '<p style="margin:0 0 16px;">Prezado(a), <strong>' + nomeH + '</strong></p>' +
           '<p style="margin:0 0 16px;">Sua inscrição na palestra <strong>' + palestraH + '</strong> do Congresso da Secretaria Municipal de Educação: &ldquo;' + eventoH + '&rdquo; foi confirmada com sucesso!</p>' +
           '<p style="margin:0 0 16px;">Agradecemos sua inscrição e temos a satisfação de contar com sua presença neste importante momento de formação, troca de experiências e fortalecimento de conhecimentos.</p>' +
           '<p style="margin:0 0 10px;">Para agilizar o processo de credenciamento e garantir seu acesso ao evento, é indispensável apresentar o <strong>QR Code de confirmação</strong>, podendo ser:</p>' +
-          '<ul style="margin:0 0 16px;padding-left:22px;">' +
+          '<ul style="margin:0 0 16px;padding-left:22px;font-size:17px;">' +
             '<li style="margin:0 0 6px;">exibido na tela do celular (print ou arquivo digital); ou</li>' +
             '<li style="margin:0;">apresentado de forma impressa.</li>' +
           '</ul>' +
           '<p style="margin:0 0 22px;">Recomendamos que o QR Code esteja acessível no momento da entrada, evitando atrasos na validação de presença.</p>' +
           '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" bgcolor="#eef3f8" style="background-color:#eef3f8;border:1px solid #d6e2ef;border-radius:8px;">' +
-            '<tr><td style="padding:16px 20px;font-family:Arial,Helvetica,sans-serif;font-size:15px;color:#1f4e79;">' +
+            '<tr><td style="padding:16px 20px;font-family:Arial,Helvetica,sans-serif;font-size:17px;line-height:1.6;color:#1f4e79;">' +
               '<p style="margin:0 0 6px;"><strong>Data:</strong> ' + esc(EVENTO_DATA) + '</p>' +
               '<p style="margin:0 0 6px;"><strong>Horário:</strong> ' + horarioH + '</p>' +
               '<p style="margin:0;"><strong>Local:</strong> ' + localH + '</p>' +
@@ -211,7 +214,7 @@ function _enviarConfirmacao(p, cfg) {
           '</table>' +
           '<table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr><td align="center" style="padding:24px 0 4px;">' +
             '<img src="cid:qrcode" width="220" height="220" alt="QR Code" style="display:block;margin:0 auto;width:220px;height:220px;border:1px solid #e5e5e5;border-radius:12px;">' +
-            '<p style="margin:12px 0 0;font-size:12px;color:#999999;font-family:monospace;">' + esc(p.token) + '</p>' +
+            '<p style="margin:12px 0 0;font-size:14px;color:#999999;font-family:monospace;">' + esc(p.token) + '</p>' +
           '</td></tr></table>' +
           '<p style="margin:22px 0 4px;">Estamos felizes em recebê-lo(a) e desejamos que sua participação seja enriquecedora e inspiradora.</p>' +
           '<p style="margin:18px 0 0;">Atenciosamente,</p>' +
