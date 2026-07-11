@@ -164,12 +164,12 @@
   function populaStationsFiscal() {
     var sel = document.getElementById("stationSelect");
     var saved = localStorage.getItem("fiscal_palestra") || "";
-    fetch(SUPA_URL + "/palestras?select=id,nome&order=nome", { headers: supaHeaders() })
+    fetch(SUPA_URL + "/palestras?select=id,nome,periodo,hora&order=nome,periodo", { headers: supaHeaders() })
       .then(function(r){ return r.json(); })
       .then(function(data){
         if (!Array.isArray(data)) return;
         var opts = '<option value="">— selecione a palestra —</option>';
-        data.forEach(function(p){ opts += '<option value="'+escapeHtml(p.id)+'">'+escapeHtml(p.nome)+'</option>'; });
+        data.forEach(function(p){ opts += '<option value="'+escapeHtml(p.id)+'">'+escapeHtml(palestraLabel(p))+'</option>'; });
         sel.innerHTML = opts;
         if (saved && data.some(function(p){ return p.id === saved; })) sel.value = saved;
       })

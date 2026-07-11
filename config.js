@@ -44,3 +44,29 @@ function fetchAll(url, headers, pageSize) {
   }
   return grab(0);
 }
+
+/**
+ * Período curto e normalizado (Manhã / Tarde / Noite) a partir do valor do banco.
+ */
+function periodoCurto(periodo) {
+  if (!periodo) return "";
+  var s = String(periodo).trim().toLowerCase();
+  if (s.indexOf("manh") === 0) return "Manhã";
+  if (s.indexOf("tard") === 0) return "Tarde";
+  if (s.indexOf("noit") === 0 || s.indexOf("notur") === 0) return "Noite";
+  return periodo;
+}
+
+/**
+ * Rótulo da palestra com o PERÍODO (e horário, se houver), para distinguir
+ * a mesma palestra que roda de manhã e de tarde. Ex.:
+ *   "A Mochila do Educador... — Manhã (08:00)"
+ * Aceita objetos com {nome, periodo, hora} (e cai para id/nome se faltar período).
+ */
+function palestraLabel(pal) {
+  if (!pal) return "";
+  var nome = pal.nome || pal.id || "";
+  var per  = periodoCurto(pal.periodo);
+  if (!per) return nome;
+  return nome + " — " + per + (pal.hora ? " (" + pal.hora + ")" : "");
+}

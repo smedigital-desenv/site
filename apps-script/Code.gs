@@ -22,8 +22,10 @@
 var CONFIG = {
   PLANILHA_ID:       "1cMYIDoAaWsL4v9bO9kh_jeBA3YC5peDuZsKX0EN7VRE",
   ABA_PARTICIPANTES: "PARTICIPANTES_unificado",
-  ABA_PALESTRAS:     "PALESTRAS",
   ABA_PRESENCAS:     "PRESENCAS"
+  // Palestras NÃO são sincronizadas pela planilha — são as 23 sessões fixas
+  // gerenciadas por SQL (db/adicionar-local-sessoes.sql). A aba antiga
+  // "PALESTRAS" (ids numéricos) não é usada, para não recriar duplicados.
 };
 
 var SUPABASE_URL = "https://iqldovwttomkjkoakosc.supabase.co";  // projeto do gom

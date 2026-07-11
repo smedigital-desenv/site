@@ -31,29 +31,13 @@ function sincronizarNovosInscritos() {
     existentes.forEach(function(p) { tokensExistentes[String(p.token)] = true; });
   }
 
-  // 2. Busca palestras já existentes no Supabase
-  var palestrasExistentes = supaFetch("palestras?select=id", "GET", null);
-  var idsExistentes = {};
-  if (Array.isArray(palestrasExistentes)) {
-    palestrasExistentes.forEach(function(p) { idsExistentes[String(p.id)] = true; });
-  }
+  // ATENÇÃO: as PALESTRAS (23 sessões) são fixas e gerenciadas por SQL
+  // (db/adicionar-local-sessoes.sql — ids MOCHILA_M, MOCHILA_T, ...).
+  // Este sync NÃO cria/atualiza palestras. Ler a aba antiga "PALESTRAS"
+  // (ids numéricos 1..23, nomes em MAIÚSCULA) reinseriria linhas
+  // DUPLICADAS no Supabase — foi o que gerou as palestras repetidas.
 
-  // 3. Lê palestras da planilha e insere as novas (se houver aba PALESTRAS)
-  var abaPalestras = ss.getSheetByName(CONFIG.ABA_PALESTRAS);
-  if (abaPalestras) {
-    var rowsPalestras = abaPalestras.getDataRange().getValues();
-    for (var i = 1; i < rowsPalestras.length; i++) {
-      var pid = String(rowsPalestras[i][0]).trim();
-      if (!pid || idsExistentes[pid]) continue;
-      supaFetch("palestras?on_conflict=id", "POST", {
-        id:            pid,
-        nome:          rowsPalestras[i][1],
-        carga_horaria: String(rowsPalestras[i][2] || "")
-      });
-    }
-  }
-
-  // 4. Lê participantes e insere apenas os novos
+  // 2. Lê participantes e insere apenas os novos
   var abaPartic = ss.getSheetByName(CONFIG.ABA_PARTICIPANTES);
   var dados     = abaPartic.getDataRange().getValues();
 

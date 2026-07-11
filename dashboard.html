@@ -442,7 +442,7 @@
   function carregar() {
     document.getElementById("btnRefresh").classList.add("loading");
     return Promise.all([
-      fetch(SUPA_URL + "/palestras?select=id,nome,carga_horaria&order=nome", { headers: h() }).then(function(r){ return r.json(); }),
+      fetch(SUPA_URL + "/palestras?select=id,nome,carga_horaria,periodo,hora&order=nome,periodo", { headers: h() }).then(function(r){ return r.json(); }),
       fetchAll(SUPA_URL + "/participantes?select=token,nome,email,palestra_id", h()),
       fetchAll(SUPA_URL + "/presencas?select=token,palestra_id,data_hora,validado_por", h())
     ]).then(function(res) {
@@ -494,7 +494,10 @@
       var ins  = mapIns[pal.id]  || 0;
       var pres = mapPres[pal.id] || 0;
       var taxa = ins > 0 ? Math.round(pres/ins*100) : 0;
-      return { pal:pal, ins:ins, pres:pres, aus:ins-pres, taxa:taxa };
+      var sub  = pal.periodo
+        ? periodoCurto(pal.periodo) + (pal.hora ? " (" + pal.hora + ")" : "")
+        : (pal.carga_horaria || "");
+      return { pal:pal, ins:ins, pres:pres, aus:ins-pres, taxa:taxa, sub:sub };
     }).sort(function(a,b){ return b.taxa - a.taxa; });
 
     var html = '<div class="palestras-grid">';
@@ -502,7 +505,7 @@
       var tc = d.taxa>=75?"taxa-alta":d.taxa>=40?"taxa-media":"taxa-baixa";
       html +=
         '<div class="palestra-card fadeUp" style="animation-delay:'+(idx*.04)+'s" onclick="abrirModal(\''+d.pal.id+'\')">' +
-          '<div class="palestra-header"><div><div class="palestra-nome">'+escapeHtml(d.pal.nome)+'</div>'+(d.pal.carga_horaria?'<div class="palestra-carga">'+escapeHtml(d.pal.carga_horaria)+'</div>':'')+'</div><span class="taxa-badge '+tc+'">'+d.taxa+'%</span></div>'+
+          '<div class="palestra-header"><div><div class="palestra-nome">'+escapeHtml(d.pal.nome)+'</div>'+(d.sub?'<div class="palestra-carga">'+escapeHtml(d.sub)+'</div>':'')+'</div><span class="taxa-badge '+tc+'">'+d.taxa+'%</span></div>'+
           '<div class="barra-bg"><div class="barra-fill" style="width:'+d.taxa+'%"></div></div>'+
           '<div class="palestra-nums">'+
             '<div class="num-item"><div class="n n-inscritos">'+d.ins+'</div><div class="l">Inscritos</div></div>'+
@@ -594,7 +597,7 @@
     var saved = localStorage.getItem("fiscal_palestra") || "";
     var opts = '<option value="">— selecione a sua palestra —</option>';
     dadosPalestras.forEach(function(pal){
-      opts += '<option value="'+escapeHtml(pal.id)+'">'+escapeHtml(pal.nome)+'</option>';
+      opts += '<option value="'+escapeHtml(pal.id)+'">'+escapeHtml(palestraLabel(pal))+'</option>';
     });
     sel.innerHTML = opts;
     if (saved && dadosPalestras.some(function(p){ return p.id === saved; })) sel.value = saved;
@@ -627,7 +630,7 @@
     document.getElementById(filtroAtual==="ausentes"?"fAusentes":filtroAtual==="presentes"?"fPresentes":"fTodos").classList.add("ativo");
 
     var pal = dadosPalestras.find(function(p){ return p.id === palestraId; });
-    document.getElementById("modalTitulo").textContent = pal ? pal.nome : "Palestra";
+    document.getElementById("modalTitulo").textContent = pal ? palestraLabel(pal) : "Palestra";
     document.getElementById("modalOverlay").classList.add("aberto");
     document.body.style.overflow = "hidden";
     renderizarLista();
