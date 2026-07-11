@@ -117,6 +117,13 @@ function enviarQRTeste(emailDestino, token) {
   Logger.log("Teste enviado para " + emailDestino + " (amostra do token " + p.token + "). qr_enviado NÃO alterado.");
 }
 
+// Gancho de teste: selecione esta função no editor e clique em Executar (▶).
+// Envia o e-mail de teste para os endereços abaixo (sem marcar qr_enviado).
+function testarMeuEmail() {
+  enviarQRTeste("matheusprospero@gmail.com");
+  enviarQRTeste("julianabertoleti@educacao.pmrp.sp.gov.br");
+}
+
 // ── GATILHO ───────────────────────────────────────────────────
 function configurarGatilhoQR() {
   ScriptApp.getProjectTriggers().forEach(function(t) {
