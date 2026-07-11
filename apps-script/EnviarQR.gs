@@ -97,6 +97,26 @@ function enviarQRParaToken(token) {
   Logger.log("Enviado: " + p.email);
 }
 
+// ── TESTE PARA UM E-MAIL ESPECÍFICO (o seu) ───────────────────
+// Envia SÓ para 'emailDestino', usando os dados de um inscrito real como
+// amostra. NÃO marca qr_enviado (não conta no envio). Use no editor:
+//   enviarQRTeste("desenv.sme@gmail.com")            -> pega um inscrito qualquer
+//   enviarQRTeste("desenv.sme@gmail.com", "40119")   -> usa um token específico
+function enviarQRTeste(emailDestino, token) {
+  if (!emailDestino) { Logger.log("Informe o e-mail de destino."); return; }
+  var sel  = "&select=token,nome,email,palestra_id,palestras(nome,local,endereco)&limit=1";
+  var path = token
+    ? "participantes?token=eq." + encodeURIComponent(token) + sel
+    : "participantes?email=not.is.null" + sel;
+  var lista = supaFetch(path, "GET", null);
+  if (!Array.isArray(lista) || lista.length === 0) { Logger.log("Nenhum inscrito encontrado."); return; }
+
+  var p = lista[0];
+  p.email = emailDestino;                 // força o destino para o teste
+  _enviarConfirmacao(p, _qrConfigEmail());
+  Logger.log("Teste enviado para " + emailDestino + " (amostra do token " + p.token + "). qr_enviado NÃO alterado.");
+}
+
 // ── GATILHO ───────────────────────────────────────────────────
 function configurarGatilhoQR() {
   ScriptApp.getProjectTriggers().forEach(function(t) {
