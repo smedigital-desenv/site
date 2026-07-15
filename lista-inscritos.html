@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png?v=1">
+  <link rel="icon" href="favicon.ico?v=1">
+  <title>Lista de Inscritos</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root{--bg:#0f1117;--surface:#1a1d27;--border:#2a2d3a;--accent:#4f8ef7;--accent2:#7c3aed;--text:#e8eaf0;--muted:#6b7280;--radius:14px;}
+    *{box-sizing:border-box;margin:0;padding:0;}
+    body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding:0 0 40px;}
+    .topbar{position:sticky;top:0;z-index:10;background:rgba(15,17,23,.92);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:12px 16px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;}
+    .topbar h1{font-size:15px;font-weight:600;flex:1;min-width:150px;}
+    .topbar a{color:var(--muted);font-size:13px;text-decoration:none;}
+    .wrap{max-width:860px;margin:0 auto;padding:16px;}
+    select{width:100%;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:13px 16px;font-size:15px;font-family:'DM Sans',sans-serif;color:var(--text);outline:none;cursor:pointer;}
+    .barra{display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;}
+    .barra select{flex:1;min-width:240px;}
+    .btn-pdf{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;border:none;border-radius:10px;padding:13px 22px;font:600 15px 'DM Sans';cursor:pointer;display:flex;align-items:center;gap:8px;}
+    .btn-pdf svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+    .btn-pdf:disabled{opacity:.45;cursor:not-allowed;}
+    .status{font-size:13px;color:var(--muted);margin-bottom:14px;}
+    .negado{max-width:480px;margin:80px auto;text-align:center;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:34px 26px;font-size:14px;line-height:1.7;color:var(--text);}
+    .negado b{color:#fca5a5;}
+
+    /* folha (também é o layout impresso) */
+    .folha{background:#fff;color:#16181d;border-radius:14px;padding:26px 30px;margin-bottom:22px;}
+    .f-head{display:flex;justify-content:space-between;gap:14px;border-bottom:2px solid #173257;padding-bottom:12px;margin-bottom:6px;}
+    .f-title{font-size:17px;font-weight:700;color:#173257;line-height:1.3;}
+    .f-sub{font-size:12.5px;color:#555;margin-top:3px;}
+    .f-meta{font-size:12px;color:#555;text-align:right;white-space:nowrap;}
+    table{width:100%;border-collapse:collapse;font-size:12.5px;margin-top:10px;}
+    th{background:#eef3f8;color:#173257;text-align:left;padding:7px 9px;border:1px solid #d7dfe8;font-size:11px;text-transform:uppercase;letter-spacing:.4px;}
+    td{padding:6px 9px;border:1px solid #e3e8ee;vertical-align:top;}
+    tr:nth-child(even) td{background:#f7f9fb;}
+    .tk{font-family:monospace;white-space:nowrap;}
+    .assin{margin-top:6px;font-size:11px;color:#888;}
+    .tot{margin-top:12px;font-size:12.5px;color:#173257;font-weight:600;}
+
+    @media print{
+      body{background:#fff;padding:0;}
+      .topbar,.barra,.status{display:none!important;}
+      .wrap{max-width:none;padding:0;}
+      .folha{border-radius:0;padding:10mm 8mm;margin:0;page-break-after:always;}
+      .folha:last-child{page-break-after:auto;}
+      th{background:#eef3f8!important;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+      tr:nth-child(even) td{background:#f7f9fb!important;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+    }
+  </style>
+</head>
+<body>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="config.js?v=19"></script>
+<script src="auth.js?v=19"></script>
+
+<div class="topbar">
+  <h1>Lista de inscritos por palestra</h1>
+  <a href="fiscal.html">&larr; Voltar</a>
+</div>
+
+<div class="wrap" id="app" style="display:none">
+  <div class="barra">
+    <select id="selPalestra" onchange="renderiza()"></select>
+    <button class="btn-pdf" id="btnPdf" onclick="window.print()" disabled>
+      <svg viewBox="0 0 24 24"><path d="M6 9V2h12v7M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2M6 14h12v8H6z"/></svg>
+      Gerar PDF
+    </button>
+  </div>
+  <div class="status" id="status">Carregando…</div>
+  <div id="folhas"></div>
+</div>
+
+<div class="negado" id="negado" style="display:none">
+  <b>Acesso restrito.</b><br>
+  Esta página de listas de inscritos está disponível apenas para a equipe organizadora autorizada.
+</div>
+
+<script>
+  // Somente estes e-mails enxergam as listas (além de precisarem estar em validadores).
+  var PERMITIDOS = [
+    "julianabertoleti@educacao.pmrp.sp.gov.br",
+    "matheusprospero@educacao.pmrp.sp.gov.br",
+    "diogoperez@educacao.pmrp.sp.gov.br"
+  ];
+
+  var palestras = [], participantes = [], presTok = {};
+
+  function supaHeaders(){
+    return { "apikey": SUPA_KEY, "Authorization": "Bearer " + SUPA_KEY, "Accept-Profile": SUPA_SCHEMA, "Content-Profile": SUPA_SCHEMA };
+  }
+
+  window.onload = function(){
+    protegerPagina().then(function(user){
+      if (!user) return; // redirecionado ao login
+      if (PERMITIDOS.indexOf(String(user.email||"").toLowerCase()) === -1) {
+        document.getElementById("negado").style.display = "block";
+        return;
+      }
+      document.getElementById("app").style.display = "block";
+      carregar();
+    });
+  };
+
+  function carregar(){
+    Promise.all([
+      fetch(SUPA_URL + "/palestras?select=id,nome,local,endereco,periodo,hora&order=nome,periodo", { headers: supaHeaders() }).then(function(r){ return r.json(); }),
+      fetchAll(SUPA_URL + "/participantes?select=token,nome,email,unidade,palestra_id&order=nome.asc", supaHeaders()),
+      fetchAll(SUPA_URL + "/presencas?select=token", supaHeaders())
+    ]).then(function(res){
+      palestras     = Array.isArray(res[0]) ? res[0] : [];
+      participantes = Array.isArray(res[1]) ? res[1] : [];
+      (Array.isArray(res[2]) ? res[2] : []).forEach(function(p){ presTok[p.token] = true; });
+
+      var sel = document.getElementById("selPalestra");
+      var opts = '<option value="__todas__">Todas as palestras (uma por página)</option>';
+      palestras.forEach(function(p){
+        opts += '<option value="' + escapeHtml(p.id) + '">' + escapeHtml(palestraLabel(p)) + '</option>';
+      });
+      sel.innerHTML = opts;
+
+      var salva = localStorage.getItem("fiscal_palestra") || "";
+      if (salva && palestras.some(function(p){ return p.id === salva; })) sel.value = salva;
+
+      document.getElementById("btnPdf").disabled = false;
+      renderiza();
+    }).catch(function(){
+      document.getElementById("status").textContent = "Erro ao carregar os dados. Recarregue a página.";
+    });
+  }
+
+  function folhaHtml(pal){
+    var lista = participantes.filter(function(x){ return x.palestra_id === pal.id; });
+    var pres  = lista.filter(function(x){ return presTok[x.token]; }).length;
+    var agora = new Date().toLocaleString("pt-BR");
+    var h = '<div class="folha">' +
+      '<div class="f-head"><div>' +
+        '<div class="f-title">' + escapeHtml(pal.nome || pal.id) + '</div>' +
+        '<div class="f-sub">' + escapeHtml((periodoCurto(pal.periodo)||"") + (pal.hora ? " · " + pal.hora : "") + " · 21/07/2026") +
+          (pal.local ? " · " + escapeHtml(pal.local) : "") + '</div>' +
+        (pal.endereco ? '<div class="f-sub">' + escapeHtml(pal.endereco) + '</div>' : "") +
+      '</div><div class="f-meta">Congresso Municipal da Educação<br>Educar para COMviver<br>Emitido em ' + escapeHtml(agora) + '</div></div>' +
+      '<table><thead><tr><th style="width:26px">#</th><th>Nome</th><th style="width:70px">Token</th><th>Unidade</th><th style="width:140px">Assinatura</th></tr></thead><tbody>';
+    lista.forEach(function(x, i){
+      h += '<tr><td>' + (i+1) + '</td><td>' + escapeHtml(x.nome||"") + '</td>' +
+           '<td class="tk">' + escapeHtml(x.token) + '</td>' +
+           '<td>' + escapeHtml(x.unidade||"") + '</td><td></td></tr>';
+    });
+    h += '</tbody></table>' +
+      '<div class="tot">Total de inscritos: ' + lista.length + (pres ? ' · Presenças já validadas: ' + pres : '') + '</div>' +
+      '</div>';
+    return { html: h, n: lista.length };
+  }
+
+  function renderiza(){
+    var v = document.getElementById("selPalestra").value;
+    var alvo = v === "__todas__" ? palestras : palestras.filter(function(p){ return p.id === v; });
+    var html = "", tot = 0;
+    alvo.forEach(function(p){ var f = folhaHtml(p); html += f.html; tot += f.n; });
+    document.getElementById("folhas").innerHTML = html;
+    document.getElementById("status").textContent =
+      (v === "__todas__" ? palestras.length + " palestras · " : "") + tot + " inscrito(s). Use “Gerar PDF” e escolha “Salvar como PDF”.";
+  }
+</script>
+</body>
+</html>
