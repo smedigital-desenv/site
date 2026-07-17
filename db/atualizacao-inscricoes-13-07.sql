@@ -3,7 +3,6 @@
 --  Fonte: Relação de Professores com Inscrição Palestras.xlsx
 --
 --  1) Nova palestra "Diálogos entre o Direito e a Educação" (M/T)
---  2) Local do Educar para Conviver: Anfiteatro (Fac. Direito)
 --  3) Cristopher — alinha ao lançamento oficial
 --  4) Renomeações de token (quem ganhou a 2ª sessão)
 --  5) 32 remoções (saíram do sistema oficial)
@@ -21,11 +20,6 @@ insert into presenca.palestras (id, nome, local, endereco, periodo, hora) values
 ('DIALOGOS_DIREITO_M', 'Diálogos entre o Direito e a Educação: contribuições jurídicas para uma escola democrática.', 'USP - Anfiteatro (FEA)', 'Av. Bandeirantes, 3900 - Vila Monte Alegre', 'Manhã', '08:00'),
 ('DIALOGOS_DIREITO_T', 'Diálogos entre o Direito e a Educação: contribuições jurídicas para uma escola democrática.', 'USP - Anfiteatro (FEA)', 'Av. Bandeirantes, 3900 - Vila Monte Alegre', 'Tarde', '14:00')
 on conflict (id) do update set nome=excluded.nome, local=excluded.local, endereco=excluded.endereco, periodo=excluded.periodo, hora=excluded.hora;
-
--- 2) LOCAL DO EDUCAR PARA CONVIVER --------------------------------
-update presenca.palestras
-set local = 'USP - Anfiteatro (Faculdade de Direito)'
-where id in ('EDUCAR_CONVIVER_M','EDUCAR_CONVIVER_T');
 
 -- 3) CRISTOPHER — alinha ao lançamento oficial --------------------
 update presenca.participantes set palestra_id='QUEM_BRINCA_T' where token='40030';
