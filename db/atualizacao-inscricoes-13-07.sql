@@ -8,12 +8,40 @@
 --  5) 32 remoções (saíram do sistema oficial)
 --  6) 258 novas inscrições
 --
---  Preservados os ajustes manuais: 50402, 50460 (48824 rescindido não
---  volta), 49483, 43350. Pendência da Mara (41747) não alterada.
+--  0) Garante os ajustes manuais anteriores (idempotente: se você já
+--     rodou algum deles, não muda nada; se não rodou, aplica agora)
+--  7) Mara (41747): mantém as DUAS palestras (formulário de 06/07)
+--  8) Luciano Santos Toniolo (45168): inscrição de última hora
 --  Rode TUDO de uma vez no SQL Editor do Supabase.
 -- ============================================================
 
 begin;
+
+-- 0) GARANTE AJUSTES MANUAIS ANTERIORES (idempotente) --------------
+-- Gabriela Stoco: rescindiu 49722, assumiu 50402 (Além das Telas M)
+delete from presenca.presencas     where token = '49722';
+delete from presenca.participantes where token = '49722';
+insert into presenca.participantes (token,nome,email,cpf,palestra_id,codigo_funcional,origem,unidade) values
+('50402','GABRIELA STOCO CORREA DE OLIVEIRA','gabrielafrancisco@educacao.pmrp.sp.gov.br',NULL,'ALEM_TELAS_M','50402','OFICIAL','ANTONIO PALOCCI, EMEF')
+on conflict (token) do update set nome=excluded.nome, email=excluded.email, palestra_id=excluded.palestra_id, codigo_funcional=excluded.codigo_funcional, unidade=excluded.unidade;
+
+-- Gabriela Pizani: rescindiu 48824, assumiu 50460 (Mochila T)
+delete from presenca.presencas     where token = '48824';
+delete from presenca.participantes where token = '48824';
+insert into presenca.participantes (token,nome,email,cpf,palestra_id,codigo_funcional,origem,unidade) values
+('50460','GABRIELA PIZANI SOARES','gabrielasoares@educacao.pmrp.sp.gov.br',NULL,'MOCHILA_T','50460','OFICIAL','CARMEM MASSAROTTO, PROFª., EMEI')
+on conflict (token) do update set nome=excluded.nome, email=excluded.email, palestra_id=excluded.palestra_id, codigo_funcional=excluded.codigo_funcional, unidade=excluded.unidade;
+
+-- Inclusões avulsas anteriores (André e Angela)
+insert into presenca.participantes (token,nome,email,cpf,palestra_id,codigo_funcional,origem,unidade) values
+('43350','ANDRE ALBUQUERQUE FERREIRA','andreferreira@educacao.pmrp.sp.gov.br',NULL,'EDUCAR_CONVIVER_M','43350','OFICIAL','CELSO CHARURI DR.'),
+('49483','ANGELA MARIA DIAS DA SILVA','marciasoares@educacao.pmrp.sp.gov.br',NULL,'ALEM_TELAS_T','49483','OFICIAL','EGYDIO PEDRESCHI, CEEEF')
+on conflict (token) do nothing;
+
+-- Gestão Democrática: os dois períodos no SENAI (garante)
+update presenca.palestras
+set local = 'SENAI', endereco = 'Rua Capitão Salomão, 1813 - Campos Elíseos'
+where id in ('GESTAO_DEMOCRATICA_M','GESTAO_DEMOCRATICA_T');
 
 -- 1) NOVA PALESTRA ------------------------------------------------
 insert into presenca.palestras (id, nome, local, endereco, periodo, hora) values
@@ -306,9 +334,24 @@ insert into presenca.participantes (token,nome,email,cpf,palestra_id,codigo_func
 ('38522','TAUANA BACHA DE SOUZA','tauanasouza@educacao.pmrp.sp.gov.br',NULL,'QUEM_BRINCA_T','38522','OFICIAL','ROBERTO AFONSO PONTES, EMEI')
 on conflict (token) do nothing;
 
+-- 7) MARA (41747): mantém as DUAS palestras (formulário de 06/07) ---
+update presenca.participantes set token = '41747_T' where token = '41747';
+insert into presenca.participantes (token,nome,email,cpf,palestra_id,codigo_funcional,origem,unidade) values
+('41747_M','MARA ANGELICA DA SILVA','mangelicasilva@educacao.pmrp.sp.gov.br',NULL,'EDUC_ALIMENTAR_M','41747','OFICIAL','LEONOR MERTÍLIA COSTA, CEI')
+on conflict (token) do nothing;
+
+-- 8) LUCIANO SANTOS TONIOLO (45168): inscrição de última hora -------
+--    Além das Telas — Manhã (21/07 08:00)
+insert into presenca.participantes (token,nome,email,cpf,palestra_id,codigo_funcional,origem,unidade) values
+('45168','LUCIANO SANTOS TONIOLO','lucianotoniolo@educacao.pmrp.sp.gov.br',NULL,'ALEM_TELAS_M','45168','OFICIAL','GERALDA DE SOUZA ESPIN, EMEF')
+on conflict (token) do update set nome=excluded.nome, email=excluded.email, palestra_id=excluded.palestra_id, unidade=excluded.unidade;
+
 commit;
 
 -- CONFERÊNCIA ------------------------------------------------------
 select count(*) as total_participantes from presenca.participantes;
 select palestra_id, count(*) from presenca.participantes
 where palestra_id like 'DIALOGOS%' group by palestra_id order by 1;  -- esperado: 47 M / 50 T
+select token, nome, palestra_id from presenca.participantes
+where codigo_funcional in ('41747','45168','50402','50460','40030','38268')
+order by nome, token;  -- Mara 2 linhas (_M/_T), Luciano, Gabrielas, Cristopher
