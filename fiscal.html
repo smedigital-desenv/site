@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png?v=1">
+  <link rel="icon" href="favicon.ico?v=1">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png?v=1">
+  <title>Fiscal - Validacao de Presenca</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=DM+Mono:wght@500&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+  <style>
+    :root {
+      --bg:#0f1117;--surface:#1a1d27;--border:#2a2d3a;
+      --accent:#4f8ef7;--accent2:#7c3aed;--success:#22c55e;
+      --text:#e8eaf0;--muted:#6b7280;--radius:14px;
+    }
+    *{box-sizing:border-box;margin:0;padding:0;}
+    body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;min-height:100dvh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px 16px;}
+    body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse 60% 40% at 20% 20%,rgba(79,142,247,.07) 0%,transparent 70%),radial-gradient(ellipse 50% 50% at 80% 80%,rgba(124,58,237,.07) 0%,transparent 70%);pointer-events:none;}
+    .container{width:100%;max-width:400px;}
+    .logo{text-align:center;margin-bottom:28px;}
+    .logo-icon{width:52px;height:52px;background:linear-gradient(135deg,var(--accent),var(--accent2));border-radius:16px;display:inline-flex;align-items:center;justify-content:center;margin-bottom:12px;box-shadow:0 8px 24px rgba(79,142,247,.25);}
+    .logo-icon svg{width:26px;height:26px;fill:none;stroke:#fff;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+    .logo h1{font-size:20px;font-weight:600;}
+    .logo p{font-size:13px;color:var(--muted);margin-top:4px;}
+    .card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:24px;margin-bottom:12px;animation:fadeUp .25s ease both;}
+    @keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+    .fiscal-bar{display:none;align-items:center;justify-content:space-between;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:12px 16px;margin-bottom:12px;}
+    .fiscal-bar .info{display:flex;align-items:center;gap:10px;}
+    .dot{width:8px;height:8px;border-radius:50%;background:var(--success);box-shadow:0 0 8px var(--success);}
+    .email-mono{font-family:'DM Mono',monospace;font-size:12px;}
+    .fiscal-bar button{font-size:12px;color:var(--muted);background:none;border:none;cursor:pointer;padding:4px 8px;border-radius:6px;transition:background .2s;}
+    .fiscal-bar button:hover{background:var(--border);color:var(--text);}
+    label{display:block;font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin-bottom:8px;}
+    input{width:100%;background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:13px 16px;font-size:15px;font-family:'DM Sans',sans-serif;color:var(--text);outline:none;transition:border-color .2s,box-shadow .2s;}
+    input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(79,142,247,.15);}
+    select{width:100%;background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:13px 16px;font-size:15px;font-family:'DM Sans',sans-serif;color:var(--text);outline:none;cursor:pointer;transition:border-color .2s;}
+    select:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(79,142,247,.15);}
+    .btn{width:100%;padding:14px;border:none;border-radius:10px;font-size:15px;font-weight:600;font-family:'DM Sans',sans-serif;cursor:pointer;transition:opacity .2s,transform .1s;margin-top:14px;}
+    .btn:active{transform:scale(.98);}
+    .btn:disabled{opacity:.45;cursor:not-allowed;transform:none;}
+    .btn-primary{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;box-shadow:0 4px 16px rgba(79,142,247,.3);}
+    .msg{margin-top:12px;padding:11px 14px;border-radius:10px;font-size:13px;display:none;line-height:1.5;}
+    .msg.erro{background:rgba(239,68,68,.12);color:#fca5a5;border:1px solid rgba(239,68,68,.2);display:block;}
+    .msg.info{background:rgba(79,142,247,.12);color:#93c5fd;border:1px solid rgba(79,142,247,.2);display:block;}
+    #leitor{border-radius:12px;overflow:hidden;border:2px solid var(--accent);box-shadow:0 0 20px rgba(79,142,247,.2);}
+    .dica{font-size:12px;color:var(--muted);text-align:center;margin-top:10px;line-height:1.6;}
+    .cache-status{font-size:11px;color:var(--muted);text-align:center;margin-top:8px;}
+    .cache-status span{color:var(--success);}
+    #etapa-token{display:none;}
+  </style>
+</head>
+<body>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="config.js?v=19"></script>
+<script src="auth.js?v=19"></script>
+<script src="menu.js?v=19"></script>
+<div class="container">
+  <div class="logo">
+    <div class="logo-icon">
+      <svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
+    </div>
+    <h1>Validacao de Presenca</h1>
+    <p>Acesso do fiscal</p>
+  </div>
+
+  <div class="fiscal-bar" id="fiscal-bar">
+    <div class="info"><div class="dot"></div><span class="email-mono" id="bar-email"></span></div>
+    <button onclick="logout()">Sair</button>
+  </div>
+
+  <div class="card" id="etapa-login">
+    <label>Acesso restrito a fiscais autorizados</label>
+    <button class="btn btn-primary" id="btnEntrar" onclick="entrarComGoogle()">Entrar com Google</button>
+    <div class="msg" id="msgLogin"></div>
+  </div>
+
+  <div id="etapa-token">
+    <a id="btnLista" href="lista-inscritos.html" style="display:none;align-items:center;justify-content:center;gap:8px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:13px;margin-bottom:12px;color:var(--text);font:600 14px 'DM Sans';text-decoration:none;">
+      <svg viewBox="0 0 24 24" style="width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6M16 13H8M16 17H8M10 9H8"/></svg>
+      Lista de inscritos por palestra (PDF)
+    </a>
+    <div class="card">
+      <label for="stationSelect">Palestra onde voce esta</label>
+      <select id="stationSelect" onchange="setStationFiscal()">
+        <option value="">— selecione a palestra —</option>
+      </select>
+    </div>
+    <div class="card" id="scannerPrompt" style="display:none;text-align:center;color:var(--muted);font-size:13px;line-height:1.6;">
+      Selecione acima a palestra onde voce esta para liberar a leitura do QR Code.
+    </div>
+    <div id="scannerArea" style="display:none">
+      <div class="card">
+        <div id="leitor"></div>
+        <p class="dica">Aponte para o QR Code do participante</p>
+        <div class="cache-status" id="cacheStatus"></div>
+        <div class="msg" id="msgLeitor"></div>
+      </div>
+      <div class="card">
+        <label for="inputToken">Ou digite o token manualmente</label>
+        <input type="text" id="inputToken" placeholder="Ex.: 12345 ou 12345_M" autocomplete="off" autocapitalize="characters"/>
+        <button class="btn btn-primary" onclick="irParaValidar()">Validar presenca</button>
+      </div>
+    </div>
+    <a id="btnVagas" href="vagas.html" style="display:none;align-items:center;justify-content:center;gap:8px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:13px;margin-top:12px;color:var(--text);font:600 14px 'DM Sans';text-decoration:none;">
+      <svg viewBox="0 0 24 24" style="width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;"><path d="M18 20V10M12 20V4M6 20v-6"/></svg>
+      Acompanhamento de vagas (lotação)
+    </a>
+  </div>
+</div>
+
+<script>
+  // SUPA_URL / SUPA_KEY definidos em config.js
+  var KEY_EMAIL    = "fiscal_email";
+  var KEY_CACHE    = "participantes_cache";
+  var KEY_CACHE_DT = "participantes_cache_data";
+  var html5QrCode  = null;
+  var emailAtual   = "";
+
+  function supaHeaders() {
+    return { "apikey": SUPA_KEY, "Authorization": "Bearer " + SUPA_KEY, "Accept-Profile": SUPA_SCHEMA, "Content-Profile": SUPA_SCHEMA };
+  }
+
+  function dataHoje() { return new Date().toISOString().slice(0,10); }
+  function cacheValido() { return localStorage.getItem(KEY_CACHE_DT) === dataHoje() && localStorage.getItem(KEY_CACHE); }
+  function salvarCache(lista) { localStorage.setItem(KEY_CACHE, JSON.stringify(lista)); localStorage.setItem(KEY_CACHE_DT, dataHoje()); }
+  function totalCache() { try { return JSON.parse(localStorage.getItem(KEY_CACHE)||"[]").length; } catch(e){ return 0; } }
+
+  window.onload = function() {
+    var msg = document.getElementById("msgLogin");
+    if (new URLSearchParams(window.location.search).get("erro") === "nao_autorizado") {
+      msg.className = "msg erro";
+      msg.innerHTML = "E-mail nao autorizado. Fale com o gerente do evento.";
+    }
+    verificarSessao().then(function(user) {
+      if (user && user.naoAutorizado) {
+        msg.className = "msg erro";
+        msg.innerHTML = "E-mail nao autorizado. Fale com o gerente do evento.";
+      } else if (user && user.email) {
+        iniciarSessao(user.email, user.nome || "");
+      }
+    });
+  };
+
+  function entrarComGoogle() {
+    var btn = document.getElementById("btnEntrar");
+    var msg = document.getElementById("msgLogin");
+    btn.disabled = true; btn.textContent = "Redirecionando...";
+    msg.className = "msg info"; msg.innerHTML = "Abrindo login do Google...";
+    loginGoogle().catch(function() {
+      btn.disabled = false; btn.textContent = "Entrar com Google";
+      msg.className = "msg erro"; msg.innerHTML = "Nao foi possivel iniciar o login.";
+    });
+  }
+
+  // Botão da lista de inscritos (PDF): somente para a equipe organizadora.
+  var LISTA_PERMITIDOS = [
+    "julianabertoleti@educacao.pmrp.sp.gov.br",
+    "matheusprospero@educacao.pmrp.sp.gov.br",
+    "diogoperez@educacao.pmrp.sp.gov.br"
+  ];
+
+  function iniciarSessao(email, nome) {
+    emailAtual = email;
+    document.getElementById("bar-email").textContent    = nome || email;
+    document.getElementById("fiscal-bar").style.display = "flex";
+    document.getElementById("etapa-login").style.display= "none";
+    document.getElementById("etapa-token").style.display= "block";
+    if (LISTA_PERMITIDOS.indexOf(String(email||"").toLowerCase()) !== -1) {
+      document.getElementById("btnLista").style.display = "flex";
+      document.getElementById("btnVagas").style.display = "flex";
+    }
+    garantirCache(function(total){
+      var st = document.getElementById("cacheStatus");
+      if (st) st.innerHTML = "<span>" + total + "</span> participantes em cache";
+    });
+    aplicarEstacao();          // abre a câmera só se a palestra já estiver escolhida
+    populaStationsFiscal();    // carrega as palestras no seletor
+  }
+
+  // ── ESTAÇÃO OBRIGATÓRIA (palestra do fiscal) ────────────────
+  function populaStationsFiscal() {
+    var sel = document.getElementById("stationSelect");
+    var saved = localStorage.getItem("fiscal_palestra") || "";
+    fetch(SUPA_URL + "/palestras?select=id,nome,periodo,hora&order=nome,periodo", { headers: supaHeaders() })
+      .then(function(r){ return r.json(); })
+      .then(function(data){
+        if (!Array.isArray(data)) return;
+        var opts = '<option value="">— selecione a palestra —</option>';
+        data.forEach(function(p){ opts += '<option value="'+escapeHtml(p.id)+'">'+escapeHtml(palestraLabel(p))+'</option>'; });
+        sel.innerHTML = opts;
+        if (saved && data.some(function(p){ return p.id === saved; })) sel.value = saved;
+      })
+      .catch(function(){});
+  }
+
+  function setStationFiscal() {
+    var el = document.getElementById("stationSelect");
+    var v  = el.value;
+    if (v) {
+      localStorage.setItem("fiscal_palestra", v);
+      localStorage.setItem("fiscal_palestra_nome", el.options[el.selectedIndex].text);
+    } else {
+      localStorage.removeItem("fiscal_palestra");
+      localStorage.removeItem("fiscal_palestra_nome");
+    }
+    aplicarEstacao();
+  }
+
+  // Libera a leitura só quando há palestra escolhida.
+  function aplicarEstacao() {
+    var station = localStorage.getItem("fiscal_palestra") || "";
+    var area    = document.getElementById("scannerArea");
+    var prompt  = document.getElementById("scannerPrompt");
+    if (station) {
+      prompt.style.display = "none";
+      area.style.display   = "block";
+      abrirCamera(emailAtual);
+    } else {
+      area.style.display   = "none";
+      prompt.style.display = "block";
+      if (html5QrCode) { html5QrCode.stop().catch(function(){}); html5QrCode = null; }
+    }
+  }
+
+  function garantirCache(callback) {
+    if (cacheValido()) { if (callback) callback(totalCache()); return; }
+    var st = document.getElementById("cacheStatus");
+    st.innerHTML = "Carregando participantes...";
+    fetchAll(SUPA_URL + "/participantes?select=token,nome,email,palestra_id,qr_url,palestras(nome,periodo,hora)&order=token", supaHeaders())
+      .then(function(data) {
+        if (Array.isArray(data)) {
+          // Normaliza palestraNome (com período, para distinguir manhã/tarde)
+          var lista = data.map(function(p) {
+            return {
+              token:       p.token,
+              nome:        p.nome,
+              email:       p.email,
+              palestraId:  p.palestra_id,
+              palestraNome: p.palestras ? palestraLabel(p.palestras) : "",
+              qr_url:      p.qr_url
+            };
+          });
+          salvarCache(lista);
+          if (callback) callback(lista.length);
+        }
+      })
+      .catch(function(){ st.innerHTML = "Sem cache — buscas serao online."; });
+  }
+
+  function abrirCamera(email) {
+    if (html5QrCode) { html5QrCode.stop().catch(function(){}); html5QrCode=null; }
+    html5QrCode = new Html5Qrcode("leitor");
+    html5QrCode.start(
+      { facingMode:"environment" },
+      { fps:10, qrbox:{width:250,height:250} },
+      function(texto) {
+        html5QrCode.stop().then(function(){
+          var token = extrairToken(texto);
+          if (!token) {
+            var m=document.getElementById("msgLeitor");
+            m.className="msg erro"; m.innerHTML="QR invalido.";
+            setTimeout(function(){ m.className="msg"; abrirCamera(email); }, 1500);
+            return;
+          }
+          irParaValidarComToken(token);
+        });
+      },
+      function(){}
+    ).catch(function(){ document.getElementById("leitor").style.display="none"; });
+  }
+
+  function extrairToken(texto) {
+    try { var u=new URL(texto); var t=u.searchParams.get("t"); if(t) return t; } catch(e){}
+    return texto.trim()||null;
+  }
+
+  function irParaValidar() {
+    var token = document.getElementById("inputToken").value.trim().toUpperCase();
+    if (!token) return;
+    irParaValidarComToken(token);
+  }
+
+  function irParaValidarComToken(token) {
+    window.location.href = "validar.html?t=" + encodeURIComponent(token);
+  }
+
+  function logout() {
+    if (html5QrCode) { html5QrCode.stop().catch(function(){}); html5QrCode=null; }
+    logoutAuth();  // sai so da presenca (nao mexe na sessao do GOM)
+  }
+
+  document.getElementById("inputToken").addEventListener("keydown", function(e){ if(e.key==="Enter") irParaValidar(); });
+</script>
+</body>
+</html>
