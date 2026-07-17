@@ -1,0 +1,1189 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png?v=1">
+  <link rel="icon" href="favicon.ico?v=1">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png?v=1">
+  <title>Dashboard - Presencas</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@500&display=swap" rel="stylesheet">
+  <style>
+    :root{--bg:#0f1117;--surface:#1a1d27;--surface2:#212536;--border:#2a2d3a;--accent:#4f8ef7;--accent2:#7c3aed;--success:#22c55e;--warning:#f59e0b;--danger:#ef4444;--text:#e8eaf0;--muted:#6b7280;--radius:14px;}
+    *{box-sizing:border-box;margin:0;padding:0;}
+    body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
+    body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse 60% 40% at 10% 10%,rgba(79,142,247,.06) 0%,transparent 60%),radial-gradient(ellipse 40% 50% at 90% 90%,rgba(124,58,237,.06) 0%,transparent 60%);pointer-events:none;}
+
+    /* TOPBAR */
+    .topbar{position:sticky;top:0;z-index:10;background:rgba(15,17,23,.92);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:14px 20px;display:flex;align-items:center;gap:12px;}
+    .topbar-center{flex:1;}
+    .topbar-center h1{font-size:17px;font-weight:700;}
+    .topbar-center p{font-size:12px;color:var(--muted);margin-top:2px;}
+    .topbar-actions{display:flex;gap:8px;}
+    .btn-icon{display:flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);color:var(--text);border-radius:10px;padding:8px 12px;font-size:13px;font-weight:500;cursor:pointer;transition:background .2s;font-family:'DM Sans',sans-serif;white-space:nowrap;}
+    .btn-icon:hover{background:var(--surface2);}
+    .btn-icon svg{width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+    .btn-icon.loading svg{animation:spin 1s linear infinite;}
+    .btn-icon.ativo{border-color:var(--danger);color:var(--danger);background:rgba(239,68,68,.08);}
+    @keyframes spin{to{transform:rotate(360deg);}}
+
+    /* CONTENT */
+    .content{max-width:960px;margin:0 auto;padding:20px;}
+
+    /* RESUMO */
+    .resumo{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-bottom:20px;}
+    .resumo-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px 18px;}
+    .resumo-card .label{font-size:10px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin-bottom:6px;}
+    .resumo-card .valor{font-size:28px;font-weight:700;line-height:1;}
+    .cor-total{color:var(--accent);}
+    .cor-presente{color:var(--success);}
+    .cor-ausente{color:var(--danger);}
+    .cor-taxa{color:var(--warning);}
+
+    /* SECAO */
+    .secao-titulo{font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin-bottom:10px;}
+
+    /* BUSCA GLOBAL */
+    .busca-global{position:relative;margin-bottom:16px;}
+    .busca-global .busca-input{width:100%;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:13px 40px 13px 42px;font-size:15px;font-family:'DM Sans',sans-serif;color:var(--text);outline:none;transition:border-color .2s,box-shadow .2s;}
+    .busca-global .busca-input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(79,142,247,.13);}
+    .busca-icon{position:absolute;left:15px;top:50%;transform:translateY(-50%);width:17px;height:17px;fill:none;stroke:var(--muted);stroke-width:2;stroke-linecap:round;stroke-linejoin:round;pointer-events:none;}
+    .busca-limpar{position:absolute;right:8px;top:50%;transform:translateY(-50%);background:var(--surface2);border:none;color:var(--muted);width:28px;height:28px;border-radius:8px;font-size:19px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;}
+    .busca-limpar:hover{color:var(--text);}
+
+    /* ESTACAO (palestra onde o fiscal esta) */
+    .station-bar{display:flex;align-items:center;gap:10px;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:10px 14px;margin-bottom:12px;flex-wrap:wrap;}
+    .station-bar.definida{border-color:rgba(79,142,247,.4);background:rgba(79,142,247,.06);}
+    .station-label{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.7px;display:flex;align-items:center;gap:6px;}
+    .station-label svg{width:15px;height:15px;fill:none;stroke:var(--accent);stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+    .station-select{flex:1;min-width:180px;background:var(--bg);border:1px solid var(--border);border-radius:9px;color:var(--text);padding:9px 12px;font-size:14px;font-family:'DM Sans',sans-serif;outline:none;cursor:pointer;}
+    .station-select:focus{border-color:var(--accent);}
+
+    /* card: faltam validar */
+    .card-ausentes{width:100%;margin-top:10px;background:rgba(245,158,11,.12);color:#fcd34d;border:1px solid rgba(245,158,11,.25);border-radius:9px;padding:9px;font-size:13px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;transition:background .2s;}
+    .card-ausentes:hover{background:rgba(245,158,11,.2);}
+
+    /* busca: professor de outra palestra que a estacao */
+    .participante-row.outra{border-left:3px solid var(--warning);}
+    .participante-alerta{font-size:11px;color:#fcd34d;font-weight:600;margin-top:3px;display:flex;align-items:center;gap:4px;}
+    .participante-alerta svg{width:13px;height:13px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0;}
+    .badge-desta{display:inline-block;font-size:10px;font-weight:700;color:#86efac;background:rgba(34,197,94,.12);border:1px solid rgba(34,197,94,.25);border-radius:5px;padding:1px 6px;margin-left:6px;}
+
+    /* CARDS PALESTRA */
+    .palestras-grid{display:flex;flex-direction:column;gap:8px;}
+    .palestra-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px 18px;cursor:pointer;transition:border-color .2s,background .2s;}
+    .palestra-card:hover{border-color:var(--accent);background:var(--surface2);}
+    .palestra-header{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px;}
+    .palestra-nome{font-size:15px;font-weight:600;}
+    .palestra-carga{font-size:12px;color:var(--muted);margin-top:2px;}
+    .taxa-badge{flex-shrink:0;font-size:13px;font-weight:700;padding:4px 10px;border-radius:8px;}
+    .taxa-alta{background:rgba(34,197,94,.15);color:#86efac;}
+    .taxa-media{background:rgba(245,158,11,.15);color:#fcd34d;}
+    .taxa-baixa{background:rgba(239,68,68,.15);color:#fca5a5;}
+    .barra-bg{background:var(--border);border-radius:99px;height:6px;overflow:hidden;margin-bottom:10px;}
+    .barra-fill{height:100%;border-radius:99px;background:linear-gradient(90deg,var(--accent),var(--success));transition:width .6s cubic-bezier(.4,0,.2,1);}
+    .palestra-nums{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;}
+    .num-item{text-align:center;}
+    .num-item .n{font-size:20px;font-weight:700;}
+    .num-item .l{font-size:11px;color:var(--muted);margin-top:2px;}
+    .n-inscritos{color:var(--text);}
+    .n-presentes{color:var(--success);}
+    .n-ausentes{color:var(--danger);}
+    .palestra-card .hint{font-size:11px;color:var(--muted);text-align:center;margin-top:10px;}
+
+    /* ESTADO */
+    .estado{text-align:center;padding:48px 20px;color:var(--muted);font-size:14px;}
+    .estado svg{width:36px;height:36px;stroke:var(--muted);fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;margin:0 auto 10px;display:block;}
+    .atualizado{font-size:11px;color:var(--muted);text-align:right;margin-top:14px;}
+
+    /* ── MODAL ── */
+    .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);backdrop-filter:blur(4px);z-index:100;display:none;align-items:flex-end;justify-content:center;}
+    .modal-overlay.aberto{display:flex;}
+    @media(min-width:600px){.modal-overlay{align-items:center;}}
+
+    .modal{
+      background:var(--surface);border:1px solid var(--border);
+      border-radius:20px 20px 0 0;
+      width:100%;max-width:640px;
+      max-height:90vh;display:flex;flex-direction:column;
+      animation:slideUp .25s ease both;
+    }
+    @media(min-width:600px){.modal{border-radius:20px;max-height:85vh;}}
+    @keyframes slideUp{from{opacity:0;transform:translateY(32px)}to{opacity:1;transform:translateY(0)}}
+
+    .modal-header{padding:18px 20px 14px;border-bottom:1px solid var(--border);display:flex;align-items:flex-start;gap:12px;flex-shrink:0;}
+    .modal-header-info{flex:1;min-width:0;}
+    .modal-titulo{font-size:16px;font-weight:700;}
+    .modal-sub{font-size:12px;color:var(--muted);margin-top:3px;}
+    .btn-fechar{flex-shrink:0;background:var(--surface2);border:1px solid var(--border);color:var(--muted);border-radius:8px;width:32px;height:32px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:color .2s;}
+    .btn-fechar:hover{color:var(--text);}
+    .btn-fechar svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+
+    .modal-resumo{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:14px 20px;border-bottom:1px solid var(--border);flex-shrink:0;}
+    .mini-card{background:var(--bg);border-radius:10px;padding:10px 12px;text-align:center;}
+    .mini-card .mn{font-size:22px;font-weight:700;}
+    .mini-card .ml{font-size:10px;color:var(--muted);margin-top:2px;text-transform:uppercase;letter-spacing:.6px;}
+
+    .modal-filtros{display:flex;gap:6px;padding:12px 20px;border-bottom:1px solid var(--border);flex-wrap:wrap;flex-shrink:0;}
+    .filtro-btn{background:var(--bg);border:1px solid var(--border);color:var(--muted);border-radius:8px;padding:5px 12px;font-size:13px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .2s;}
+    .filtro-btn.ativo{border-color:var(--accent);color:var(--accent);background:rgba(79,142,247,.1);}
+
+    .modal-busca{padding:10px 20px;border-bottom:1px solid var(--border);flex-shrink:0;}
+    .busca-input{width:100%;background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:10px 14px;font-size:14px;font-family:'DM Sans',sans-serif;color:var(--text);outline:none;transition:border-color .2s;}
+    .busca-input:focus{border-color:var(--accent);}
+
+    .modal-lista{overflow-y:auto;flex:1;padding:10px 20px 20px;}
+
+    /* ROWS */
+    .participante-row{background:var(--bg);border:1px solid var(--border);border-radius:12px;padding:11px 14px;display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:6px;transition:border-color .2s;}
+    .participante-row.presente{border-left:3px solid var(--success);}
+    .participante-row.ausente{border-left:3px solid var(--border);}
+    .participante-info{flex:1;min-width:0;}
+    .participante-nome{font-size:14px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+    .participante-email{font-size:12px;color:var(--muted);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+    .participante-meta{font-size:11px;color:var(--success);margin-top:2px;}
+    .btn-validar-inline{flex-shrink:0;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;border:none;border-radius:8px;padding:7px 12px;font-size:13px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;transition:opacity .2s,transform .1s;white-space:nowrap;}
+    .btn-validar-inline:active{transform:scale(.96);}
+    .btn-validar-inline:disabled{opacity:.4;cursor:not-allowed;}
+    .tag-presente{flex-shrink:0;background:rgba(34,197,94,.12);color:#86efac;border:1px solid rgba(34,197,94,.2);border-radius:6px;padding:4px 8px;font-size:11px;font-weight:600;}
+
+    /* ── TELA GERENCIAL ── */
+    #tela-gerencial{display:none;}
+    .gerencial-busca{margin-bottom:12px;}
+    .presenca-row{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:12px 16px;display:flex;align-items:center;gap:12px;margin-bottom:6px;}
+    .presenca-info{flex:1;min-width:0;}
+    .presenca-nome{font-size:14px;font-weight:600;}
+    .presenca-detalhe{font-size:12px;color:var(--muted);margin-top:2px;}
+    .presenca-data{font-size:11px;color:var(--success);margin-top:2px;}
+    .btn-excluir{flex-shrink:0;background:rgba(239,68,68,.1);color:#fca5a5;border:1px solid rgba(239,68,68,.2);border-radius:8px;padding:7px 12px;font-size:13px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;transition:background .2s;white-space:nowrap;}
+    .btn-excluir:hover{background:rgba(239,68,68,.2);}
+    .btn-excluir:disabled{opacity:.4;cursor:not-allowed;}
+
+    /* CONFIRM MODAL */
+    .confirm-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:200;display:none;align-items:center;justify-content:center;padding:20px;}
+    .confirm-overlay.aberto{display:flex;}
+    .confirm-box{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:24px;max-width:360px;width:100%;animation:slideUp .2s ease both;}
+    .confirm-titulo{font-size:16px;font-weight:700;margin-bottom:8px;}
+    .confirm-msg{font-size:14px;color:var(--muted);line-height:1.5;margin-bottom:20px;}
+    .confirm-acoes{display:flex;gap:8px;}
+    .btn-cancelar{flex:1;background:var(--surface2);border:1px solid var(--border);color:var(--text);border-radius:10px;padding:12px;font-size:14px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;}
+    .btn-confirmar-excluir{flex:1;background:var(--danger);color:#fff;border:none;border-radius:10px;padding:12px;font-size:14px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;transition:opacity .2s;}
+    .btn-confirmar-excluir:hover{opacity:.85;}
+
+    /* GERENCIAL GRUPOS */
+    .grupo-palestra{margin-bottom:10px;}
+    .grupo-header{
+      background:var(--surface);border:1px solid var(--border);
+      border-radius:var(--radius);padding:14px 18px;
+      display:flex;align-items:center;justify-content:space-between;gap:12px;
+      cursor:pointer;transition:border-color .2s,background .2s;
+      user-select:none;
+    }
+    .grupo-header:hover{border-color:var(--accent);background:var(--surface2);}
+    .grupo-header.aberto{border-radius:var(--radius) var(--radius) 0 0;border-bottom-color:transparent;border-color:var(--accent);}
+    .grupo-info{flex:1;min-width:0;}
+    .grupo-nome{font-size:14px;font-weight:600;}
+    .grupo-contagem{font-size:12px;color:var(--muted);margin-top:2px;}
+    .grupo-chevron{flex-shrink:0;width:18px;height:18px;fill:none;stroke:var(--muted);stroke-width:2;stroke-linecap:round;stroke-linejoin:round;transition:transform .2s;}
+    .grupo-header.aberto .grupo-chevron{transform:rotate(180deg);}
+    .grupo-badge{flex-shrink:0;font-size:12px;font-weight:700;padding:3px 9px;border-radius:6px;background:rgba(34,197,94,.12);color:#86efac;border:1px solid rgba(34,197,94,.2);}
+    .grupo-corpo{display:none;border:1px solid var(--accent);border-top:none;border-radius:0 0 var(--radius) var(--radius);padding:8px 12px 12px;}
+    .grupo-corpo.aberto{display:block;}
+
+    @keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+    .acoes-gerente{display:none;gap:8px;margin-bottom:16px;flex-wrap:wrap;}
+    .acoes-gerente.visivel{display:flex;}
+    .btn-acao{flex:1;min-width:140px;display:flex;align-items:center;justify-content:center;gap:7px;background:var(--surface);border:1px solid var(--border);color:var(--text);border-radius:10px;padding:11px 14px;font-size:13px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;transition:background .2s,border-color .2s;}
+    .btn-acao:hover{background:var(--surface2);}
+    .btn-acao:disabled{opacity:.4;cursor:not-allowed;}
+    .btn-acao svg{width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0;}
+    .btn-acao.loading svg{animation:spin 1s linear infinite;}
+    .btn-acao.sucesso{border-color:var(--success);color:#86efac;}
+    .btn-acao.erro{border-color:var(--danger);color:#fca5a5;}
+
+    /* TELA EMAILS */
+    .email-resumo{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px;}
+    .email-row{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:12px 16px;display:flex;align-items:center;gap:12px;margin-bottom:6px;}
+    .email-row.enviado{border-left:3px solid var(--success);}
+    .email-row.pendente{border-left:3px solid var(--warning);}
+    .email-info{flex:1;min-width:0;}
+    .email-nome{font-size:14px;font-weight:600;}
+    .email-detalhe{font-size:12px;color:var(--muted);margin-top:2px;}
+    .tag-enviado{flex-shrink:0;background:rgba(34,197,94,.12);color:#86efac;border:1px solid rgba(34,197,94,.2);border-radius:6px;padding:3px 9px;font-size:11px;font-weight:600;}
+    .tag-pendente{flex-shrink:0;background:rgba(245,158,11,.12);color:#fcd34d;border:1px solid rgba(245,158,11,.2);border-radius:6px;padding:3px 9px;font-size:11px;font-weight:600;}
+    .filtros-email{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;}
+    .btn-excluir-inline{flex-shrink:0;background:rgba(239,68,68,.1);color:#fca5a5;border:1px solid rgba(239,68,68,.2);border-radius:8px;padding:5px 10px;font-size:11px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;transition:background .2s;margin-left:4px;}
+    .btn-excluir-inline:hover{background:rgba(239,68,68,.22);}
+    .acoes-presente{display:flex;align-items:center;gap:4px;}
+    .fadeUp{animation:fadeUp .2s ease both;}
+    @media(max-width:480px){.content{padding:12px;}.resumo-card .valor{font-size:22px;}.num-item .n{font-size:16px;}}
+  </style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<!-- topbar removida: navegação feita pelo menu global -->
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="config.js?v=19"></script>
+<script src="auth.js?v=19"></script>
+<script src="menu.js?v=19"></script>
+<div class="content">
+
+  <!-- TELA DASHBOARD -->
+  <div id="tela-dashboard">
+
+    <!-- Ações rápidas — visível só para gerentes -->
+    <div class="acoes-gerente" id="acoesGerente">
+      <button class="btn-acao" id="btnSyncInscritos" onclick="rodarSync()">
+        <svg viewBox="0 0 24 24"><path d="M23 4v6h-6M1 20v-6h6"/><path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/></svg>
+        Sync inscritos
+      </button>
+      <button class="btn-acao" id="btnEnviarEmails" onclick="rodarEmails()">
+        <svg viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+        Enviar emails
+      </button>
+    </div>
+
+    <div class="resumo">
+      <div class="resumo-card"><div class="label">Inscritos</div> <div class="valor cor-total"    id="rTotal">-</div></div>
+      <div class="resumo-card"><div class="label">Presentes</div><div class="valor cor-presente" id="rPresentes">-</div></div>
+      <div class="resumo-card"><div class="label">Ausentes</div> <div class="valor cor-ausente"  id="rAusentes">-</div></div>
+      <div class="resumo-card"><div class="label">Taxa geral</div><div class="valor cor-taxa"    id="rTaxa">-</div></div>
+    </div>
+    <!-- Estacao: em qual palestra o fiscal esta validando -->
+    <div class="station-bar" id="stationBar">
+      <span class="station-label"><svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 12-9 12s-9-5-9-12a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>Estou na palestra</span>
+      <select class="station-select" id="stationSelect" onchange="setStation()">
+        <option value="">— selecione a sua palestra —</option>
+      </select>
+    </div>
+
+    <!-- Busca global de professor (todas as palestras) -->
+    <div class="busca-global">
+      <svg viewBox="0 0 24 24" class="busca-icon"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+      <input class="busca-input" id="buscaGlobal" type="text" placeholder="Buscar professor por nome, e-mail ou codigo..." oninput="renderizarBuscaGlobal()" autocomplete="off">
+      <button class="busca-limpar" id="buscaLimpar" onclick="limparBuscaGlobal()" style="display:none">&times;</button>
+    </div>
+    <div id="resultadoBusca" style="display:none;margin-bottom:20px;"></div>
+
+    <div id="secaoPalestras">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+      <span class="secao-titulo" style="margin-bottom:0">Por palestra</span>
+      <div style="display:flex;gap:8px;">
+        <button class="btn-icon" id="btnEmails" onclick="toggleEmails()" style="display:none">
+          <svg viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+          E-mails
+        </button>
+        <button class="btn-icon" id="btnQR" onclick="toggleQR()" style="display:none">
+          <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><path d="M14 14h.01M14 17h.01M17 14h.01M17 17h.01M20 14h.01M20 20h.01M17 20h.01M14 20h.01M20 17h.01"/></svg>
+          QR
+        </button>
+        <button class="btn-icon" id="btnGerencial" onclick="toggleGerencial()" style="display:none">
+          <svg viewBox="0 0 24 24"><path d="M12 20h9M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+          Gerenciar
+        </button>
+        <button class="btn-icon" id="btnRefresh" onclick="recarregar()">
+          <svg viewBox="0 0 24 24"><path d="M23 4v6h-6M1 20v-6h6"/><path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/></svg>
+          Atualizar
+        </button>
+      </div>
+    </div>
+    <div class="palestras-grid" id="palestrasGrid">
+      <div class="estado"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>Carregando...</div>
+    </div>
+    </div><!-- /secaoPalestras -->
+    <div class="atualizado" id="atualizado"></div>
+  </div>
+
+  <!-- TELA GERENCIAL -->
+  <div id="tela-gerencial">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
+      <button onclick="toggleGerencial()" style="display:flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);color:var(--muted);border-radius:10px;padding:8px 14px;font-size:13px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;transition:background .2s;">
+        <svg viewBox="0 0 24 24" style="width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+        Voltar ao dashboard
+      </button>
+      <span style="font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;">Gerenciar presenças</span>
+    </div>
+    <div class="gerencial-busca">
+      <input class="busca-input" id="gerencialBusca" type="text" placeholder="Buscar por nome, e-mail ou token..." oninput="renderizarGerencial()"/>
+    </div>
+    <div id="gerencialLista">
+      <div class="estado"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>Carregando...</div>
+    </div>
+  </div>
+
+
+  <!-- TELA EMAILS -->
+  <div id="tela-emails" style="display:none">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
+      <button onclick="toggleEmails()" style="display:flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);color:var(--muted);border-radius:10px;padding:8px 14px;font-size:13px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;">
+        <svg viewBox="0 0 24 24" style="width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+        Voltar ao dashboard
+      </button>
+      <span style="font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;">Confirmações por e-mail</span>
+    </div>
+
+    <div class="email-resumo">
+      <div class="resumo-card"><div class="label">Total</div><div class="valor cor-total"    id="emTotal">-</div></div>
+      <div class="resumo-card"><div class="label">Enviados</div><div class="valor cor-presente" id="emEnviados">-</div></div>
+      <div class="resumo-card"><div class="label">Pendentes</div><div class="valor cor-taxa" id="emPendentes">-</div></div>
+    </div>
+
+    <div class="filtros-email">
+      <button class="filtro-btn ativo" id="efTodos"    onclick="filtrarEmails('todos')">Todos</button>
+      <button class="filtro-btn"       id="efEnviados" onclick="filtrarEmails('enviados')">Enviados</button>
+      <button class="filtro-btn"       id="efPendentes" onclick="filtrarEmails('pendentes')">Pendentes</button>
+    </div>
+
+    <div class="gerencial-busca" style="margin-bottom:12px;">
+      <input class="busca-input" id="emailsBusca" type="text" placeholder="Buscar por nome, e-mail ou palestra..." oninput="renderizarEmails()"/>
+    </div>
+
+    <div id="emailsLista">
+      <div class="estado"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>Carregando...</div>
+    </div>
+  </div>
+
+  <!-- TELA QR CODES -->
+  <div id="tela-qr" style="display:none">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
+      <button onclick="toggleQR()" style="display:flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);color:var(--muted);border-radius:10px;padding:8px 14px;font-size:13px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;">
+        <svg viewBox="0 0 24 24" style="width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+        Voltar ao dashboard
+      </button>
+      <span style="font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;">Envio de QR Codes</span>
+    </div>
+
+    <div class="email-resumo">
+      <div class="resumo-card"><div class="label">Total</div><div class="valor cor-total"    id="qrTotal">-</div></div>
+      <div class="resumo-card"><div class="label">Enviados</div><div class="valor cor-presente" id="qrEnviados">-</div></div>
+      <div class="resumo-card"><div class="label">Pendentes</div><div class="valor cor-taxa" id="qrPendentes">-</div></div>
+    </div>
+
+    <div class="filtros-email">
+      <button class="filtro-btn ativo" id="qfTodos"     onclick="filtrarQR('todos')">Todos</button>
+      <button class="filtro-btn"       id="qfEnviados"  onclick="filtrarQR('enviados')">Enviados</button>
+      <button class="filtro-btn"       id="qfPendentes" onclick="filtrarQR('pendentes')">Pendentes</button>
+    </div>
+
+    <div class="gerencial-busca" style="margin-bottom:12px;">
+      <input class="busca-input" id="qrBusca" type="text" placeholder="Buscar por nome, e-mail ou palestra..." oninput="renderizarQR()"/>
+    </div>
+
+    <div id="qrLista">
+      <div class="estado"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>Carregando...</div>
+    </div>
+  </div>
+
+</div>
+
+<!-- MODAL DETALHE PALESTRA -->
+<div class="modal-overlay" id="modalOverlay" onclick="fecharModalSeFora(event)">
+  <div class="modal" id="modal">
+    <div class="modal-header">
+      <div class="modal-header-info">
+        <div class="modal-titulo" id="modalTitulo">-</div>
+        <div class="modal-sub" id="modalSub">-</div>
+      </div>
+      <button class="btn-fechar" onclick="fecharModal()">
+        <svg viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <div class="modal-resumo">
+      <div class="mini-card"><div class="mn cor-total"    id="mTotal">-</div><div class="ml">Inscritos</div></div>
+      <div class="mini-card"><div class="mn cor-presente" id="mPresentes">-</div><div class="ml">Presentes</div></div>
+      <div class="mini-card"><div class="mn cor-ausente"  id="mAusentes">-</div><div class="ml">Ausentes</div></div>
+    </div>
+    <div class="modal-filtros">
+      <button class="filtro-btn ativo" id="fTodos"     onclick="filtrar('todos')">Todos</button>
+      <button class="filtro-btn"       id="fPresentes" onclick="filtrar('presentes')">Presentes</button>
+      <button class="filtro-btn"       id="fAusentes"  onclick="filtrar('ausentes')">Ausentes</button>
+    </div>
+    <div class="modal-busca">
+      <input class="busca-input" id="buscaInput" type="text" placeholder="Buscar por nome ou e-mail..." oninput="renderizarLista()"/>
+    </div>
+    <div class="modal-lista" id="participantesLista"></div>
+  </div>
+</div>
+
+<!-- CONFIRM EXCLUIR -->
+<div class="confirm-overlay" id="confirmOverlay">
+  <div class="confirm-box">
+    <div class="confirm-titulo">Excluir presenca?</div>
+    <div class="confirm-msg" id="confirmMsg">Esta acao nao pode ser desfeita.</div>
+    <div class="confirm-acoes">
+      <button class="btn-cancelar" onclick="fecharConfirm()">Cancelar</button>
+      <button class="btn-confirmar-excluir" id="btnConfirmarExcluir" onclick="confirmarExclusao()">Excluir</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  // SUPA_URL / SUPA_KEY definidos em config.js
+  var KEY_EMAIL = "fiscal_email";
+
+  function h(extra) {
+    var base = { "apikey": SUPA_KEY, "Authorization": "Bearer " + SUPA_KEY, "Content-Type": "application/json", "Prefer": "return=representation", "Accept-Profile": SUPA_SCHEMA, "Content-Profile": SUPA_SCHEMA };
+    if (extra) Object.assign(base, extra);
+    return base;
+  }
+
+  var dadosPalestras     = [];
+  var dadosParticipantes = [];
+  var dadosPresencas     = [];
+  var palestraAtual      = null;
+  var filtroAtual        = "todos";
+  var emailFiscal        = localStorage.getItem(KEY_EMAIL) || "";
+  var telaAtual          = "dashboard"; // "dashboard" | "gerencial"
+  var tokenParaExcluir   = null;
+
+  // ── CARREGAR ────────────────────────────────────────────────
+  function carregar() {
+    document.getElementById("btnRefresh").classList.add("loading");
+    return Promise.all([
+      fetch(SUPA_URL + "/palestras?select=id,nome,carga_horaria,periodo,hora&order=nome,periodo", { headers: h() }).then(function(r){ return r.json(); }),
+      fetchAll(SUPA_URL + "/participantes?select=token,nome,email,palestra_id", h()),
+      fetchAll(SUPA_URL + "/presencas?select=token,palestra_id,data_hora,validado_por", h())
+    ]).then(function(res) {
+      document.getElementById("btnRefresh").classList.remove("loading");
+      dadosPalestras     = Array.isArray(res[0]) ? res[0] : [];
+      dadosParticipantes = Array.isArray(res[1]) ? res[1] : [];
+      dadosPresencas     = Array.isArray(res[2]) ? res[2] : [];
+      return true;
+    }).catch(function() {
+      document.getElementById("btnRefresh").classList.remove("loading");
+      return false;
+    });
+  }
+
+  function recarregar() {
+    carregar().then(function(ok) {
+      if (!ok) return;
+      if (telaAtual === "gerencial") renderizarGerencial();
+      else renderizarDashboard();
+      if (buscaGlobalAtiva()) renderizarBuscaGlobal();
+      if (palestraAtual) renderizarLista();
+    });
+  }
+
+  // ── DASHBOARD ───────────────────────────────────────────────
+  function renderizarDashboard() {
+    var tP = {};
+    dadosPresencas.forEach(function(p){ tP[p.token] = p; });
+
+    var mapIns = {}, mapPres = {};
+    dadosPalestras.forEach(function(pal){ mapIns[pal.id]=0; mapPres[pal.id]=0; });
+    dadosParticipantes.forEach(function(p){
+      if (mapIns[p.palestra_id] !== undefined) {
+        mapIns[p.palestra_id]++;
+        if (tP[p.token]) mapPres[p.palestra_id]++;
+      }
+    });
+
+    var totIns  = dadosParticipantes.length;
+    var totPres = dadosPresencas.length;
+    document.getElementById("rTotal").textContent    = totIns;
+    document.getElementById("rPresentes").textContent = totPres;
+    document.getElementById("rAusentes").textContent  = totIns - totPres;
+    document.getElementById("rTaxa").textContent      = totIns > 0 ? Math.round(totPres/totIns*100)+"%" : "0%";
+    // topSub removido
+    document.getElementById("atualizado").textContent = "Atualizado em " + new Date().toLocaleString("pt-BR");
+
+    var dados = dadosPalestras.map(function(pal){
+      var ins  = mapIns[pal.id]  || 0;
+      var pres = mapPres[pal.id] || 0;
+      var taxa = ins > 0 ? Math.round(pres/ins*100) : 0;
+      var sub  = pal.periodo
+        ? periodoCurto(pal.periodo) + (pal.hora ? " (" + pal.hora + ")" : "")
+        : (pal.carga_horaria || "");
+      return { pal:pal, ins:ins, pres:pres, aus:ins-pres, taxa:taxa, sub:sub };
+    }).sort(function(a,b){ return b.taxa - a.taxa; });
+
+    var html = '<div class="palestras-grid">';
+    dados.forEach(function(d, idx){
+      var tc = d.taxa>=75?"taxa-alta":d.taxa>=40?"taxa-media":"taxa-baixa";
+      html +=
+        '<div class="palestra-card fadeUp" style="animation-delay:'+(idx*.04)+'s" onclick="abrirModal(\''+d.pal.id+'\')">' +
+          '<div class="palestra-header"><div><div class="palestra-nome">'+escapeHtml(d.pal.nome)+'</div>'+(d.sub?'<div class="palestra-carga">'+escapeHtml(d.sub)+'</div>':'')+'</div><span class="taxa-badge '+tc+'">'+d.taxa+'%</span></div>'+
+          '<div class="barra-bg"><div class="barra-fill" style="width:'+d.taxa+'%"></div></div>'+
+          '<div class="palestra-nums">'+
+            '<div class="num-item"><div class="n n-inscritos">'+d.ins+'</div><div class="l">Inscritos</div></div>'+
+            '<div class="num-item"><div class="n n-presentes">'+d.pres+'</div><div class="l">Presentes</div></div>'+
+            '<div class="num-item"><div class="n n-ausentes">'+d.aus+'</div><div class="l">Ausentes</div></div>'+
+          '</div>'+
+          (d.aus>0
+            ? '<button class="card-ausentes" onclick="event.stopPropagation();abrirModal(\''+d.pal.id+'\',\'ausentes\')">'+d.aus+' faltam validar &rarr;</button>'
+            : '<div class="hint" style="color:#86efac">Todos presentes</div>'
+          )+
+        '</div>';
+    });
+    html += '</div>';
+    document.getElementById("palestrasGrid").innerHTML = html;
+  }
+
+  // ── BUSCA GLOBAL (todas as palestras) ───────────────────────
+  function limparBuscaGlobal() {
+    document.getElementById("buscaGlobal").value = "";
+    renderizarBuscaGlobal();
+    document.getElementById("buscaGlobal").focus();
+  }
+
+  function renderizarBuscaGlobal() {
+    var inp = document.getElementById("buscaGlobal");
+    var q   = inp.value.trim().toLowerCase();
+    var sec = document.getElementById("secaoPalestras");
+    var box = document.getElementById("resultadoBusca");
+    document.getElementById("buscaLimpar").style.display = q ? "flex" : "none";
+
+    if (!q) { box.style.display = "none"; box.innerHTML = ""; sec.style.display = "block"; return; }
+    sec.style.display = "none"; box.style.display = "block";
+
+    var tP = {};  dadosPresencas.forEach(function(p){ tP[p.token] = p; });
+    var mapPal = {}; dadosPalestras.forEach(function(p){ mapPal[p.id] = p; });
+
+    var res = dadosParticipantes.filter(function(p){
+      return (p.nome||"").toLowerCase().indexOf(q)  !== -1 ||
+             (p.email||"").toLowerCase().indexOf(q) !== -1 ||
+             (p.token||"").toLowerCase().indexOf(q) !== -1;
+    }).sort(function(a,b){
+      var aP = tP[a.token]?1:0, bP = tP[b.token]?1:0;
+      if (aP !== bP) return aP - bP;                 // ausentes primeiro (a validar)
+      return (a.nome||"").localeCompare(b.nome||"");
+    });
+
+    var LIMITE = 60, total = res.length;
+    res = res.slice(0, LIMITE);
+
+    if (res.length === 0) {
+      box.innerHTML = '<div class="estado"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>Nenhum professor encontrado.</div>';
+      return;
+    }
+
+    var station = localStorage.getItem("fiscal_palestra") || "";
+    var html = '<div class="secao-titulo">' + total + ' resultado(s)' + (total > LIMITE ? ' — refine a busca (mostrando ' + LIMITE + ')' : '') + '</div>';
+    res.forEach(function(p){
+      var pr  = tP[p.token];
+      var pal = mapPal[p.palestra_id] ? mapPal[p.palestra_id].nome : p.palestra_id;
+      var dt  = pr && pr.data_hora ? new Date(pr.data_hora).toLocaleString("pt-BR") : "";
+      var mismatch = station && p.palestra_id !== station;
+      var desta    = station && p.palestra_id === station;
+      html +=
+        '<div class="participante-row '+(pr?"presente":"ausente")+(mismatch?" outra":"")+'" id="row-'+p.token+'">'+
+          '<div class="participante-info">'+
+            '<div class="participante-nome">'+escapeHtml(p.nome||"")+(desta?'<span class="badge-desta">desta palestra</span>':'')+'</div>'+
+            '<div class="participante-email">'+escapeHtml(pal)+(p.email?' · '+escapeHtml(p.email):'')+'</div>'+
+            (mismatch?'<div class="participante-alerta"><svg viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><path d="M12 9v4M12 17h.01"/></svg>Palestra diferente da sua estação</div>':'')+
+            (pr?'<div class="participante-meta">Presente · '+dt+'</div>':'')+
+          '</div>'+
+          (pr
+            ? '<span class="tag-presente">Presente</span>'
+            : '<button class="btn-validar-inline" id="btn-'+p.token+'" onclick="validarInline(\''+p.token+'\',\''+p.palestra_id+'\')">Validar</button>'
+          )+
+        '</div>';
+    });
+    box.innerHTML = html;
+  }
+
+  function buscaGlobalAtiva() {
+    var i = document.getElementById("buscaGlobal");
+    return i && i.value.trim() !== "";
+  }
+
+  // ── ESTAÇÃO (palestra do fiscal) ────────────────────────────
+  function populaStations() {
+    var sel = document.getElementById("stationSelect");
+    if (!sel) return;
+    var saved = localStorage.getItem("fiscal_palestra") || "";
+    var opts = '<option value="">— selecione a sua palestra —</option>';
+    dadosPalestras.forEach(function(pal){
+      opts += '<option value="'+escapeHtml(pal.id)+'">'+escapeHtml(palestraLabel(pal))+'</option>';
+    });
+    sel.innerHTML = opts;
+    if (saved && dadosPalestras.some(function(p){ return p.id === saved; })) sel.value = saved;
+    atualizaStationBar();
+  }
+  function setStation() {
+    var el = document.getElementById("stationSelect");
+    var v  = el.value;
+    if (v) {
+      localStorage.setItem("fiscal_palestra", v);
+      localStorage.setItem("fiscal_palestra_nome", el.options[el.selectedIndex].text);
+    } else {
+      localStorage.removeItem("fiscal_palestra");
+      localStorage.removeItem("fiscal_palestra_nome");
+    }
+    atualizaStationBar();
+    if (buscaGlobalAtiva()) renderizarBuscaGlobal();
+  }
+  function atualizaStationBar() {
+    var v = localStorage.getItem("fiscal_palestra") || "";
+    document.getElementById("stationBar").classList.toggle("definida", !!v);
+  }
+
+  // ── MODAL ───────────────────────────────────────────────────
+  function abrirModal(palestraId, filtroInicial) {
+    palestraAtual = palestraId;
+    filtroAtual   = filtroInicial || "todos";
+    document.getElementById("buscaInput").value = "";
+    ["fTodos","fPresentes","fAusentes"].forEach(function(id){ document.getElementById(id).classList.remove("ativo"); });
+    document.getElementById(filtroAtual==="ausentes"?"fAusentes":filtroAtual==="presentes"?"fPresentes":"fTodos").classList.add("ativo");
+
+    var pal = dadosPalestras.find(function(p){ return p.id === palestraId; });
+    document.getElementById("modalTitulo").textContent = pal ? palestraLabel(pal) : "Palestra";
+    document.getElementById("modalOverlay").classList.add("aberto");
+    document.body.style.overflow = "hidden";
+    renderizarLista();
+  }
+
+  function fecharModal() {
+    palestraAtual = null;
+    document.getElementById("modalOverlay").classList.remove("aberto");
+    document.body.style.overflow = "";
+  }
+
+  function fecharModalSeFora(e) {
+    if (e.target === document.getElementById("modalOverlay")) fecharModal();
+  }
+
+  function filtrar(tipo) {
+    filtroAtual = tipo;
+    ["fTodos","fPresentes","fAusentes"].forEach(function(id){ document.getElementById(id).classList.remove("ativo"); });
+    document.getElementById(tipo==="todos"?"fTodos":tipo==="presentes"?"fPresentes":"fAusentes").classList.add("ativo");
+    renderizarLista();
+  }
+
+  function renderizarLista() {
+    var tP = {};
+    dadosPresencas.forEach(function(p){ tP[p.token] = p; });
+
+    var participantes = dadosParticipantes.filter(function(p){ return p.palestra_id === palestraAtual; });
+    var busca = document.getElementById("buscaInput").value.trim().toLowerCase();
+
+    var ins  = participantes.length;
+    var pres = participantes.filter(function(p){ return tP[p.token]; }).length;
+    document.getElementById("mTotal").textContent    = ins;
+    document.getElementById("mPresentes").textContent = pres;
+    document.getElementById("mAusentes").textContent  = ins - pres;
+    document.getElementById("modalSub").textContent   = ins + " inscrito(s) · " + pres + " presente(s)";
+
+    var lista = participantes.filter(function(p){
+      if (filtroAtual === "presentes" && !tP[p.token]) return false;
+      if (filtroAtual === "ausentes"  &&  tP[p.token]) return false;
+      if (busca && p.nome.toLowerCase().indexOf(busca)===-1 && p.email.toLowerCase().indexOf(busca)===-1) return false;
+      return true;
+    }).sort(function(a,b){
+      var aP = tP[a.token]?1:0, bP = tP[b.token]?1:0;
+      if (aP !== bP) return aP - bP;
+      return a.nome.localeCompare(b.nome);
+    });
+
+    if (lista.length === 0) {
+      document.getElementById("participantesLista").innerHTML =
+        '<div class="estado"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>Nenhum participante encontrado.</div>';
+      return;
+    }
+
+    var html = "";
+    lista.forEach(function(p) {
+      var pr  = tP[p.token];
+      var dt  = pr && pr.data_hora ? new Date(pr.data_hora).toLocaleString("pt-BR") : "";
+      var por = pr && pr.validado_por ? pr.validado_por : "";
+      html +=
+        '<div class="participante-row '+(pr?"presente":"ausente")+'" id="row-'+p.token+'">'+
+          '<div class="participante-info">'+
+            '<div class="participante-nome">'+escapeHtml(p.nome)+'</div>'+
+            '<div class="participante-email">'+escapeHtml(p.email)+'</div>'+
+            (pr?'<div class="participante-meta">'+dt+(por?" · "+escapeHtml(por):"")+'</div>':'')+
+          '</div>'+
+          (pr
+            ? '<span class="tag-presente">Presente</span>'
+            : '<button class="btn-validar-inline" id="btn-'+p.token+'" onclick="validarInline(\''+p.token+'\',\''+p.palestra_id+'\')">Validar</button>'
+          )+
+        '</div>';
+    });
+    document.getElementById("participantesLista").innerHTML = html;
+  }
+
+  // ── VALIDAR INLINE ──────────────────────────────────────────
+  function validarInline(token, palestraId) {
+    if (!emailFiscal) { alert("Voce nao esta logado como fiscal."); return; }
+    var btn = document.getElementById("btn-"+token);
+    btn.disabled = true; btn.textContent = "...";
+
+    fetch(SUPA_URL + "/presencas", {
+      method: "POST", headers: h(),
+      body: JSON.stringify({ token: token, palestra_id: palestraId, data_hora: new Date().toISOString(), validado_por: emailFiscal })
+    })
+    .then(function(r){
+      if (r.status === 201) return r.json();
+      if (r.status === 409) throw new Error("ja_registrado");
+      return r.json().then(function(d){ throw new Error(d.message||"Erro"); });
+    })
+    .then(function() {
+      dadosPresencas.push({ token: token, palestra_id: palestraId, data_hora: new Date().toISOString(), validado_por: emailFiscal });
+      if (palestraAtual) renderizarLista();
+      if (buscaGlobalAtiva()) renderizarBuscaGlobal();
+      renderizarDashboard();
+    })
+    .catch(function(err) {
+      if (err.message === "ja_registrado") {
+        if (!dadosPresencas.some(function(x){ return x.token === token; }))
+          dadosPresencas.push({ token: token, palestra_id: palestraId, data_hora: new Date().toISOString(), validado_por: "" });
+        if (palestraAtual) renderizarLista();
+        if (buscaGlobalAtiva()) renderizarBuscaGlobal();
+        renderizarDashboard();
+      }
+      else { btn.disabled=false; btn.textContent="Validar"; alert("Erro: "+err.message); }
+    });
+  }
+
+  // ── GERENCIAL ───────────────────────────────────────────────
+  function toggleGerencial() {
+    if (telaAtual === "gerencial") {
+      telaAtual = "dashboard";
+      document.getElementById("tela-dashboard").style.display = "block";
+      document.getElementById("tela-gerencial").style.display = "none";
+      document.getElementById("btnGerencial").classList.remove("ativo");
+    } else {
+      // Fecha outras telas
+      telaAtual = "gerencial";
+      telaEmailsAberta = false;
+      telaQRAberta = false;
+      document.getElementById("tela-emails").style.display    = "none";
+      document.getElementById("tela-qr").style.display        = "none";
+      document.getElementById("tela-dashboard").style.display = "none";
+      document.getElementById("tela-gerencial").style.display = "block";
+      document.getElementById("btnGerencial").classList.add("ativo");
+      document.getElementById("btnEmails").classList.remove("ativo");
+      document.getElementById("btnQR").classList.remove("ativo");
+      document.getElementById("gerencialBusca").value = "";
+      renderizarGerencial();
+    }
+  }
+
+  function renderizarGerencial() {
+    var busca = document.getElementById("gerencialBusca").value.trim().toLowerCase();
+
+    var mapPart = {};
+    dadosParticipantes.forEach(function(p){ mapPart[p.token] = p; });
+    var mapPal = {};
+    dadosPalestras.forEach(function(p){ mapPal[p.id] = p; });
+
+    var lista = dadosPresencas.filter(function(pr) {
+      if (!busca) return true;
+      var part = mapPart[pr.token];
+      if (!part) return pr.token.toLowerCase().indexOf(busca) !== -1;
+      return part.nome.toLowerCase().indexOf(busca) !== -1 ||
+             part.email.toLowerCase().indexOf(busca) !== -1 ||
+             pr.token.toLowerCase().indexOf(busca) !== -1;
+    });
+
+    // topSub removido
+
+    if (lista.length === 0) {
+      document.getElementById("gerencialLista").innerHTML =
+        '<div class="estado"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>Nenhuma presenca encontrada.</div>';
+      return;
+    }
+
+    // Agrupa por palestra
+    var grupos = {};
+    dadosPalestras.forEach(function(pal){ grupos[pal.id] = []; });
+    lista.forEach(function(pr){
+      if (!grupos[pr.palestra_id]) grupos[pr.palestra_id] = [];
+      grupos[pr.palestra_id].push(pr);
+    });
+
+    var html = "";
+    dadosPalestras.forEach(function(pal) {
+      var gr = grupos[pal.id] || [];
+      if (gr.length === 0) return;
+
+      gr.sort(function(a, b) {
+        var nA = mapPart[a.token] ? mapPart[a.token].nome : a.token;
+        var nB = mapPart[b.token] ? mapPart[b.token].nome : b.token;
+        return nA.localeCompare(nB);
+      });
+
+      html +=
+        '<div class="grupo-palestra">' +
+          '<div class="grupo-header" id="gh-'+pal.id+'" onclick="toggleGrupo(\'' + pal.id + '\')">' +
+            '<div class="grupo-info">' +
+              '<div class="grupo-nome">'+escapeHtml(pal.nome)+'</div>' +
+              '<div class="grupo-contagem">'+gr.length+' presente(s)</div>' +
+            '</div>' +
+            '<span class="grupo-badge">'+gr.length+'</span>' +
+            '<svg class="grupo-chevron" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg>' +
+          '</div>' +
+          '<div class="grupo-corpo" id="gc-'+pal.id+'">';
+
+      gr.forEach(function(pr) {
+        var part    = mapPart[pr.token];
+        var dt      = pr.data_hora ? new Date(pr.data_hora).toLocaleString("pt-BR") : "-";
+        var nome    = part ? part.nome : pr.token;
+        var nomeEsc = nome.replace(/'/g, "\\'");
+        html +=
+          '<div class="presenca-row" id="prow-'+pr.token+'">' +
+            '<div class="presenca-info">' +
+              '<div class="presenca-nome">'+escapeHtml(nome)+'</div>' +
+              '<div class="presenca-detalhe">'+(part?escapeHtml(part.email):"")+'</div>' +
+              '<div class="presenca-data">'+dt+(pr.validado_por?" · "+escapeHtml(pr.validado_por):"")+'</div>' +
+            '</div>' +
+            '<button class="btn-excluir" onclick="pedirExclusao(\'' + pr.token + '\',\'' + (part ? part.nome.replace(/'/g,"\\'") : pr.token) + '\')">Excluir</button>' +
+          '</div>';
+      });
+
+      html += '</div></div>';
+    });
+
+    document.getElementById("gerencialLista").innerHTML = html;
+
+    if (busca) {
+      dadosPalestras.forEach(function(pal) {
+        if (grupos[pal.id] && grupos[pal.id].length > 0) toggleGrupo(pal.id, true);
+      });
+    }
+  }
+
+  function toggleGrupo(palestraId, forcarAberto) {
+    var header = document.getElementById("gh-"+palestraId);
+    var corpo  = document.getElementById("gc-"+palestraId);
+    if (!header || !corpo) return;
+    var estaAberto = corpo.classList.contains("aberto");
+    if (forcarAberto && estaAberto) return;
+    if (estaAberto && !forcarAberto) {
+      corpo.classList.remove("aberto");
+      header.classList.remove("aberto");
+    } else {
+      corpo.classList.add("aberto");
+      header.classList.add("aberto");
+    }
+  }
+
+  // ── EXCLUSÃO ────────────────────────────────────────────────
+  function pedirExclusao(token, nome) {
+    tokenParaExcluir = token;
+    document.getElementById("confirmMsg").textContent =
+      "Deseja excluir a presenca de \"" + nome + "\"? Esta acao nao pode ser desfeita.";
+    document.getElementById("confirmOverlay").classList.add("aberto");
+  }
+
+  function fecharConfirm() {
+    tokenParaExcluir = null;
+    document.getElementById("confirmOverlay").classList.remove("aberto");
+  }
+
+  function confirmarExclusao() {
+    if (!tokenParaExcluir) return;
+    var token = tokenParaExcluir;
+    var btn   = document.getElementById("btnConfirmarExcluir");
+    btn.disabled = true; btn.textContent = "Excluindo...";
+
+    // RLS precisa de policy de DELETE para anon
+    fetch(SUPA_URL + "/presencas?token=eq." + encodeURIComponent(token), {
+      method: "DELETE",
+      headers: { "apikey": SUPA_KEY, "Authorization": "Bearer " + SUPA_KEY, "Content-Profile": SUPA_SCHEMA }
+    })
+    .then(function(r) {
+      if (r.status === 204 || r.status === 200) {
+        // Remove do estado local
+        dadosPresencas = dadosPresencas.filter(function(p){ return p.token !== token; });
+        fecharConfirm();
+        renderizarDashboard();
+        if (telaAtual === "gerencial") renderizarGerencial();
+        // Atualiza o modal se estiver aberto
+        if (palestraAtual) renderizarLista();
+      } else {
+        return r.text().then(function(t){ throw new Error(t); });
+      }
+    })
+    .catch(function(err) {
+      alert("Erro ao excluir: " + err.message);
+    })
+    .finally(function() {
+      btn.disabled = false; btn.textContent = "Excluir";
+    });
+  }
+
+  // ── EMAILS ─────────────────────────────────────────────────
+  var dadosEmails     = [];   // presenças com info de email_enviado
+  var filtroEmail     = "todos";
+  var telaEmailsAberta = false;
+
+  // ── QR ─────────────────────────────────────────────────────
+  var dadosQR      = [];      // participantes com info de qr_enviado
+  var filtroQR     = "todos";
+  var telaQRAberta = false;
+
+  function toggleEmails() {
+    if (telaEmailsAberta) {
+      telaEmailsAberta = false;
+      telaAtual = "dashboard";
+      document.getElementById("tela-emails").style.display    = "none";
+      document.getElementById("tela-dashboard").style.display = "block";
+      document.getElementById("btnEmails").classList.remove("ativo");
+    } else {
+      telaEmailsAberta = true;
+      telaQRAberta = false;
+      telaAtual = "emails";
+      document.getElementById("tela-dashboard").style.display  = "none";
+      document.getElementById("tela-gerencial").style.display  = "none";
+      document.getElementById("tela-qr").style.display         = "none";
+      document.getElementById("tela-emails").style.display     = "block";
+      document.getElementById("btnQR").classList.remove("ativo");
+      document.getElementById("btnEmails").classList.add("ativo");
+      document.getElementById("emailsBusca").value = "";
+      filtroEmail = "todos";
+      ["efTodos","efEnviados","efPendentes"].forEach(function(id){ document.getElementById(id).classList.remove("ativo"); });
+      document.getElementById("efTodos").classList.add("ativo");
+      carregarEmails();
+    }
+  }
+
+  function carregarEmails() {
+    document.getElementById("emailsLista").innerHTML =
+      '<div class="estado"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>Carregando...</div>';
+
+    fetchAll(SUPA_URL + "/presencas?select=token,email_enviado,data_hora,validado_por,participantes(nome,email),palestras(nome)&order=email_enviado.asc,data_hora.desc",
+      h())
+      .then(function(data) {
+        dadosEmails = Array.isArray(data) ? data : [];
+        renderizarEmails();
+      })
+      .catch(function(){
+        document.getElementById("emailsLista").innerHTML =
+          '<div class="estado">Erro ao carregar.</div>';
+      });
+  }
+
+  function filtrarEmails(tipo) {
+    filtroEmail = tipo;
+    ["efTodos","efEnviados","efPendentes"].forEach(function(id){ document.getElementById(id).classList.remove("ativo"); });
+    document.getElementById(tipo==="todos"?"efTodos":tipo==="enviados"?"efEnviados":"efPendentes").classList.add("ativo");
+    renderizarEmails();
+  }
+
+  function renderizarEmails() {
+    var busca = document.getElementById("emailsBusca").value.trim().toLowerCase();
+
+    var lista = dadosEmails.filter(function(pr) {
+      if (filtroEmail === "enviados"  && !pr.email_enviado) return false;
+      if (filtroEmail === "pendentes" &&  pr.email_enviado) return false;
+      if (busca) {
+        var nome     = pr.participantes ? pr.participantes.nome.toLowerCase()  : "";
+        var email    = pr.participantes ? pr.participantes.email.toLowerCase() : "";
+        var palestra = pr.palestras     ? pr.palestras.nome.toLowerCase()      : "";
+        if (nome.indexOf(busca)===-1 && email.indexOf(busca)===-1 && palestra.indexOf(busca)===-1) return false;
+      }
+      return true;
+    });
+
+    var total     = dadosEmails.length;
+    var enviados  = dadosEmails.filter(function(p){ return p.email_enviado; }).length;
+    var pendentes = total - enviados;
+
+    document.getElementById("emTotal").textContent    = total;
+    document.getElementById("emEnviados").textContent  = enviados;
+    document.getElementById("emPendentes").textContent = pendentes;
+
+    if (lista.length === 0) {
+      document.getElementById("emailsLista").innerHTML =
+        '<div class="estado"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>Nenhum registro encontrado.</div>';
+      return;
+    }
+
+    var html = "";
+    lista.forEach(function(pr) {
+      var nome     = pr.participantes ? pr.participantes.nome  : pr.token;
+      var email    = pr.participantes ? pr.participantes.email : "-";
+      var palestra = pr.palestras     ? pr.palestras.nome      : "-";
+      var dt       = pr.data_hora ? new Date(pr.data_hora).toLocaleString("pt-BR") : "-";
+      var enviado  = pr.email_enviado;
+
+      var classeRow = "email-row " + (enviado ? "enviado" : "pendente");
+      html += '<div class="' + classeRow + '">';
+      html +=   '<div class="email-info">';
+      html +=     '<div class="email-nome">' + escapeHtml(nome) + '</div>';
+      html +=     '<div class="email-detalhe">' + escapeHtml(email) + ' &middot; ' + escapeHtml(palestra) + '</div>';
+      html +=     '<div class="email-detalhe" style="margin-top:2px;font-size:11px;color:var(--muted)">Presenca: ' + dt + '</div>';
+      html +=   '</div>';
+      html +=   (enviado
+        ? '<span class="tag-enviado">&#10003; Enviado</span>'
+        : '<span class="tag-pendente">Pendente</span>');
+      html += '</div>';
+    });
+
+    document.getElementById("emailsLista").innerHTML = html;
+  }
+
+  // ── QR CODES ───────────────────────────────────────────────
+  function toggleQR() {
+    if (telaQRAberta) {
+      telaQRAberta = false;
+      telaAtual = "dashboard";
+      document.getElementById("tela-qr").style.display        = "none";
+      document.getElementById("tela-dashboard").style.display = "block";
+      document.getElementById("btnQR").classList.remove("ativo");
+    } else {
+      telaQRAberta = true;
+      telaEmailsAberta = false;
+      telaAtual = "qr";
+      document.getElementById("tela-dashboard").style.display = "none";
+      document.getElementById("tela-gerencial").style.display = "none";
+      document.getElementById("tela-emails").style.display    = "none";
+      document.getElementById("tela-qr").style.display        = "block";
+      document.getElementById("btnQR").classList.add("ativo");
+      document.getElementById("btnEmails").classList.remove("ativo");
+      document.getElementById("qrBusca").value = "";
+      filtroQR = "todos";
+      ["qfTodos","qfEnviados","qfPendentes"].forEach(function(id){ document.getElementById(id).classList.remove("ativo"); });
+      document.getElementById("qfTodos").classList.add("ativo");
+      carregarQR();
+    }
+  }
+
+  function carregarQR() {
+    document.getElementById("qrLista").innerHTML =
+      '<div class="estado"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>Carregando...</div>';
+
+    fetchAll(SUPA_URL + "/participantes?select=token,nome,email,qr_enviado,qr_url,palestras(nome)&order=qr_enviado.asc,nome.asc",
+      h())
+      .then(function(data) {
+        dadosQR = Array.isArray(data) ? data : [];
+        renderizarQR();
+      })
+      .catch(function(){
+        document.getElementById("qrLista").innerHTML = '<div class="estado">Erro ao carregar.</div>';
+      });
+  }
+
+  function filtrarQR(tipo) {
+    filtroQR = tipo;
+    ["qfTodos","qfEnviados","qfPendentes"].forEach(function(id){ document.getElementById(id).classList.remove("ativo"); });
+    document.getElementById(tipo==="todos"?"qfTodos":tipo==="enviados"?"qfEnviados":"qfPendentes").classList.add("ativo");
+    renderizarQR();
+  }
+
+  function renderizarQR() {
+    var busca = document.getElementById("qrBusca").value.trim().toLowerCase();
+
+    var lista = dadosQR.filter(function(p) {
+      if (filtroQR === "enviados"  && !p.qr_enviado) return false;
+      if (filtroQR === "pendentes" &&  p.qr_enviado) return false;
+      if (busca) {
+        var nome     = (p.nome  || "").toLowerCase();
+        var email    = (p.email || "").toLowerCase();
+        var palestra = p.palestras ? p.palestras.nome.toLowerCase() : "";
+        if (nome.indexOf(busca)===-1 && email.indexOf(busca)===-1 && palestra.indexOf(busca)===-1) return false;
+      }
+      return true;
+    });
+
+    var total     = dadosQR.length;
+    var enviados  = dadosQR.filter(function(p){ return p.qr_enviado; }).length;
+    var pendentes = total - enviados;
+
+    document.getElementById("qrTotal").textContent     = total;
+    document.getElementById("qrEnviados").textContent  = enviados;
+    document.getElementById("qrPendentes").textContent = pendentes;
+
+    if (lista.length === 0) {
+      document.getElementById("qrLista").innerHTML =
+        '<div class="estado"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>Nenhum registro encontrado.</div>';
+      return;
+    }
+
+    var html = "";
+    lista.forEach(function(p) {
+      var nome     = p.nome  || p.token;
+      var email    = p.email || "-";
+      var palestra = p.palestras ? p.palestras.nome : "-";
+      var enviado  = p.qr_enviado;
+      var temQR    = p.qr_url && /fid=/.test(p.qr_url);
+
+      html += '<div class="email-row ' + (enviado ? "enviado" : "pendente") + '">';
+      html +=   '<div class="email-info">';
+      html +=     '<div class="email-nome">' + escapeHtml(nome) + '</div>';
+      html +=     '<div class="email-detalhe">' + escapeHtml(email) + ' &middot; ' + escapeHtml(palestra) + '</div>';
+      if (!temQR) html += '<div class="email-detalhe" style="margin-top:2px;font-size:11px;color:var(--warning)">QR ainda nao gerado</div>';
+      html +=   '</div>';
+      html +=   (enviado
+        ? '<span class="tag-enviado">&#10003; Enviado</span>'
+        : '<span class="tag-pendente">Pendente</span>');
+      html += '</div>';
+    });
+
+    document.getElementById("qrLista").innerHTML = html;
+  }
+
+  // ── ACOES RAPIDAS ──────────────────────────────────────────
+  // APPS_URL definido em config.js
+
+  function chamarAppsScript(action, btnId, onSucesso) {
+    var btn = document.getElementById(btnId);
+    btn.disabled = true;
+    btn.classList.add("loading");
+
+    // Usa fetch com mode no-cors para evitar bloqueio de CORS.
+    // Envia o e-mail do gerente logado; o Apps Script valida contra validadores
+    // antes de executar acoes sensiveis (ver apps-script/Code.gs e SECURITY.md).
+    fetch(APPS_URL + "?action=" + action + "&email=" + encodeURIComponent(emailFiscal), { mode: "no-cors" })
+      .then(function() {
+        btn.classList.remove("loading");
+        btn.classList.add("sucesso");
+        setTimeout(function(){
+          btn.classList.remove("sucesso");
+          btn.disabled = false;
+        }, 3000);
+        if (onSucesso) setTimeout(onSucesso, 1500);
+      })
+      .catch(function() {
+        // no-cors sempre resolve — se cair aqui é erro de rede real
+        btn.classList.remove("loading");
+        btn.classList.add("erro");
+        setTimeout(function(){ btn.classList.remove("erro"); btn.disabled = false; }, 3000);
+      });
+  }
+
+  function rodarSync() {
+    chamarAppsScript("syncInscritos", "btnSyncInscritos", function() {
+      recarregar();
+    });
+  }
+
+  function rodarEmails() {
+    chamarAppsScript("enviarEmails", "btnEnviarEmails", function() {
+      if (telaEmailsAberta) carregarEmails();
+    });
+  }
+
+  // ── INIT ────────────────────────────────────────────────────
+  protegerPagina().then(function(user) {
+    if (!user) return;  // protegerPagina ja redirecionou
+    emailFiscal = user.email;
+
+    // Exibe elementos exclusivos de gerente
+    if (user.perfil === "gerente") {
+      var btnG = document.getElementById("btnGerencial");
+      if (btnG) btnG.style.display = "flex";
+      var btnE = document.getElementById("btnEmails");
+      if (btnE) btnE.style.display = "flex";
+      var btnQ = document.getElementById("btnQR");
+      if (btnQ) btnQ.style.display = "flex";
+      var acoes = document.getElementById("acoesGerente");
+      if (acoes) acoes.classList.add("visivel");
+    }
+
+    carregar().then(function(ok){
+      if (!ok) return;
+      renderizarDashboard();
+      populaStations();
+      var bg = document.getElementById("buscaGlobal");
+      if (bg) bg.focus();
+    });
+    setInterval(function(){ if (telaAtual==="dashboard" && !palestraAtual) recarregar(); }, 60000);
+  });
+</script>
+</body>
+</html>
