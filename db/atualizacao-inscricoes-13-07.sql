@@ -45,9 +45,12 @@ where id in ('GESTAO_DEMOCRATICA_M','GESTAO_DEMOCRATICA_T');
 
 -- 1) NOVA PALESTRA ------------------------------------------------
 insert into presenca.palestras (id, nome, local, endereco, periodo, hora) values
-('DIALOGOS_DIREITO_M', 'Diálogos entre o Direito e a Educação: contribuições jurídicas para uma escola democrática.', 'USP - Anfiteatro (FEA)', 'Av. Bandeirantes, 3900 - Vila Monte Alegre', 'Manhã', '08:00'),
-('DIALOGOS_DIREITO_T', 'Diálogos entre o Direito e a Educação: contribuições jurídicas para uma escola democrática.', 'USP - Anfiteatro (FEA)', 'Av. Bandeirantes, 3900 - Vila Monte Alegre', 'Tarde', '14:00')
+('DIALOGOS_DIREITO_M', 'Diálogos entre o Direito e a Educação: contribuições jurídicas para uma gestão escolar inclusiva.', 'USP - Anfiteatro (FEA)', 'Av. Bandeirantes, 3900 - Vila Monte Alegre', 'Manhã', '08:00'),
+('DIALOGOS_DIREITO_T', 'Diálogos entre o Direito e a Educação: contribuições jurídicas para uma gestão escolar inclusiva.', 'USP - Anfiteatro (FEA)', 'Av. Bandeirantes, 3900 - Vila Monte Alegre', 'Tarde', '14:00')
 on conflict (id) do update set nome=excluded.nome, local=excluded.local, endereco=excluded.endereco, periodo=excluded.periodo, hora=excluded.hora;
+
+alter table presenca.palestras add column if not exists capacidade integer;
+update presenca.palestras set capacidade = 95 where id in ('DIALOGOS_DIREITO_M','DIALOGOS_DIREITO_T');
 
 -- 3) CRISTOPHER — alinha ao lançamento oficial --------------------
 update presenca.participantes set palestra_id='QUEM_BRINCA_T' where token='40030';
