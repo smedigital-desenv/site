@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png?v=1">
+  <link rel="icon" href="favicon.ico?v=1">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png?v=1">
+  <title>Consultas Públicas — Secretaria Municipal de Educação</title>
+  <meta name="description" content="Participe das consultas públicas da Secretaria Municipal de Educação de Ribeirão Preto e contribua para a construção de uma educação cada vez melhor para todos.">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --navy:#0f2a52; --navy2:#173257; --blue:#eaf2fb; --blue2:#dceaf9;
+      --gold:#f6b91e; --gold2:#e0a30f;
+      --ink:#16233d; --muted:#5b6d8a; --line:#d7e3f3;
+      --surface:#ffffff; --radius:18px;
+    }
+    *{box-sizing:border-box;margin:0;padding:0;}
+    html{scroll-behavior:smooth;}
+    body{font-family:'DM Sans',system-ui,sans-serif;background:var(--blue);color:var(--ink);line-height:1.6;-webkit-font-smoothing:antialiased;}
+    img{max-width:100%;display:block;}
+    a{color:inherit;}
+    .wrap{max-width:900px;margin:0 auto;padding:0 20px;}
+
+    /* ---- HEADER ---- */
+    header.top{position:sticky;top:0;z-index:50;background:rgba(234,242,251,.92);backdrop-filter:blur(10px);border-bottom:1px solid var(--line);}
+    .top .wrap{display:flex;align-items:center;justify-content:space-between;height:60px;gap:12px;}
+    .brand{display:flex;align-items:center;gap:10px;font-weight:700;color:var(--navy);font-size:14.5px;letter-spacing:-.01em;}
+    .brand .dot{width:10px;height:10px;border-radius:50%;background:linear-gradient(135deg,var(--navy2),var(--gold));flex:none;}
+    .brand small{display:block;font-weight:500;color:var(--muted);font-size:11px;letter-spacing:.02em;}
+
+    /* ---- HERO ---- */
+    .hero{position:relative;overflow:hidden;background:
+      radial-gradient(ellipse 70% 60% at 85% 0%,rgba(246,185,30,.16),transparent 60%),
+      radial-gradient(ellipse 60% 60% at 5% 100%,rgba(15,42,82,.10),transparent 60%),
+      var(--blue);}
+    .hero .wrap{padding:52px 20px 40px;text-align:center;}
+    .badge{display:inline-flex;align-items:center;gap:9px;background:var(--navy);color:#fff;border-radius:999px;padding:10px 22px 10px 14px;font:800 15px 'DM Sans',sans-serif;letter-spacing:.01em;box-shadow:0 10px 26px rgba(15,42,82,.22);}
+    .badge .ic{width:30px;height:30px;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center;flex:none;}
+    .badge .ic svg{width:17px;height:17px;stroke:var(--navy);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+    .badge .em{color:var(--gold);}
+    .hero p.lead{max-width:44ch;margin:22px auto 0;font-size:clamp(16px,2.4vw,19px);color:var(--navy2);line-height:1.55;}
+    .hero p.lead b{color:var(--navy);}
+
+    /* ---- LISTA DE CONSULTAS ---- */
+    #lista{padding:8px 20px 64px;}
+    .sec-tag{font:700 12px 'DM Sans',sans-serif;letter-spacing:.14em;text-transform:uppercase;color:var(--gold2);text-align:center;margin-bottom:8px;}
+    .sec-title{font-size:clamp(22px,3.4vw,28px);font-weight:800;color:var(--navy);text-align:center;margin-bottom:30px;letter-spacing:-.01em;}
+
+    .card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:26px 26px 24px;margin-bottom:18px;box-shadow:0 4px 18px rgba(15,42,82,.06);display:flex;gap:18px;align-items:flex-start;}
+    .card .icon{width:46px;height:46px;border-radius:13px;flex:none;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,var(--navy2),var(--navy));}
+    .card .icon svg{width:22px;height:22px;stroke:#fff;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+    .card .body{flex:1;min-width:0;}
+    .card .tag{display:inline-block;font:700 10.5px 'DM Sans',sans-serif;letter-spacing:.08em;text-transform:uppercase;color:var(--gold2);background:rgba(246,185,30,.14);border-radius:999px;padding:4px 11px;margin-bottom:10px;}
+    .card h3{font-size:17.5px;font-weight:700;color:var(--navy);line-height:1.4;margin-bottom:6px;}
+    .card p{font-size:14px;color:var(--muted);line-height:1.55;margin-bottom:16px;}
+    .btn{display:inline-flex;align-items:center;gap:8px;background:var(--navy);color:#fff;border:none;border-radius:11px;padding:12px 20px;font:700 14px 'DM Sans',sans-serif;text-decoration:none;transition:background .18s,transform .1s;}
+    .btn:hover{background:var(--navy2);}
+    .btn:active{transform:scale(.98);}
+    .btn svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;}
+
+    @media (max-width:560px){
+      .card{flex-direction:column;padding:22px 20px;}
+      .card .icon{margin-bottom:2px;}
+      .btn{width:100%;justify-content:center;}
+    }
+
+    /* ---- RODAPÉ ---- */
+    footer{background:var(--navy);color:#c8d7ec;padding:32px 0;text-align:center;font-size:13px;}
+    footer b{color:#fff;}
+    footer .fmark{font-weight:800;color:#fff;font-size:15px;margin-bottom:6px;letter-spacing:-.01em;}
+  </style>
+</head>
+<body>
+
+<header class="top">
+  <div class="wrap">
+    <div class="brand">
+      <span class="dot"></span>
+      <span>Secretaria Municipal de Educação<small>Prefeitura de Ribeirão Preto</small></span>
+    </div>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="wrap">
+    <span class="badge">
+      <span class="ic"><svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg></span>
+      Consultas <span class="em">em andamento</span>
+    </span>
+    <p class="lead">Participe das <b>consultas públicas</b> e contribua para a construção de uma educação cada vez melhor para todos!</p>
+  </div>
+</section>
+
+<section id="lista">
+  <div class="wrap">
+    <div class="sec-tag">Formulários abertos</div>
+    <div class="sec-title">Escolha a consulta e dê sua opinião</div>
+
+    <div class="card">
+      <div class="icon"><svg viewBox="0 0 24 24"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h5"/></svg></div>
+      <div class="body">
+        <span class="tag">Materiais pedagógicos</span>
+        <h3>Aquisição de jogos e materiais pedagógicos</h3>
+        <p>Consulta pública aos profissionais da educação da rede municipal de ensino sobre a aquisição de jogos e materiais pedagógicos.</p>
+        <a class="btn" href="https://docs.google.com/forms/d/1rtWBo7JcizSzW2JpeTZj6Drqdtu-NsNLV1cdCkoNuJw/viewform" target="_blank" rel="noopener">
+          Responder ao formulário
+          <svg viewBox="0 0 24 24"><path d="M7 17L17 7M7 7h10v10"/></svg>
+        </a>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="icon"><svg viewBox="0 0 24 24"><path d="M12 22s8-4.5 8-11V5l-8-3-8 3v6c0 6.5 8 11 8 11z"/></svg></div>
+      <div class="body">
+        <span class="tag">Segurança escolar</span>
+        <h3>Protocolo de Segurança e Paz para as Escolas Municipais</h3>
+        <p>Contribuições para o Protocolo de Segurança e Paz para as Escolas Municipais de Ribeirão Preto.</p>
+        <a class="btn" href="https://docs.google.com/forms/d/1zX1UFU25Zs2oOXxdkpDnpfNOW33jp26hEbxwTooxxgk/viewform" target="_blank" rel="noopener">
+          Responder ao formulário
+          <svg viewBox="0 0 24 24"><path d="M7 17L17 7M7 7h10v10"/></svg>
+        </a>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="icon"><svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 00-4-4H6a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg></div>
+      <div class="body">
+        <span class="tag">Vida funcional</span>
+        <h3>Processo de remoção e atribuição de aulas</h3>
+        <p>Consulta pública aos profissionais da educação da rede municipal de ensino sobre o processo de remoção e atribuição de aulas.</p>
+        <a class="btn" href="https://docs.google.com/forms/d/1l9MqoCoiePFvDXhxHYMBreEhiBCv3WZfP4ULeis6eKw/viewform" target="_blank" rel="noopener">
+          Responder ao formulário
+          <svg viewBox="0 0 24 24"><path d="M7 17L17 7M7 7h10v10"/></svg>
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="fmark">Secretaria Municipal de Educação</div>
+    <p>Prefeitura Municipal de Ribeirão Preto<br>Transparência e diálogo — juntos por uma educação de qualidade.</p>
+  </div>
+</footer>
+
+</body>
+</html>
