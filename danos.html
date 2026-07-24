@@ -50,6 +50,7 @@
   .cards2{display:grid;grid-template-columns:1fr 1fr;gap:13px;}
   .panel{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:18px 20px;}
   .panel h3{font-size:14px;font-weight:700;color:var(--navy);margin-bottom:14px;}
+  #suspInfo{font-weight:500;color:var(--muted);font-size:12px;}
 
   .bar-row{display:flex;align-items:center;gap:10px;margin-bottom:9px;font-size:13px;}
   .bar-row .lab{width:112px;flex:none;color:var(--ink);font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
@@ -134,7 +135,10 @@
 </div></section>
 
 <section><div class="wrap">
-  <div class="panel"><h3>Tipos de dano mais relatados</h3><div id="chTipo"></div></div>
+  <div class="cards2">
+    <div class="panel"><h3>Tipos de dano mais relatados</h3><div id="chTipo"></div></div>
+    <div class="panel"><h3>Motivos da suspensão de aulas <span id="suspInfo"></span></h3><div id="chMotSusp"></div></div>
+  </div>
 </div></section>
 
 <section><div class="wrap">
@@ -201,6 +205,14 @@ function initKPIs(){
   var tp={}; RECS().forEach(function(x){(x.tipos||[]).forEach(function(t){tp[t]=(tp[t]||0)+1;});});
   var cT=Object.keys(tp).sort(function(a,b){return tp[b]-tp[a];}).map(function(t){return {lab:t,v:tp[t],cls:'c-gold'};});
   barra('chTipo', cT);
+
+  // Motivos entre quem SUSPENDEU o atendimento
+  var suspRecs=RECS().filter(function(x){return x.susp==='Sim';});
+  document.getElementById('suspInfo').textContent = '· '+suspRecs.length+' unidades';
+  var mm={}; suspRecs.forEach(function(x){ motivosSuspJS(x.motivo).forEach(function(m){ mm[m]=(mm[m]||0)+1; }); });
+  var cM=Object.keys(mm).sort(function(a,b){return mm[b]-mm[a];}).map(function(m){return {lab:m,v:mm[m],cls:'c-alta'};});
+  if(!cM.length) cM=[{lab:'—',v:0}];
+  barra('chMotSusp', cM);
 }
 
 function statusChips(x){
@@ -275,6 +287,21 @@ function soEnergiaJS(m){
   var fisico=/alag|inund|desab|desmoron|caiu|caí|queda|qued|destelh|telhad|forr|telha|muro|parede|teto|rachad|vazament|goteir|[aá]rvore|galho|destro[cç]|entulho|danificad|danos?\s+(em|na|no)|transbord|invad|muita [aá]gua|[aá]gua\s+(na|nas|no|nos|dentro)/.test(ml);
   var semAgua=/sem [aá]gua|falta de [aá]gua|sem abastec/.test(ml);
   return !fisico && !semAgua;
+}
+// Motivos da suspensão de aulas (uma unidade pode ter mais de um).
+function motivosSuspJS(m){
+  var ml=(m||'').toLowerCase(), t=[];
+  if(/energ|luz|el[eé]tric/.test(ml)) t.push('Energia');
+  if(/alag|inund|invad|sala.{0,20}[aá]gua|p[aá]tio.{0,20}[aá]gua|muita [aá]gua|transbord/.test(ml)) t.push('Alagamento');
+  if(/sem [aá]gua|falta de [aá]gua|abastec|bomba.{0,10}[aá]gua|caixa d/.test(ml)) t.push('Água');
+  if(/[aá]rvore|galho/.test(ml)) t.push('Árvores');
+  if(/destelh|telhad|forr|telha/.test(ml)) t.push('Telhado');
+  if(/muro|parede|teto|estrutur|desab|desmoron|rachad/.test(ml)) t.push('Estrutura');
+  if(/acesso|via|rua|bairro|entrada|transito|trânsito|caminho/.test(ml)) t.push('Acesso/vias');
+  if(/funcion[aá]ri|equipe|professor.{0,15}(não|nao) conseg|servidor.{0,15}(não|nao)/.test(ml)) t.push('Funcionários');
+  if(/(não|nao|nenhum|poucos?) .{0,15}(alun|crian)|(alun|crian).{0,15}(não|nao) (vier|compare|apare)|pais (não|nao|prefer)|fam[ií]li/.test(ml)) t.push('Alunos ausentes');
+  if(/risco|seguran|perig|queda de fio|fios? de energia|poste/.test(ml)) t.push('Risco');
+  return t;
 }
 function prioJS(x){
   var afetada = (x.impede==='Sim' || x.susp==='Sim' || x.naoimpede==='Sim');
