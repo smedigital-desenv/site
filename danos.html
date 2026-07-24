@@ -7,7 +7,6 @@
 <link rel="icon" href="favicon.ico?v=1">
 <title>Avaliação de Danos — Temporal | Secretaria de Educação</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<script src="config.js"></script>
 <style>
   :root{
     --navy:#0f2a52;--navy2:#173257;--blue:#eef4fb;--gold:#f6b91e;--gold2:#d99b06;
@@ -106,31 +105,6 @@
   .chip{font-size:11px;font-weight:600;color:var(--navy2);background:#eaf1fa;border:1px solid #d7e3f3;border-radius:6px;padding:2px 8px;}
   .chip.st{background:#fff4e6;border-color:#ffd8a8;color:#c25e00;}
   .motivo{font-size:12.5px;color:var(--muted);margin-top:9px;line-height:1.5;border-top:1px dashed var(--line);padding-top:9px;}
-  /* ===== Reabertura na segunda-feira ===== */
-  .ab-resumo{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:14px;}
-  .ab-chip{border:1px solid var(--line);border-radius:10px;background:var(--surface);padding:8px 14px;font-family:'DM Sans',sans-serif;}
-  .ab-chip b{font-size:20px;font-weight:800;color:var(--navy);margin-right:6px;}
-  .ab-chip span{font-size:12px;color:var(--muted);font-weight:600;}
-  .ab-chip.ok b{color:var(--norm)} .ab-chip.no b{color:var(--crit)} .ab-chip.pd b{color:#9aa7b8}
-  .ab-tools{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:12px;}
-  .ab-fbtn{border:1px solid var(--line);background:#fff;border-radius:999px;padding:6px 13px;font:600 12.5px 'DM Sans';color:var(--navy2);cursor:pointer;}
-  .ab-fbtn.on{background:var(--navy);color:#fff;border-color:var(--navy);}
-  .ab-note{font-size:12px;color:var(--muted);margin-bottom:12px;display:flex;align-items:center;gap:7px;}
-  .ab-note .dt{width:8px;height:8px;border-radius:50%;background:#9aa7b8;flex:none;}
-  .ab-note.sync .dt{background:var(--norm);} .ab-note.local .dt{background:var(--alta);}
-  .ab-grp{margin-bottom:18px;}
-  .ab-grp h4{font:700 13px 'DM Sans';color:var(--navy);text-transform:uppercase;letter-spacing:.04em;margin:0 0 8px;padding-bottom:6px;border-bottom:2px solid var(--line);}
-  .ab-row{display:flex;flex-wrap:wrap;align-items:center;gap:10px;padding:10px 12px;border:1px solid var(--line);border-left-width:4px;border-radius:10px;background:#fff;margin-bottom:8px;}
-  .ab-row .an{flex:1 1 240px;min-width:0;font-weight:600;color:var(--navy2);font-size:14px;}
-  .ab-row .av{font:700 10.5px 'DM Sans';text-transform:uppercase;letter-spacing:.04em;border-radius:999px;padding:3px 9px;flex:none;}
-  .ab-sel{border:1px solid var(--line);border-radius:8px;padding:7px 10px;font:600 13px 'DM Sans';color:var(--navy2);background:#fff;cursor:pointer;flex:none;}
-  .ab-sel.abre{border-color:var(--norm);color:var(--norm);background:rgba(47,158,68,.06);}
-  .ab-sel.nao{border-color:var(--crit);color:var(--crit);background:rgba(224,49,49,.06);}
-  .ab-mot{flex:1 1 100%;border:1px solid var(--crit);border-radius:8px;padding:8px 11px;font:400 13px 'DM Sans';color:var(--navy2);resize:vertical;min-height:38px;}
-  .ab-mot::placeholder{color:#c98c8c;}
-  .ab-row.g-graves{border-left-color:var(--crit)} .ab-row.g-leves{border-left-color:var(--aten)}
-  .ab-row.g-energia{border-left-color:var(--ener)} .ab-row.g-sem{border-left-color:var(--norm)}
-  .ab-row.g-naoavaliado{border-left-color:#9aa7b8}
   .vazio{text-align:center;color:var(--muted);padding:30px;font-size:14px;}
   .cont{font-size:12.5px;color:var(--muted);margin-bottom:10px;}
 
@@ -209,28 +183,6 @@
   <div id="lista"></div>
 </div></section>
 
-<section><div class="wrap">
-  <div class="sec-t">Reabertura na segunda-feira</div>
-  <p style="color:var(--muted);font-size:13.5px;margin:-6px 0 14px;line-height:1.55;">
-    Para cada unidade, marque se tem condições de <b>abrir na segunda-feira</b>. Ao marcar
-    <b>“Não abre”</b>, descreva o motivo. As escolas aparecem por segmento, com a avaliação de danos ao lado.
-  </p>
-  <div class="ab-resumo">
-    <div class="ab-chip ok"><b id="abOk">0</b><span>abrem</span></div>
-    <div class="ab-chip no"><b id="abNo">0</b><span>não abrem</span></div>
-    <div class="ab-chip pd"><b id="abPd">0</b><span>pendentes</span></div>
-  </div>
-  <div class="ab-tools">
-    <button class="ab-fbtn on" data-f="todas" onclick="filtrarAb('todas')">Todas</button>
-    <button class="ab-fbtn" data-f="pendentes" onclick="filtrarAb('pendentes')">Pendentes</button>
-    <button class="ab-fbtn" data-f="abre" onclick="filtrarAb('abre')">Abrem</button>
-    <button class="ab-fbtn" data-f="nao" onclick="filtrarAb('nao')">Não abrem</button>
-    <input class="busca" id="buscaAb" style="flex:1 1 200px;margin:0;" placeholder="Buscar unidade..." oninput="renderAbertura()">
-  </div>
-  <div class="ab-note" id="abNote"><span class="dt"></span><span id="abNoteTxt">Carregando…</span></div>
-  <div id="listaAb"></div>
-</div></section>
-
 <footer>
   <b>Secretaria Municipal de Educação</b> · Prefeitura de Ribeirão Preto<br>
   Painel de avaliação de danos — dados informados pelas unidades escolares.
@@ -245,7 +197,7 @@ var ORDEMP={critica:0,alta:1,energia:2,atencao:3,normal:4};
 var filtroAtual='prioritarias';
 var incluirConv=true;
 function RECS(){ return incluirConv ? RECS_ALL : RECS_ALL.filter(function(x){return x.seg!=='Conveniada';}); }
-function toggleConv(){ incluirConv=document.getElementById('swConv').checked; initKPIs(); render(); if(typeof renderAbertura==='function') renderAbertura(); }
+function toggleConv(){ incluirConv=document.getElementById('swConv').checked; initKPIs(); render(); }
 
 function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
 
@@ -438,7 +390,7 @@ function hora(){ var d=new Date(); return ('0'+d.getHours()).slice(-2)+':'+('0'+
 function statusEl(){ return document.getElementById('atual'); }
 
 function aplicar(recs){
-  RECS_ALL=normaliza(recs); initKPIs(); render(); if(typeof renderAbertura==='function') renderAbertura();
+  RECS_ALL=normaliza(recs); initKPIs(); render();
   var e=statusEl(); e.className='atual live';
   e.innerHTML='<span class="ldot"></span>Atualizado às '+hora()+' · '+recs.length+' respostas (ao vivo · atualiza a cada 5 min)';
 }
@@ -462,145 +414,8 @@ function carregarAoVivo(){
   document.body.appendChild(s);
 }
 
-// ================= REABERTURA NA SEGUNDA-FEIRA =================
-var AB_TABLE  = 'danos_abertura';
-var AB_LSKEY  = 'danos_abertura_v1';
-var AB_HEADERS = (typeof SUPA_KEY !== 'undefined') ? {
-  apikey: SUPA_KEY, Authorization: 'Bearer ' + SUPA_KEY,
-  'Accept-Profile': SUPA_SCHEMA, 'Content-Profile': SUPA_SCHEMA,
-  'Content-Type': 'application/json'
-} : null;
-var STATUS = {};        // nome -> {abre:'Sim'|'Não'|'', motivo:''}
-var abModo = 'local';   // 'sync' (Supabase) | 'local'
-var fAb = 'todas';
-
-// Consolida escolas duplicadas; mantém a PIOR gravidade entre as respostas.
-function escolasUnicas(){
-  var m = {};
-  RECS().forEach(function(x){
-    var k = (x.nome || '').trim(); if(!k) return;
-    var sv = severidadeJS(x);
-    if(!m[k] || SEVRANK[sv] < SEVRANK[m[k].sev]) m[k] = {nome:k, seg:x.seg, sev:sv};
-  });
-  return Object.keys(m).map(function(k){return m[k];}).sort(function(a,b){
-    return String(a.seg).localeCompare(String(b.seg)) || a.nome.localeCompare(b.nome);
-  });
-}
-
-function lsLoad(){ try{ return JSON.parse(localStorage.getItem(AB_LSKEY)||'{}'); }catch(_){ return {}; } }
-function lsSave(){ try{ localStorage.setItem(AB_LSKEY, JSON.stringify(STATUS)); }catch(_){ } }
-
-function abNote(){
-  var el=document.getElementById('abNote'), tx=document.getElementById('abNoteTxt');
-  if(abModo==='sync'){ el.className='ab-note sync'; tx.textContent='Salvando no servidor — compartilhado entre todos os acessos.'; }
-  else { el.className='ab-note local'; tx.innerHTML='Salvando só neste navegador. Para compartilhar e gerar relatório, rode o SQL <b>db/abertura-segunda.sql</b> no Supabase.'; }
-}
-
-function carregarStatusAbertura(){
-  STATUS = lsLoad(); renderAbertura();      // parte do que houver salvo localmente
-  if(!AB_HEADERS){ abModo='local'; abNote(); return; }
-  fetch(SUPA_URL+'/'+AB_TABLE+'?select=nome,abre,motivo', {headers:AB_HEADERS})
-    .then(function(r){ if(!r.ok) throw new Error(r.status); return r.json(); })
-    .then(function(rows){
-      if(!Array.isArray(rows)) throw new Error('resp');
-      var srv={}; rows.forEach(function(r){ srv[(r.nome||'').trim()]={abre:r.abre||'', motivo:r.motivo||''}; });
-      STATUS=srv; lsSave(); abModo='sync'; abNote(); renderAbertura();
-    })
-    .catch(function(){ abModo='local'; abNote(); renderAbertura(); });   // tabela ainda não criada
-}
-
-function salvarStatus(nome){
-  lsSave();                                  // sempre espelha local (rede de segurança)
-  if(!AB_HEADERS || abModo!=='sync') return;
-  var esc0=escolasUnicas().filter(function(e){return e.nome===nome;})[0]||{};
-  var st=STATUS[nome]||{};
-  var row={ nome:nome, segmento:esc0.seg||'', avaliacao:esc0.sev||'',
-            abre:st.abre||'', motivo:st.motivo||'', atualizado_em:new Date().toISOString() };
-  fetch(SUPA_URL+'/'+AB_TABLE+'?on_conflict=nome', {
-    method:'POST',
-    headers: Object.assign({}, AB_HEADERS, {Prefer:'resolution=merge-duplicates,return=minimal'}),
-    body: JSON.stringify([row])
-  }).catch(function(){ /* falhou a rede: mantém o espelho local */ });
-}
-
-function filtrarAb(f){
-  fAb=f;
-  var bs=document.querySelectorAll('.ab-fbtn');
-  for(var i=0;i<bs.length;i++) bs[i].classList.toggle('on', bs[i].getAttribute('data-f')===f);
-  renderAbertura();
-}
-
-var _abTmr={};
-function abMotivo(nome, val){
-  STATUS[nome]=STATUS[nome]||{abre:'',motivo:''}; STATUS[nome].motivo=val;
-  clearTimeout(_abTmr[nome]); _abTmr[nome]=setTimeout(function(){ salvarStatus(nome); }, 500);
-}
-function abSelect(nome, val){
-  STATUS[nome]=STATUS[nome]||{abre:'',motivo:''}; STATUS[nome].abre=val;
-  if(val!=='Não') STATUS[nome].motivo='';
-  salvarStatus(nome); renderAbertura();
-}
-
-function resumoAb(){
-  var esc=escolasUnicas(), ok=0,no=0,pd=0;
-  esc.forEach(function(e){ var a=(STATUS[e.nome]||{}).abre; if(a==='Sim')ok++; else if(a==='Não')no++; else pd++; });
-  document.getElementById('abOk').textContent=ok;
-  document.getElementById('abNo').textContent=no;
-  document.getElementById('abPd').textContent=pd;
-}
-
-function renderAbertura(){
-  var q=(document.getElementById('buscaAb').value||'').toLowerCase().trim();
-  var esc=escolasUnicas().filter(function(e){
-    var a=(STATUS[e.nome]||{}).abre||'';
-    var okF = fAb==='todas' || (fAb==='pendentes'&&!a) || (fAb==='abre'&&a==='Sim') || (fAb==='nao'&&a==='Não');
-    var okQ = !q || e.nome.toLowerCase().indexOf(q)!==-1;
-    return okF && okQ;
-  });
-  resumoAb();
-  var cont=document.getElementById('listaAb');
-  if(!esc.length){ cont.innerHTML='<div class="vazio">Nenhuma unidade neste filtro.</div>'; return; }
-  var grupos={}; esc.forEach(function(e){ (grupos[e.seg]=grupos[e.seg]||[]).push(e); });
-  var h='';
-  Object.keys(grupos).sort().forEach(function(seg){
-    h+='<div class="ab-grp"><h4>'+esc0(seg)+' · '+grupos[seg].length+'</h4>';
-    grupos[seg].forEach(function(e){
-      var st=STATUS[e.nome]||{abre:'',motivo:''};
-      var selCls = st.abre==='Sim'?'abre':(st.abre==='Não'?'nao':'');
-      h+='<div class="ab-row g-'+e.sev+'">'+
-         '<span class="an">'+esc0(e.nome)+'</span>'+
-         '<span class="av bs-'+e.sev+'">'+SEVLAB[e.sev]+'</span>'+
-         '<select class="ab-sel '+selCls+'" data-role="sel" data-nome="'+esc0(e.nome)+'">'+
-           '<option value=""'+(st.abre===''?' selected':'')+'>— tem condições de abrir?</option>'+
-           '<option value="Sim"'+(st.abre==='Sim'?' selected':'')+'>Abre na segunda</option>'+
-           '<option value="Não"'+(st.abre==='Não'?' selected':'')+'>Não abre</option>'+
-         '</select>'+
-         (st.abre==='Não'
-            ? '<textarea class="ab-mot" data-role="mot" data-nome="'+esc0(e.nome)+'" placeholder="Descreva o motivo de não abrir...">'+esc0(st.motivo||'')+'</textarea>'
-            : '')+
-         '</div>';
-    });
-    h+='</div>';
-  });
-  cont.innerHTML=h;
-}
-// usa o mesmo escapador da página; alias curto p/ atributos
-function esc0(s){ return esc(s); }
-
-// Delegação de eventos (nomes têm vírgulas/pontos — evita handler inline)
-(function(){
-  var cont=document.getElementById('listaAb');
-  cont.addEventListener('change', function(ev){
-    var el=ev.target; if(el.getAttribute && el.getAttribute('data-role')==='sel') abSelect(el.getAttribute('data-nome'), el.value);
-  });
-  cont.addEventListener('input', function(ev){
-    var el=ev.target; if(el.getAttribute && el.getAttribute('data-role')==='mot') abMotivo(el.getAttribute('data-nome'), el.value);
-  });
-})();
-
 normaliza(RECS_ALL);
 initKPIs(); render();
-carregarStatusAbertura();
 carregarAoVivo();
 setInterval(carregarAoVivo, INTERVALO_MS);
 </script>
