@@ -76,6 +76,28 @@
   .b-critica{background:rgba(224,49,49,.12);color:var(--crit)}.b-alta{background:rgba(240,140,0,.14);color:var(--alta)}
   .b-energia{background:rgba(66,99,235,.12);color:var(--ener)}
   .b-atencao{background:rgba(246,185,30,.16);color:var(--gold2)}.b-normal{background:rgba(47,158,68,.12);color:var(--norm)}
+  /* por GRAVIDADE (nova taxonomia) */
+  .item.g-graves{border-left-color:var(--crit)}.item.g-leves{border-left-color:var(--aten)}
+  .item.g-energia{border-left-color:var(--ener)}.item.g-sem{border-left-color:var(--norm)}
+  .bs-graves{background:rgba(224,49,49,.12);color:var(--crit)}.bs-leves{background:rgba(246,185,30,.16);color:var(--gold2)}
+  .bs-energia{background:rgba(66,99,235,.12);color:var(--ener)}.bs-sem{background:rgba(47,158,68,.12);color:var(--norm)}
+  /* MATRIZ Suspensas x Gravidade */
+  .matriz{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:18px;}
+  .mcat{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:15px 16px;}
+  .mhead{display:flex;justify-content:space-between;align-items:baseline;gap:10px;margin-bottom:11px;cursor:pointer;border-radius:8px;padding:3px 5px;margin:-3px -5px 8px;}
+  .mhead:hover{background:#f2f7fd;}
+  .mhead.on{background:#e9f1fb;}
+  .mtitle{font-weight:700;color:var(--navy);font-size:15px;}
+  .mtot{font-weight:800;color:var(--navy);font-size:20px;}
+  .mcells{display:grid;grid-template-columns:1fr 1fr;gap:9px;}
+  .cell{border:1px solid var(--line);border-left-width:4px;border-radius:10px;background:#fff;padding:10px 12px;cursor:pointer;text-align:left;transition:.14s;display:flex;flex-direction:column;gap:2px;font-family:'DM Sans',sans-serif;}
+  .cell:hover{background:#f7faff;transform:translateY(-1px);}
+  .cell.on{outline:2px solid var(--navy);outline-offset:-1px;}
+  .cell b{font-size:19px;font-weight:800;color:var(--navy);line-height:1;}
+  .cell span{font-size:11px;color:var(--muted);font-weight:600;}
+  .cell.sev-graves{border-left-color:var(--crit)}.cell.sev-leves{border-left-color:var(--aten)}
+  .cell.sev-energia{border-left-color:var(--ener)}.cell.sev-sem{border-left-color:var(--norm)}
+  @media(max-width:720px){.matriz{grid-template-columns:1fr}}
   .chips{display:flex;gap:6px;flex-wrap:wrap;margin-top:9px;}
   .chip{font-size:11px;font-weight:600;color:var(--navy2);background:#eaf1fa;border:1px solid #d7e3f3;border-radius:6px;padding:2px 8px;}
   .chip.st{background:#fff4e6;border-color:#ffd8a8;color:#c25e00;}
@@ -121,15 +143,15 @@
 <section><div class="wrap">
   <div class="kpis">
     <div class="kpi"><div class="n" id="kTot">0</div><div class="l">Unidades responderam</div></div>
-    <div class="kpi k-crit"><div class="n" id="kCrit">0</div><div class="l">Crítica — dano físico que impede o funcionamento</div><div class="pct" id="kCritP"></div></div>
-    <div class="kpi k-alta"><div class="n" id="kSusp">0</div><div class="l">Suspensão por danos (sem impedir estrutura)</div><div class="pct" id="kSuspP"></div></div>
-    <div class="kpi k-ener"><div class="n" id="kEner">0</div><div class="l">Situação apenas por falta de energia</div><div class="pct" id="kEnerP"></div></div>
+    <div class="kpi k-alta"><div class="n" id="kSusp">0</div><div class="l">Suspenderam as aulas</div><div class="pct" id="kSuspP"></div></div>
+    <div class="kpi k-crit"><div class="n" id="kGrave">0</div><div class="l">Danos graves</div><div class="pct" id="kGraveP"></div></div>
+    <div class="kpi k-ener"><div class="n" id="kEner">0</div><div class="l">Só falta de energia</div><div class="pct" id="kEnerP"></div></div>
   </div>
 </div></section>
 
 <section><div class="wrap">
   <div class="cards2">
-    <div class="panel"><h3>Por prioridade</h3><div id="chPrio"></div></div>
+    <div class="panel"><h3>Por gravidade</h3><div id="chGrav"></div></div>
     <div class="panel"><h3>Por segmento</h3><div id="chSeg"></div></div>
   </div>
 </div></section>
@@ -142,17 +164,19 @@
 </div></section>
 
 <section><div class="wrap">
-  <div class="sec-t">Escolas prioritárias</div>
-  <div class="filtros" id="filtros">
-    <button class="fbtn on" data-f="prioritarias">Prioritárias</button>
-    <button class="fbtn" data-f="critica">Críticas</button>
-    <button class="fbtn" data-f="alta">Suspensão</button>
-    <button class="fbtn" data-f="energia">Falta de energia</button>
-    <button class="fbtn" data-f="atencao">Danos leves</button>
-    <button class="fbtn" data-f="todas">Todas</button>
+  <div class="sec-t">Situação das unidades</div>
+  <div class="matriz">
+    <div class="mcat">
+      <div class="mhead" id="hSim" onclick="filtrar('sim','todas')"><span class="mtitle">Suspensas</span><span class="mtot" id="mtSim">0</span></div>
+      <div class="mcells" id="mcSim"></div>
+    </div>
+    <div class="mcat">
+      <div class="mhead" id="hNao" onclick="filtrar('nao','todas')"><span class="mtitle">Não suspensas</span><span class="mtot" id="mtNao">0</span></div>
+      <div class="mcells" id="mcNao"></div>
+    </div>
   </div>
   <input class="busca" id="busca" placeholder="Buscar unidade escolar..." oninput="render()">
-  <div class="cont" id="cont"></div>
+  <div class="cont" id="cont"><span id="contTxt"></span> <button id="btnLimpar" onclick="filtrar('todas','todas')" style="display:none;border:none;background:none;color:var(--ener);font-weight:600;cursor:pointer;font-size:12.5px;">limpar filtro</button></div>
   <div id="lista"></div>
 </div></section>
 
@@ -184,19 +208,36 @@ function barra(container, itens, maxOverride){
 }
 
 function initKPIs(){
-  var tot=RECS().length;
-  function porPrio(p){ return RECS().filter(function(x){return x.prio===p;}).length; }
-  var crit=porPrio('critica'), susp=porPrio('alta'), ener=porPrio('energia');
+  var base=RECS();
+  var tot=base.length;
   function pc(n){return tot?Math.round(n/tot*100)+'% das unidades':'';}
+  var nSusp=base.filter(function(x){return x.susp==='Sim';}).length;
+  function porSev(sv){ return base.filter(function(x){return severidadeJS(x)===sv;}).length; }
+  var graves=porSev('graves'), ener=porSev('energia');
   document.getElementById('kTot').textContent=tot;
-  document.getElementById('kCrit').textContent=crit; document.getElementById('kCritP').textContent=pc(crit);
-  document.getElementById('kSusp').textContent=susp; document.getElementById('kSuspP').textContent=pc(susp);
-  document.getElementById('kEner').textContent=ener; document.getElementById('kEnerP').textContent=pc(ener);
+  document.getElementById('kSusp').textContent=nSusp;  document.getElementById('kSuspP').textContent=pc(nSusp);
+  document.getElementById('kGrave').textContent=graves; document.getElementById('kGraveP').textContent=pc(graves);
+  document.getElementById('kEner').textContent=ener;   document.getElementById('kEnerP').textContent=pc(ener);
 
-  var cP=['critica','alta','energia','atencao','normal'].map(function(p){
-    return {lab:LABELP[p], v:porPrio(p), cls:'c-'+({critica:'crit',alta:'alta',energia:'ener',atencao:'aten',normal:'norm'}[p])};
+  var cP=SEVORD.map(function(sv){
+    return {lab:SEVLAB[sv], v:porSev(sv), cls:'c-'+({graves:'crit',leves:'aten',energia:'ener',sem:'norm'}[sv])};
   });
-  barra('chPrio', cP);
+  barra('chGrav', cP);
+
+  // ---- Matriz Suspensas x Gravidade ----
+  ['sim','nao'].forEach(function(cat){
+    var arr=base.filter(function(x){ return cat==='sim' ? x.susp==='Sim' : x.susp!=='Sim'; });
+    document.getElementById(cat==='sim'?'mtSim':'mtNao').textContent=arr.length;
+    var h='';
+    SEVORD.forEach(function(sv){
+      var v=arr.filter(function(x){return severidadeJS(x)===sv;}).length;
+      var sel=(fSusp===cat && fSev===sv)?' on':'';
+      h+='<button class="cell sev-'+sv+sel+'" onclick="filtrar(\''+cat+'\',\''+sv+'\')"><b>'+v+'</b><span>'+SEVLAB[sv]+'</span></button>';
+    });
+    document.getElementById(cat==='sim'?'mcSim':'mcNao').innerHTML=h;
+  });
+  document.getElementById('hSim').classList.toggle('on', fSusp==='sim' && fSev==='todas');
+  document.getElementById('hNao').classList.toggle('on', fSusp==='nao' && fSev==='todas');
 
   var segs={}; RECS().forEach(function(x){segs[x.seg]=(segs[x.seg]||0)+1;});
   var cS=Object.keys(segs).sort(function(a,b){return segs[b]-segs[a];}).map(function(s){return {lab:s,v:segs[s]};});
@@ -217,42 +258,44 @@ function initKPIs(){
 
 function statusChips(x){
   var h='';
-  if(x.susp==='Sim') h+='<span class="chip st">Atendimento suspenso</span>';
-  if(x.impede==='Sim') h+='<span class="chip st">Impede funcionamento</span>';
-  else if(x.naoimpede==='Sim') h+='<span class="chip">Danos que não impedem</span>';
+  h+='<span class="chip st">'+(x.susp==='Sim'?'Suspensa':'Não suspensa')+'</span>';
   (x.tipos||[]).forEach(function(t){h+='<span class="chip">'+esc(t)+'</span>';});
   return h;
+}
+
+function filtrar(susp, sev){
+  fSusp=susp; fSev=sev;
+  initKPIs();   // re-marca as células/cabeçalhos selecionados
+  render();
+  var lista=document.getElementById('lista');
+  if(lista && (susp!=='todas')) lista.scrollIntoView({behavior:'smooth', block:'start'});
 }
 
 function render(){
   var q=(document.getElementById('busca').value||'').toLowerCase().trim();
   var arr=RECS().filter(function(x){
-    var okf = filtroAtual==='todas' ? true
-      : filtroAtual==='prioritarias' ? (x.prio==='critica'||x.prio==='alta')
-      : x.prio===filtroAtual;
+    var okS = fSusp==='todas' || (fSusp==='sim' ? x.susp==='Sim' : x.susp!=='Sim');
+    var okV = fSev==='todas'  || severidadeJS(x)===fSev;
     var okq = !q || (x.nome||'').toLowerCase().indexOf(q)!==-1 || (x.motivo||'').toLowerCase().indexOf(q)!==-1;
-    return okf && okq;
+    return okS && okV && okq;
   });
-  document.getElementById('cont').textContent=arr.length+' unidade(s)';
+  var rotulo = (fSusp==='todas' && fSev==='todas') ? ''
+    : (fSusp==='sim'?'Suspensas':fSusp==='nao'?'Não suspensas':'Todas') + (fSev!=='todas'?' · '+SEVLAB[fSev]:'');
+  document.getElementById('contTxt').textContent = arr.length+' unidade(s)'+(rotulo?' — '+rotulo:'');
+  document.getElementById('btnLimpar').style.display = (fSusp==='todas'&&fSev==='todas') ? 'none' : 'inline';
   if(!arr.length){document.getElementById('lista').innerHTML='<div class="vazio">Nenhuma unidade neste filtro.</div>';return;}
   var h='';
   arr.forEach(function(x){
-    h+='<div class="item p-'+x.prio+'">'+
+    var sv=severidadeJS(x);
+    h+='<div class="item g-'+sv+'">'+
        '<div class="top"><div class="nome">'+esc(x.nome)+'<span class="seg">'+esc(x.seg)+'</span></div>'+
-       '<span class="badge b-'+x.prio+'">'+LABELP[x.prio]+'</span></div>'+
+       '<span class="badge bs-'+sv+'">'+SEVLAB[sv]+'</span></div>'+
        '<div class="chips">'+statusChips(x)+'</div>'+
        (x.motivo?'<div class="motivo">'+esc(x.motivo)+'</div>':'')+
        '</div>';
   });
   document.getElementById('lista').innerHTML=h;
 }
-
-document.getElementById('filtros').addEventListener('click',function(e){
-  var b=e.target.closest('.fbtn'); if(!b)return;
-  filtroAtual=b.dataset.f;
-  Array.prototype.forEach.call(this.children,function(c){c.classList.toggle('on',c===b);});
-  render();
-});
 
 // ====== ATUALIZAÇÃO AUTOMÁTICA (via Apps Script da planilha) ======
 // Cole abaixo a URL /exec do "App da Web" publicado a partir da planilha.
@@ -311,6 +354,23 @@ function prioJS(x){
   if(x.naoimpede==='Sim') return 'atencao';
   return 'normal';
 }
+// ---- GRAVIDADE (sub-categoria dentro de suspensas/não suspensas) ----
+function temFisicoJS(m){
+  var ml=(m||'').toLowerCase();
+  return /alag|inund|desab|desmoron|caiu|caí|queda|qued|destelh|telhad|forr|telha|muro|parede|teto|rachad|vazament|goteir|[aá]rvore|galho|destro[cç]|entulho|danificad|danos?\s+(em|na|no)|transbord|invad|muita [aá]gua|[aá]gua\s+(na|nas|no|nos|dentro)/.test(ml);
+}
+// energia = só falta de energia · graves = dano que impede · leves = dano que
+// não impede (ou descrito no texto) · sem = sem danos relatados
+function severidadeJS(x){
+  var afetada = (x.impede==='Sim' || x.susp==='Sim' || x.naoimpede==='Sim');
+  if(afetada && soEnergiaJS(x.motivo)) return 'energia';
+  if(x.impede==='Sim') return 'graves';
+  if(x.naoimpede==='Sim' || temFisicoJS(x.motivo)) return 'leves';
+  return 'sem';
+}
+var SEVLAB={graves:'Danos graves',leves:'Danos leves',energia:'Só falta de energia',sem:'Sem danos'};
+var SEVORD=['graves','leves','energia','sem'];
+var fSusp='todas', fSev='todas';
 // Recalcula tipos e prioridade em toda a base (aplica a regra atual sempre,
 // independentemente do que veio embutido ou do Apps Script).
 function normaliza(recs){
