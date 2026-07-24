@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png?v=1">
+<link rel="icon" href="favicon.ico?v=1">
+<title>Avaliação de Danos — Temporal | Secretaria de Educação</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy:#0f2a52;--navy2:#173257;--blue:#eef4fb;--gold:#f6b91e;--gold2:#d99b06;
+    --ink:#16233d;--muted:#5b6d8a;--line:#dbe6f4;--surface:#fff;
+    --crit:#e03131;--alta:#f08c00;--aten:#f6b91e;--norm:#2f9e44;--radius:14px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:'DM Sans',system-ui,sans-serif;background:var(--blue);color:var(--ink);line-height:1.5;-webkit-font-smoothing:antialiased;}
+  img{max-width:100%;display:block;}
+  .wrap{max-width:1120px;margin:0 auto;padding:0 20px;width:100%;}
+
+  .gov-top{background:#fff;border-bottom:1px solid #e6e6e6;}
+  .gov-top .wrap{max-width:1180px;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;padding:11px 20px;}
+  .gov-logo{height:42px;width:auto;grid-column:2;justify-self:center;}
+  .gov-sec{background:#4a7fc4;}
+  .gov-sec .wrap{max-width:1180px;padding:9px 20px;}
+  .gov-sec span{display:block;text-align:center;color:#fff;font:600 14.5px 'DM Sans';}
+  @media(max-width:640px){.gov-top .wrap{grid-template-columns:1fr}.gov-logo{grid-column:1}}
+
+  .head{padding:26px 20px 8px;}
+  .head .wrap{max-width:1120px;}
+  .kick{display:inline-flex;align-items:center;gap:8px;background:rgba(224,49,49,.1);color:var(--crit);border:1px solid rgba(224,49,49,.25);border-radius:999px;padding:5px 13px;font:700 11.5px 'DM Sans';letter-spacing:.04em;text-transform:uppercase;margin-bottom:12px;}
+  .kick .dot{width:8px;height:8px;border-radius:50%;background:var(--crit);animation:pulse 1.5s infinite;}
+  @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(224,49,49,.5)}70%{box-shadow:0 0 0 7px rgba(224,49,49,0)}100%{box-shadow:0 0 0 0 rgba(224,49,49,0)}}
+  h1{font-size:clamp(23px,3.6vw,31px);font-weight:800;color:var(--navy);letter-spacing:-.01em;}
+  .sub{color:var(--muted);font-size:14.5px;margin-top:6px;max-width:70ch;}
+
+  section{padding:16px 20px;}
+  .sec-t{font:700 12px 'DM Sans';letter-spacing:.1em;text-transform:uppercase;color:var(--gold2);margin:6px 0 12px;}
+
+  .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:13px;}
+  .kpi{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:17px 18px;position:relative;overflow:hidden;}
+  .kpi::before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--gold);}
+  .kpi.k-crit::before{background:var(--crit)}.kpi.k-alta::before{background:var(--alta)}.kpi.k-norm::before{background:var(--norm)}
+  .kpi .n{font-size:30px;font-weight:800;color:var(--navy);line-height:1;}
+  .kpi .l{font-size:12.5px;color:var(--muted);margin-top:6px;font-weight:500;}
+  .kpi .pct{font-size:11.5px;color:var(--gold2);font-weight:700;margin-top:3px;}
+  .kpi.k-crit .pct{color:var(--crit)}
+
+  .cards2{display:grid;grid-template-columns:1fr 1fr;gap:13px;}
+  .panel{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:18px 20px;}
+  .panel h3{font-size:14px;font-weight:700;color:var(--navy);margin-bottom:14px;}
+
+  .bar-row{display:flex;align-items:center;gap:10px;margin-bottom:9px;font-size:13px;}
+  .bar-row .lab{width:112px;flex:none;color:var(--ink);font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .bar-track{flex:1;background:#eef2f7;border-radius:6px;height:20px;overflow:hidden;}
+  .bar-fill{height:100%;border-radius:6px;background:var(--navy2);display:flex;align-items:center;justify-content:flex-end;padding-right:7px;color:#fff;font-size:11px;font-weight:700;min-width:22px;}
+  .bar-fill.c-crit{background:var(--crit)}.bar-fill.c-alta{background:var(--alta)}.bar-fill.c-aten{background:var(--aten);color:#5b4a00}.bar-fill.c-norm{background:var(--norm)}
+  .bar-fill.c-gold{background:var(--gold);color:#5b4a00}
+
+  .filtros{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;}
+  .fbtn{border:1px solid var(--line);background:#fff;border-radius:999px;padding:8px 15px;font:600 13px 'DM Sans';color:var(--muted);cursor:pointer;transition:.15s;}
+  .fbtn:hover{border-color:#b9cbe6;}
+  .fbtn.on{background:var(--navy);color:#fff;border-color:var(--navy);}
+  .busca{width:100%;border:1px solid var(--line);border-radius:10px;padding:11px 14px;font:400 14px 'DM Sans';margin-bottom:14px;outline:none;}
+  .busca:focus{border-color:var(--gold);}
+
+  .item{background:var(--surface);border:1px solid var(--line);border-left-width:4px;border-radius:11px;padding:14px 16px;margin-bottom:10px;}
+  .item.p-critica{border-left-color:var(--crit)}.item.p-alta{border-left-color:var(--alta)}
+  .item.p-atencao{border-left-color:var(--aten)}.item.p-normal{border-left-color:var(--norm)}
+  .item .top{display:flex;justify-content:space-between;gap:10px;align-items:flex-start;flex-wrap:wrap;}
+  .item .nome{font-weight:700;color:var(--navy);font-size:15px;line-height:1.3;}
+  .seg{font-size:11px;font-weight:700;color:var(--muted);background:#eef2f7;border-radius:5px;padding:2px 8px;margin-left:8px;}
+  .badge{font:700 10.5px 'DM Sans';text-transform:uppercase;letter-spacing:.04em;border-radius:999px;padding:4px 10px;flex:none;}
+  .b-critica{background:rgba(224,49,49,.12);color:var(--crit)}.b-alta{background:rgba(240,140,0,.14);color:var(--alta)}
+  .b-atencao{background:rgba(246,185,30,.16);color:var(--gold2)}.b-normal{background:rgba(47,158,68,.12);color:var(--norm)}
+  .chips{display:flex;gap:6px;flex-wrap:wrap;margin-top:9px;}
+  .chip{font-size:11px;font-weight:600;color:var(--navy2);background:#eaf1fa;border:1px solid #d7e3f3;border-radius:6px;padding:2px 8px;}
+  .chip.st{background:#fff4e6;border-color:#ffd8a8;color:#c25e00;}
+  .motivo{font-size:12.5px;color:var(--muted);margin-top:9px;line-height:1.5;border-top:1px dashed var(--line);padding-top:9px;}
+  .vazio{text-align:center;color:var(--muted);padding:30px;font-size:14px;}
+  .cont{font-size:12.5px;color:var(--muted);margin-bottom:10px;}
+
+  footer{background:var(--navy);color:#c3d2e6;text-align:center;padding:22px 20px;font-size:12.5px;margin-top:20px;}
+  footer b{color:#fff;}
+  @media(max-width:720px){.kpis{grid-template-columns:1fr 1fr}.cards2{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<header class="gov-top"><div class="wrap"><img class="gov-logo" src="pmrp.png" alt="Prefeitura de Ribeirão Preto"></div></header>
+<div class="gov-sec"><div class="wrap"><span>Secretaria de Educação</span></div></div>
+
+<div class="head"><div class="wrap">
+  <span class="kick"><span class="dot"></span>Avaliação de danos · Temporal</span>
+  <h1>Impacto do temporal nas unidades escolares</h1>
+  <p class="sub">Levantamento das condições das unidades após a tempestade, com base nas respostas enviadas pelas escolas. As unidades são classificadas por prioridade de atendimento.</p>
+</div></div>
+
+<section><div class="wrap">
+  <div class="kpis">
+    <div class="kpi"><div class="n" id="kTot">0</div><div class="l">Unidades responderam</div></div>
+    <div class="kpi k-crit"><div class="n" id="kCrit">0</div><div class="l">Danos que impedem o funcionamento</div><div class="pct" id="kCritP"></div></div>
+    <div class="kpi k-alta"><div class="n" id="kSusp">0</div><div class="l">Suspenderam o atendimento</div><div class="pct" id="kSuspP"></div></div>
+    <div class="kpi k-norm"><div class="n" id="kOk">0</div><div class="l">Sem dano / funcionando</div><div class="pct" id="kOkP"></div></div>
+  </div>
+</div></section>
+
+<section><div class="wrap">
+  <div class="cards2">
+    <div class="panel"><h3>Por prioridade</h3><div id="chPrio"></div></div>
+    <div class="panel"><h3>Por segmento</h3><div id="chSeg"></div></div>
+  </div>
+</div></section>
+
+<section><div class="wrap">
+  <div class="panel"><h3>Tipos de dano mais relatados</h3><div id="chTipo"></div></div>
+</div></section>
+
+<section><div class="wrap">
+  <div class="sec-t">Escolas prioritárias</div>
+  <div class="filtros" id="filtros">
+    <button class="fbtn on" data-f="prioritarias">Prioritárias</button>
+    <button class="fbtn" data-f="critica">Críticas</button>
+    <button class="fbtn" data-f="alta">Suspensão</button>
+    <button class="fbtn" data-f="atencao">Danos leves</button>
+    <button class="fbtn" data-f="todas">Todas</button>
+  </div>
+  <input class="busca" id="busca" placeholder="Buscar unidade escolar..." oninput="render()">
+  <div class="cont" id="cont"></div>
+  <div id="lista"></div>
+</div></section>
+
+<footer>
+  <b>Secretaria Municipal de Educação</b> · Prefeitura de Ribeirão Preto<br>
+  Painel de avaliação de danos — dados informados pelas unidades escolares.
+</footer>
+
+<script>
+var RECS = [{"seg": "CEI", "nome": "ALAOR GALVAO CESAR CEI", "susp": "Sim", "impede": "Sim", "naoimpede": "Não", "motivo": "Sem energia, bairro e comunidade bastante destruídos, árvore quebrou parte do telhado, não sei mensurar riscos.", "prio": "critica", "tipos": ["Energia", "Árvores", "Telhado"]}, {"seg": "CEI", "nome": "ANNA AUGUSTA FRANÇA CEI", "susp": "Não", "impede": "Sim", "naoimpede": "Sim", "motivo": "A unidade está sem água e sem energia.", "prio": "critica", "tipos": ["Energia", "Água"]}, {"seg": "CEI", "nome": "ANNA AUGUSTA FRANÇA CEI", "susp": "Sim", "impede": "Sim", "naoimpede": "Não", "motivo": "A escola está sem energia e sem água, com árvore caída e muitos galhos e folhas pela escola toda.", "prio": "critica", "tipos": ["Energia", "Água", "Árvores"]}, {"seg": "CEI", "nome": "ANNA IGNES CARVALHO GOUVEA CEI", "susp": "Sim", "impede": "Sim", "naoimpede": "Sim", "motivo": "Falta de energia elétrica.", "prio": "critica", "tipos": ["Energia"]}, {"seg": "CEI", "nome": "DEOLINDA GASPARINI CEI", "susp": "Sim", "impede": "Sim", "naoimpede": "Não", "motivo": "Falta de energia, salas alagadas, funcionários que não conseguiram chegar a tempo.", "prio": "critica", "tipos": ["Energia", "Alagamento"]}, {"seg": "CEI", "nome": "MARIA DE LOURDES GULLACI LAGUNA PROFA CEI", "susp": "Não", "impede": "Sim", "naoimpede": "Sim", "motivo": "Não houve alunos.", "prio": "critica", "tipos": []}, {"seg": "CEI", "nome": "MARIA LUCIA MEIRELLES JUNQUEIRA CEI", "susp": "Sim", "impede": "Sim", "naoimpede": "Sim", "motivo": "Unidade sem energia, queda de árvores, alagamento.", "prio": "critica", "tipos": ["Energia", "Alagamento", "Árvores"]}, {"seg": "CEI", "nome": "NELSON COSTA DOS SANTOS PADRE CEI", "susp": "Sim", "impede": "Sim", "naoimpede": "Sim", "motivo": "Destelhamento, falta de energia, queda de árvores", "prio": "critica", "tipos": ["Energia", "Árvores", "Telhado"]}, {"seg": "CEI", "nome": "QUINTINO VIEIRA CEI", "susp": "Sim", "impede": "Sim", "naoimpede": "Não", "motivo": "Árvores caídas dentro e no acesso a escola. Professores e funcionários com dificuldade de locomoção. Sala 9 alagada, sala 6 com queda de árvore sob o telhado, almoxarifado com árvores caídas sob o telhado e porta de acesso. Sombrites caíram, muro do estacionamento caiu.,", "prio": "critica", "tipos": ["Alagamento", "Árvores", "Telhado", "Muro"]}, {"seg": "CEI", "nome": "ROBERTO TARANTO CEI", "susp": "Sim", "impede": "Sim", "naoimpede": "Não", "motivo": "Devido chuva escola sem condições de atendimento. Está sem energia, telhados, calhas e sombrite arrancados e consequentemente sala de aula e refeitório alagados.", "prio": "critica", "tipos": ["Energia", "Alagamento", "Telhado"]}, {"seg": "CEI", "nome": "ROSA MARIA DE BRITTO COSENZA CEI", "susp": "Sim", "impede": "Sim", "naoimpede": "Não", "motivo": "Sem energia, algumas funcionárias não conseguiram chegar, em especial as cozinheiras, placas caídas das salas de aula, infiltração de água pelo telhado", "prio": "critica", "tipos": ["Energia", "Telhado"]}, {"seg": "Conveniada", "nome": "APRENDIZES DO EVANGELHO, LAR ESCOLA, CRECHE", "susp": "Sim", "impede": "Sim", "naoimpede": "Não", "motivo": "Falta de energia, água e sakas de aula inundadas", "prio": "critica", "tipos": ["Energia", "Alagamento"]}, {"seg": "Conveniada", "nome": "AUTA DE SOUZA, CRECHE", "susp": "Sim", "impede": "Sim", "naoimpede": "Não", "motivo": "A escola esta totalmente sem energia e cheiro de queimado", "prio": "critica", "tipos": ["Energia"]}, {"seg": "Conveniada", "nome": "CASA DE EMMANUEL BENÇÃO DE PAZ, CRECHE", "susp": "Sim", "impede": "Sim", "naoimpede": "Não", "motivo": "Salas alagadas/ sem energia / destroços que caíram nos locais abertos", "prio": "critica", "tipos": ["Energia", "Alagamento"]}, {"seg": "Conveniada", "nome": "CASAS DE BETÂNIA", "susp": "Sim", "impede": "Sim", "naoimpede": "Sim", "motivo": "Sem energia, sala alagadas e funcionários com difícil acesso e água", "prio": "critica", "tipos": ["Energia", "Alagamento"]}, {"seg": "Conveniada", "nome": "CÉLIA REGINA DA SILVA VANZO, EEI", "susp": "Sim", "impede": "Sim", "naoimpede": "Não", "motivo": "Salas alagadas, forró do teto pátio e salas desabaram", "prio": "critica", "tipos": ["Alagamento", "Telhado"]}, {"seg": "Conveniada", "nome": "GENY BIAGIONI VEIGA. E. E. I.", "susp": "Sim", "impede": "Sim", "naoimpede": "Não", "motivo": "Infra estrutura da escola", "prio": "critica", "tipos": []}, {"seg": "Conveniada", "nome": "JOÃO CUNHA - IRMÃ CRUCIFIXA, DEP. E. E. I.", "susp": "Sim", "impede": "Sim", "naoimpede": "Não", "motivo": "Sem energia, não apareceu crianças! Caiu o muro grades e tb telhado da escola.", "prio": "critica", "tipos": ["Energia", "Telhado", "Muro"]}, {"seg": "Conveniada", "nome": "MODELO DA VILA VIRGINIA, CRECHE", "susp": "Sim", "impede": "Sim", "naoimpede": "Não", "motivo": "Árvores caídas, telhado danificado, sujeira, falta de água e energia.", "prio": "critica", "tipos": ["Energia", "Água", "Árvores", "Telhado"]}, {"seg": "Conveniada", "nome": "NAGIBE EL KHOURI LIAN, E. E. I.", "susp": "Não", "impede": "Sim", "naoimpede": "Não", "motivo": "quedas de arvores, queda do telhado do pátio,  queda de uma parte da laje da sala de aula Ciclo 2 e 3 salas altamente comprometidas estruturalmente, destelhamento parcial da cozinha, patio totalmente destruido, parque de areia", "prio": "critica", "tipos": ["Árvores", "Telhado"]}, {"seg": "Conveniada", "nome": "NAILDETE BARBOSA LINS, PRª, E. E. I.", "susp": "Sim", "impede": "Sim", "naoimpede": "Não", "motivo": "Informamos que, neste momento, nossa unidade encontra-se sem fornecimento de energia elétrica, água e telefonia.  Além disso, há árvores caídas nas vias de acesso ao entorno do bairro, o que tem dificultado a chegada e a saída da região.", "prio": "critica", "tipos": ["Energia", "Árvores"]}, {"seg": "Conveniada", "nome": "NAILDETE BARBOSA LINS, PRª, E. E. I.", "susp": "Sim", "impede": "Sim", "naoimpede": "Sim", "motivo": "Falta de energia elétrica água a avenida da escola postes caídos e árvores caídas não tivemos crianças pois no horário de entrada estava impossível trânsito na avenida da escola", "prio": "critica", "tipos": ["Energia", "Árvores"]}, {"seg": "Conveniada", "nome": "NAVE DA SAUDADE, CRECHE", "susp": "Sim", "impede": "Sim", "naoimpede": "Não", "motivo": "Danos em salas de aula, falta de energia, funcionários nao conseguindo chegar ate instituição para o trabalho", "prio": "critica", "tipos": ["Energia"]}, {"seg": "Conveniada", "nome": "VINDE MENINOS, LAR DA CRIANÇA, CRECHE", "susp": "Sim", "impede": "Sim", "naoimpede": "Não", "motivo": "Algumas sala com muita água  e refeitório com necessidade de limpeza ,  falta de energia elétrica, cobertura de corredor  danificado", "prio": "critica", "tipos": ["Energia"]}, {"seg": "EMEF", "nome": "DERCY CELIA SEIXAS FERRARI, PROFª., EMEF", "susp": "Sim", "impede": "Sim", "naoimpede": "Não", "motivo": "Falta de energia, goteiras e vazamentos em toda a parte administrativa, alagamentos em vários pontos,", "prio": "critica", "tipos": ["Energia", "Alagamento"]}, {"seg": "EMEF", "nome": "DOMINGOS ANGERAMI, PROFº., EMEF", "susp": "Não", "impede": "Sim", "naoimpede": "Sim", "motivo": "Não vieram alunos", "prio": "critica", "tipos": []}, {"seg": "EMEF", "nome": "FAUSTINO JARRUCHE, EMEF", "susp": "Sim", "impede": "Sim", "naoimpede": "Não", "motivo": "Falta de energia elétrica, alagamento , queda de árvores, falta de água", "prio": "critica", "tipos": ["Energia", "Água", "Alagamento", "Árvores"]}, {"seg": "EMEF", "nome": "JOSE RODINI LUIZ PROFº., EMEF", "susp": "Não", "impede": "Sim", "naoimpede": "Sim", "motivo": "Orientamos a todos que estamos sem energia. Mas os alunos que a família precisasse a escola não dispensou.", "prio": "critica", "tipos": ["Energia"]}, {"seg": "EMEF", "nome": "LUIS DO AMARAL MOUSINHO, DOM, EMEF", "susp": "Sim", "impede": "Sim", "naoimpede": "Não", "motivo": "Sem energia, muitos funcionários nao conseguiram chegar, parte da escola alagada.", "prio": "critica", "tipos": ["Energia", "Alagamento"]}, {"seg": "EMEF", "nome": "VIRGILIO SALATA, EMEF", "susp": "Sim", "impede": "Sim", "naoimpede": "Sim", "motivo": "Sem energia, sem acesso e árvores caídas no pátio", "prio": "critica", "tipos": ["Energia", "Árvores"]}, {"seg": "EMEI", "nome": "AMELIA SOFIA RODRIGUES DA COSTA, PROFª., EMEI", "susp": "Não", "impede": "Sim", "naoimpede": "Não", "motivo": "A primeiro momento não foi suspenso. Chegaram apenas 4 pais e por conta da falta de energia resolveram levar embora. Estamos, no momento, sem energia e sem água - situação indevida para atendimento.", "prio": "critica", "tipos": ["Energia", "Água"]}, {"seg": "EMEI", "nome": "AUREA APPARECIDA BRAGHETTO MACHADO, EMEI", "susp": "Sim", "impede": "Sim", "naoimpede": "Não", "motivo": "Grande parte da escola destelhada, forros de PVC no chão salas de aulas alagadas e teto do parque caiu sem energia e água", "prio": "critica", "tipos": ["Energia", "Alagamento", "Telhado"]}, {"seg": "EMEI", "nome": "CARMEM MASSAROTTO, PROFª., EMEI", "susp": "Sim", "impede": "Sim", "naoimpede": "Não", "motivo": "Escola sem energia e totalmente sem comunicação, nem os números de emergência completavam a ligação", "prio": "critica", "tipos": ["Energia"]}, {"seg": "EMEI", "nome": "HILDA MARIA SOBRAL BARBOSA MANDARINO, EMEI", "susp": "Sim", "impede": "Sim", "naoimpede": "Sim", "motivo": "Danos em alguns ambientes e falta de energia", "prio": "critica", "tipos": ["Energia"]}, {"seg": "EMEI", "nome": "HILDA MOSCA, EMEI", "susp": "Sim", "impede": "Sim", "naoimpede": "Não", "motivo": "Falta de nergia elétrica que também afetou a caixa d'água, por causa da bomba. Somos cei tbm e não há como funcinar a cozinha do lactário,  que precisa bater o leite, não tem como dar banho nas crianças,  chuveiros sem funcionamento. Salas escuras, sem condições de manter as aulas.  Professores  e funcionários não conseguiram chegar à escola pois o caos da cidade os impediram de vir.", "prio": "critica", "tipos": ["Energia", "Água"]}, {"seg": "EMEI", "nome": "JOAO SPERANDIO, DEP., EMEI", "susp": "Sim", "impede": "Sim", "naoimpede": "Sim", "motivo": "Falta de energia, árvores arrancadas, falta de água, sombrite arrancado", "prio": "critica", "tipos": ["Energia", "Água", "Árvores"]}, {"seg": "EMEI", "nome": "JOSE CARLOS SOBRAL, DR., EMEI", "susp": "Sim", "impede": "Sim", "naoimpede": "Não", "motivo": "Falta de energia, forte temporal", "prio": "critica", "tipos": ["Energia"]}, {"seg": "EMEI", "nome": "JOSE ROBERTO FELICIO, EMEI", "susp": "Sim", "impede": "Sim", "naoimpede": "Não", "motivo": "Falta de energia sem previsão de volta  e sala inundada", "prio": "critica", "tipos": ["Energia", "Alagamento"]}, {"seg": "EMEI", "nome": "MARIA GORETTI, SANTA, EMEI", "susp": "Sim", "impede": "Sim", "naoimpede": "Não", "motivo": "Arvores caídas e fios de energia. Poste em frente a escola da ficado", "prio": "critica", "tipos": ["Energia", "Árvores"]}, {"seg": "EMEI", "nome": "MOACIR FIRMINO, EMEI", "susp": "Não", "impede": "Sim", "naoimpede": "Sim", "motivo": "", "prio": "critica", "tipos": []}, {"seg": "EMEI", "nome": "TEREZINHA, SANTA, EMEI", "susp": "Sim", "impede": "Sim", "naoimpede": "Sim", "motivo": "Queda de árvore em uma  sala de aula/ 3 salas com muita água dentro , cano de água quebrado , muitos fulanos grandes espalhandos pela unidade e falta de energia.", "prio": "critica", "tipos": ["Energia", "Árvores"]}, {"seg": "EMEI", "nome": "WANDA PRINCIVALLI MARCAL, EMEI", "susp": "Sim", "impede": "Sim", "naoimpede": "Não", "motivo": "Sem energia e muito escura a unidade.", "prio": "critica", "tipos": ["Energia"]}, {"seg": "CEI", "nome": "ANA FRANCO DO AMARAL PROF. CEI", "susp": "Sim", "impede": "Não", "naoimpede": "Não", "motivo": "Sem energia", "prio": "alta", "tipos": ["Energia"]}, {"seg": "CEI", "nome": "GIRASSOL ENCANTADO CEI", "susp": "Sim", "impede": "Não", "naoimpede": "Sim", "motivo": "Alagamento da unidade e falta de energia.", "prio": "alta", "tipos": ["Energia", "Alagamento"]}, {"seg": "CEI", "nome": "LEONOR MERTÍLIA COSTA CEI", "susp": "Sim", "impede": "Não", "naoimpede": "Não", "motivo": "Falta de energia elétrica, bombas de água sem funcionamento.", "prio": "alta", "tipos": ["Energia"]}, {"seg": "Conveniada", "nome": "INSTITUTO ESPÍRITA PAULO DE TARSO", "susp": "Sim", "impede": "Não", "naoimpede": "Sim", "motivo": "Estamos sem energia", "prio": "alta", "tipos": ["Energia"]}, {"seg": "Conveniada", "nome": "MARIA DE NAZARÉ - E.E.I.", "susp": "Sim", "impede": "Não", "naoimpede": "Sim", "motivo": "A suspensão das aulas havia sido acordada anteriormente devido as obras realizadas  a escola.", "prio": "alta", "tipos": []}, {"seg": "Conveniada", "nome": "NOSSA SENHORA DE FÁTIMA, CRECHE", "susp": "Sim", "impede": "Não", "naoimpede": "Não", "motivo": "Falta de energia , alagamento das salas e queda de árvores", "prio": "alta", "tipos": ["Energia", "Alagamento", "Árvores"]}, {"seg": "EMEI", "nome": "ANITA PROCOPIO JUNQUEIRA, EMEI", "susp": "Sim", "impede": "Não", "naoimpede": "Sim", "motivo": "Sem energia, sem água", "prio": "alta", "tipos": ["Energia", "Água"]}, {"seg": "EMEI", "nome": "CARMEN APARECIDA DE CARVALHO RAMOS, EMEI", "susp": "Sim", "impede": "Não", "naoimpede": "Não", "motivo": "Falta de água e energia elétrica", "prio": "alta", "tipos": ["Energia", "Água"]}, {"seg": "EMEI", "nome": "ROBERTO AFONSO PONTES, EMEI", "susp": "Sim", "impede": "Não", "naoimpede": "Sim", "motivo": "Falta de Energia", "prio": "alta", "tipos": ["Energia"]}, {"seg": "EMEI", "nome": "ZILDA COSSA D AVILA, EMEI", "susp": "Sim", "impede": "Não", "naoimpede": "Sim", "motivo": "Unifade sem energia elétrica e membros da equipe  ausentes.", "prio": "alta", "tipos": ["Energia"]}, {"seg": "CEI", "nome": "CECILIO FRAGUAS CEI", "susp": "Não", "impede": "Não", "naoimpede": "Sim", "motivo": "", "prio": "atencao", "tipos": []}, {"seg": "CEI", "nome": "THOMAZ URBINATTI CEI", "susp": "Não", "impede": "Não", "naoimpede": "Sim", "motivo": "", "prio": "atencao", "tipos": []}, {"seg": "Conveniada", "nome": "BENEDITO ROSA DE JESUS, CRECHE", "susp": "Não", "impede": "Não", "naoimpede": "Sim", "motivo": "", "prio": "atencao", "tipos": []}, {"seg": "Conveniada", "nome": "FRANCESCO CAMMILLERI, E. E. I", "susp": "Não", "impede": "Não", "naoimpede": "Sim", "motivo": "", "prio": "atencao", "tipos": []}, {"seg": "Conveniada", "nome": "REI PELÉ EDSON ARANTES DO NASCIMENTO, E. E. I.", "susp": "Não", "impede": "Não", "naoimpede": "Sim", "motivo": "Os pais preferiram não deixar, pois viram a ação de retirada de água do pátio e de duas salas mais a secretaria.vestamos com duas crianças e preocupadas com os alimentos, pois estamos sem energia", "prio": "atencao", "tipos": ["Energia"]}, {"seg": "EMEF", "nome": "EGYDIO PEDRESCHI,CEEEF", "susp": "Não", "impede": "Não", "naoimpede": "Sim", "motivo": "", "prio": "atencao", "tipos": []}, {"seg": "EMEF", "nome": "JULIO CESAR VOLTARELLI, EMEF", "susp": "Não", "impede": "Não", "naoimpede": "Sim", "motivo": "", "prio": "atencao", "tipos": []}, {"seg": "EMEF", "nome": "NEUZA MICHELUTTI MARZOLA, PROFª., EMEF", "susp": "Não", "impede": "Não", "naoimpede": "Sim", "motivo": "", "prio": "atencao", "tipos": []}, {"seg": "EMEF", "nome": "SEBASTIAO DE AGUIAR AZEVEDO, EMEF", "susp": "Não", "impede": "Não", "naoimpede": "Sim", "motivo": "", "prio": "atencao", "tipos": []}, {"seg": "EMEI", "nome": "ADRIANA COUTINHO BRANDANI CAMILO, EMEI", "susp": "Não", "impede": "Não", "naoimpede": "Sim", "motivo": "Só estavamos sem energia.", "prio": "atencao", "tipos": ["Energia"]}, {"seg": "EMEI", "nome": "AMELIA JUNQUEIRA, EMEI", "susp": "Não", "impede": "Não", "naoimpede": "Sim", "motivo": "", "prio": "atencao", "tipos": []}, {"seg": "EMEI", "nome": "LILIAN SPADARO ROSA E SILVA, PROFª., EMEI", "susp": "Não", "impede": "Não", "naoimpede": "Sim", "motivo": "Temos arvores caidas nos parques e area externa mas na parte interna tudo ok!", "prio": "atencao", "tipos": ["Árvores"]}, {"seg": "EMEI", "nome": "MARLENE JORGE DOS REIS, EMEI", "susp": "Não", "impede": "Não", "naoimpede": "Sim", "motivo": "", "prio": "atencao", "tipos": []}, {"seg": "CEI", "nome": "AURELIO PACAGNELLA CEI", "susp": "Não", "impede": "Não", "naoimpede": "Não", "motivo": "", "prio": "normal", "tipos": []}, {"seg": "CEI", "nome": "BRANCA SERRA CEI", "susp": "Não", "impede": "Não", "naoimpede": "Não", "motivo": "", "prio": "normal", "tipos": []}, {"seg": "CEI", "nome": "FELICITA DRUDI COSTA PINTO CEI", "susp": "Não", "impede": "Não", "naoimpede": "Não", "motivo": "", "prio": "normal", "tipos": []}, {"seg": "CEI", "nome": "JOAO DA CRUZ MOREIRA CEI/EMEI", "susp": "Não", "impede": "Não", "naoimpede": "Não", "motivo": "Não houve suspensão, a escola está funcionando normalmente, com água e energia elétrica e todos os funcionários na ativa.", "prio": "normal", "tipos": ["Energia"]}, {"seg": "CEI", "nome": "JOAO PEDRO CASTROVIEJO CEI", "susp": "Não", "impede": "Não", "naoimpede": "Não", "motivo": "", "prio": "normal", "tipos": []}, {"seg": "CEI", "nome": "LAURIVALDO FIDELIS CEI", "susp": "Não", "impede": "Não", "naoimpede": "Não", "motivo": "", "prio": "normal", "tipos": []}, {"seg": "CEI", "nome": "LUCIO MENDES CEI", "susp": "Não", "impede": "Não", "naoimpede": "Não", "motivo": "", "prio": "normal", "tipos": []}, {"seg": "CEI", "nome": "MARLENE MARREIRO SIBILLE CEI", "susp": "Não", "impede": "Não", "naoimpede": "Não", "motivo": "", "prio": "normal", "tipos": []}, {"seg": "CEI", "nome": "MODELO MARINCEK CEI", "susp": "Não", "impede": "Não", "naoimpede": "Não", "motivo": "", "prio": "normal", "tipos": []}, {"seg": "CEI", "nome": "OPUS DEI CEI", "susp": "Não", "impede": "Não", "naoimpede": "Não", "motivo": "", "prio": "normal", "tipos": []}, {"seg": "CEI", "nome": "RENATO CAMARGO MENDES CEI", "susp": "Não", "impede": "Não", "naoimpede": "Não", "motivo": "", "prio": "normal", "tipos": []}, {"seg": "Conveniada", "nome": "BOM JESUS DA ESPERANÇA, CRECHE", "susp": "Não", "impede": "Não", "naoimpede": "Não", "motivo": "", "prio": "normal", "tipos": []}, {"seg": "Conveniada", "nome": "CRECHE VOVÓ MECA", "susp": "Não", "impede": "Não", "naoimpede": "Não", "motivo": "", "prio": "normal", "tipos": []}, {"seg": "Conveniada", "nome": "EDUARDO DINIZ JUNQUEIRA, E. E. I", "susp": "Não", "impede": "Não", "naoimpede": "Não", "motivo": "", "prio": "normal", "tipos": []}, {"seg": "Conveniada", "nome": "FÁBIO DOS SANTOS MUSA, DR. E. E. I", "susp": "Não", "impede": "Não", "naoimpede": "Não", "motivo": "", "prio": "normal", "tipos": []}, {"seg": "Conveniada", "nome": "PINGO DE LEITE, CRECHE", "susp": "Não", "impede": "Não", "naoimpede": "Não", "motivo": "Sem energia, Internet e muita sujeira de folhas e galhos", "prio": "normal", "tipos": ["Energia", "Árvores"]}, {"seg": "Conveniada", "nome": "SATHYA SAI - AMES", "susp": "Não", "impede": "Não", "naoimpede": "Não", "motivo": "", "prio": "normal", "tipos": []}, {"seg": "EMEF", "nome": "ANTONIO PALOCCI, EMEF", "susp": "Não", "impede": "Não", "naoimpede": "Não", "motivo": "", "prio": "normal", "tipos": []}, {"seg": "EMEF", "nome": "DOMINGOS ADILSON CANESIN, EMEF", "susp": "Não", "impede": "Não", "naoimpede": "Não", "motivo": "", "prio": "normal", "tipos": []}, {"seg": "EMEF", "nome": "ENEIDA PEREIRA DOS SANTOS AGUIAR, EMEF", "susp": "Não", "impede": "Não", "naoimpede": "Não", "motivo": "", "prio": "normal", "tipos": []}, {"seg": "EMEF", "nome": "GERALDA DE SOUZA ESPIN, EMEF", "susp": "Não", "impede": "Não", "naoimpede": "Não", "motivo": "Não houve suspensão .", "prio": "normal", "tipos": []}, {"seg": "EMEF", "nome": "HONORATO DE LUCCA, PROFº., EMEF", "susp": "Não", "impede": "Não", "naoimpede": "Não", "motivo": "Não teve suspensão dos atendimentos", "prio": "normal", "tipos": []}, {"seg": "EMEF", "nome": "MARIA INES VIEIRA MACHADO, PROFª., EMEF", "susp": "Não", "impede": "Não", "naoimpede": "Não", "motivo": "", "prio": "normal", "tipos": []}, {"seg": "EMEF", "nome": "PAULO FREIRE, PROFº., EMEF", "susp": "Não", "impede": "Não", "naoimpede": "Não", "motivo": "", "prio": "normal", "tipos": []}, {"seg": "EMEF", "nome": "PAULO MONTE SERRAT FILHO, PROFº., DR., EMEF", "susp": "Não", "impede": "Não", "naoimpede": "Não", "motivo": "Não houve suspensão.", "prio": "normal", "tipos": []}, {"seg": "EMEF", "nome": "SEBASTIAO DE AGUIAR AZEVEDO, EMEF - UN. II", "susp": "Não", "impede": "Não", "naoimpede": "Não", "motivo": "Aqui a escola está com energia sem danos em sua estrutura", "prio": "normal", "tipos": ["Energia"]}, {"seg": "EMEI", "nome": "ALBERT EINSTEIN, EMEI", "susp": "Não", "impede": "Não", "naoimpede": "Não", "motivo": "", "prio": "normal", "tipos": []}, {"seg": "EMEI", "nome": "ALBERT EINSTEIN, EMEI", "susp": "Não", "impede": "Não", "naoimpede": "Não", "motivo": "", "prio": "normal", "tipos": []}, {"seg": "EMEI", "nome": "ANA DOS SANTOS GABARRA, EMEI", "susp": "Não", "impede": "Não", "naoimpede": "Não", "motivo": "", "prio": "normal", "tipos": []}, {"seg": "EMEI", "nome": "EMILIO JARBINET, PADRE, EMEI", "susp": "Não", "impede": "Não", "naoimpede": "Não", "motivo": "", "prio": "normal", "tipos": []}, {"seg": "EMEI", "nome": "HENILLA GODOY VELLUDO SALVADOR, EMEI", "susp": "Não", "impede": "Não", "naoimpede": "Não", "motivo": "Não houve suspenção. Professores e funcionários compareceram normalmente, no entanto, a frequência de alunos foi bastante reduzida.", "prio": "normal", "tipos": []}, {"seg": "EMEI", "nome": "IRIA JUNQUEIRA, DONA, EMEI", "susp": "Não", "impede": "Não", "naoimpede": "Não", "motivo": "", "prio": "normal", "tipos": []}, {"seg": "EMEI", "nome": "IRIA JUNQUEIRA, DONA, EMEI", "susp": "Não", "impede": "Não", "naoimpede": "Não", "motivo": "", "prio": "normal", "tipos": []}, {"seg": "EMEI", "nome": "JOSE BONIFACIO COUTINHO NOGUEIRA, EMEI", "susp": "Não", "impede": "Não", "naoimpede": "Não", "motivo": "", "prio": "normal", "tipos": []}, {"seg": "EMEI", "nome": "MARIA PONTIM, EMEI", "susp": "Não", "impede": "Não", "naoimpede": "Não", "motivo": "Não houve suspensão", "prio": "normal", "tipos": []}, {"seg": "EMEI", "nome": "PAULO HENRIQUE DE SOUZA, EMEI", "susp": "Não", "impede": "Não", "naoimpede": "Não", "motivo": "", "prio": "normal", "tipos": []}, {"seg": "EMEI", "nome": "RUY ESCOREL FERREIRA SANTOS, EMEI", "susp": "Não", "impede": "Não", "naoimpede": "Não", "motivo": "", "prio": "normal", "tipos": []}, {"seg": "EMEI", "nome": "WILSON ROSELINO, EMEI", "susp": "Não", "impede": "Não", "naoimpede": "Não", "motivo": "Estamos com criancas na escola", "prio": "normal", "tipos": []}];
+var LABELP={critica:'Crítica',alta:'Suspensão',atencao:'Danos leves',normal:'Normal'};
+var filtroAtual='prioritarias';
+
+function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
+
+function barra(container, itens, maxOverride){
+  var max = maxOverride || Math.max.apply(null, itens.map(function(i){return i.v;}))||1;
+  var h='';
+  itens.forEach(function(i){
+    var w=Math.round(i.v/max*100);
+    h+='<div class="bar-row"><span class="lab" title="'+esc(i.lab)+'">'+esc(i.lab)+'</span>'+
+       '<span class="bar-track"><span class="bar-fill '+(i.cls||'')+'" style="width:'+Math.max(w,4)+'%">'+i.v+'</span></span></div>';
+  });
+  document.getElementById(container).innerHTML=h;
+}
+
+function initKPIs(){
+  var tot=RECS.length;
+  var crit=RECS.filter(function(x){return x.impede==='Sim';}).length;
+  var susp=RECS.filter(function(x){return x.susp==='Sim';}).length;
+  var ok=RECS.filter(function(x){return x.prio==='normal';}).length;
+  function pc(n){return Math.round(n/tot*100)+'% das unidades';}
+  document.getElementById('kTot').textContent=tot;
+  document.getElementById('kCrit').textContent=crit; document.getElementById('kCritP').textContent=pc(crit);
+  document.getElementById('kSusp').textContent=susp; document.getElementById('kSuspP').textContent=pc(susp);
+  document.getElementById('kOk').textContent=ok; document.getElementById('kOkP').textContent=pc(ok);
+
+  var cP=['critica','alta','atencao','normal'].map(function(p){
+    return {lab:LABELP[p], v:RECS.filter(function(x){return x.prio===p;}).length, cls:'c-'+({critica:'crit',alta:'alta',atencao:'aten',normal:'norm'}[p])};
+  });
+  barra('chPrio', cP);
+
+  var segs={}; RECS.forEach(function(x){segs[x.seg]=(segs[x.seg]||0)+1;});
+  var cS=Object.keys(segs).sort(function(a,b){return segs[b]-segs[a];}).map(function(s){return {lab:s,v:segs[s]};});
+  barra('chSeg', cS);
+
+  var tp={}; RECS.forEach(function(x){(x.tipos||[]).forEach(function(t){tp[t]=(tp[t]||0)+1;});});
+  var cT=Object.keys(tp).sort(function(a,b){return tp[b]-tp[a];}).map(function(t){return {lab:t,v:tp[t],cls:'c-gold'};});
+  barra('chTipo', cT);
+}
+
+function statusChips(x){
+  var h='';
+  if(x.susp==='Sim') h+='<span class="chip st">Atendimento suspenso</span>';
+  if(x.impede==='Sim') h+='<span class="chip st">Impede funcionamento</span>';
+  else if(x.naoimpede==='Sim') h+='<span class="chip">Danos que não impedem</span>';
+  (x.tipos||[]).forEach(function(t){h+='<span class="chip">'+esc(t)+'</span>';});
+  return h;
+}
+
+function render(){
+  var q=(document.getElementById('busca').value||'').toLowerCase().trim();
+  var arr=RECS.filter(function(x){
+    var okf = filtroAtual==='todas' ? true
+      : filtroAtual==='prioritarias' ? (x.prio==='critica'||x.prio==='alta')
+      : x.prio===filtroAtual;
+    var okq = !q || (x.nome||'').toLowerCase().indexOf(q)!==-1 || (x.motivo||'').toLowerCase().indexOf(q)!==-1;
+    return okf && okq;
+  });
+  document.getElementById('cont').textContent=arr.length+' unidade(s)';
+  if(!arr.length){document.getElementById('lista').innerHTML='<div class="vazio">Nenhuma unidade neste filtro.</div>';return;}
+  var h='';
+  arr.forEach(function(x){
+    h+='<div class="item p-'+x.prio+'">'+
+       '<div class="top"><div class="nome">'+esc(x.nome)+'<span class="seg">'+esc(x.seg)+'</span></div>'+
+       '<span class="badge b-'+x.prio+'">'+LABELP[x.prio]+'</span></div>'+
+       '<div class="chips">'+statusChips(x)+'</div>'+
+       (x.motivo?'<div class="motivo">'+esc(x.motivo)+'</div>':'')+
+       '</div>';
+  });
+  document.getElementById('lista').innerHTML=h;
+}
+
+document.getElementById('filtros').addEventListener('click',function(e){
+  var b=e.target.closest('.fbtn'); if(!b)return;
+  filtroAtual=b.dataset.f;
+  Array.prototype.forEach.call(this.children,function(c){c.classList.toggle('on',c===b);});
+  render();
+});
+
+initKPIs(); render();
+</script>
+</body>
+</html>
