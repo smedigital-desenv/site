@@ -96,9 +96,18 @@ function coletar() {
       naoimpede: sn(iNimp !== -1 ? row[iNimp] : "")
     };
     x.tipos = tipos(x.motivo);
-    x.prio  = x.impede === "Sim" ? "critica"
+    // Regra especial: "somente energia" = menciona energia e NENHUM outro
+    // problema (nem dano físico/estrutural, nem falta d'água) -> faixa própria.
+    var ml = (x.motivo || "").toLowerCase();
+    var temEnergia = /energ|luz|el[eé]tric/.test(ml);
+    var fisico = /alag|inund|desab|desmoron|caiu|caí|queda|qued|destelh|telhad|forr|telha|muro|parede|teto|rachad|vazament|goteir|[aá]rvore|galho|destro[cç]|entulho|danificad|danos?\s+(em|na|no)|transbord|invad|muita [aá]gua|[aá]gua\s+(na|nas|no|nos|dentro)/.test(ml);
+    var semAgua = /sem [aá]gua|falta de [aá]gua|sem abastec/.test(ml);
+    var soEnergia = temEnergia && !fisico && !semAgua;
+    var afetada = (x.impede === "Sim" || x.susp === "Sim" || x.naoimpede === "Sim");
+    x.prio = (soEnergia && afetada) ? "energia"
+            : (x.impede === "Sim" ? "critica"
             : (x.susp === "Sim" ? "alta"
-            : (x.naoimpede === "Sim" ? "atencao" : "normal"));
+            : (x.naoimpede === "Sim" ? "atencao" : "normal")));
     out.push(x);
   }
   return out;
