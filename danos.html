@@ -245,7 +245,7 @@ document.getElementById('filtros').addEventListener('click',function(e){
 //  App da Web -> Executar como: Eu -> Quem acessa: Qualquer pessoa.)
 // Enquanto estiver vazio, a página mostra os dados carregados inicialmente.
 var DADOS_URL = "https://script.google.com/macros/s/AKfycbyzUwAhHLACRIcGCDW92G9yUBTl4CzSOb2wLv1XR_BFOACVwTv1bjsbPkX7gRVR1lnLjQ/exec";
-var INTERVALO_MS = 60*60*1000;      // 1 hora
+var INTERVALO_MS = 5*60*1000;       // 5 minutos
 
 // Categorização (usada só se o Apps Script devolver registros sem prio/tipos)
 function tiposJS(m){
@@ -274,7 +274,7 @@ function aplicar(recs){
     String(a.seg).localeCompare(String(b.seg)) || String(a.nome).localeCompare(String(b.nome)); });
   RECS_ALL=recs; initKPIs(); render();
   var e=statusEl(); e.className='atual live';
-  e.innerHTML='<span class="ldot"></span>Atualizado às '+hora()+' · '+recs.length+' respostas (ao vivo · atualiza a cada hora)';
+  e.innerHTML='<span class="ldot"></span>Atualizado às '+hora()+' · '+recs.length+' respostas (ao vivo · atualiza a cada 5 min)';
 }
 
 function carregarAoVivo(){
