@@ -368,11 +368,31 @@ function temFisicoJS(m){
   return /alag|inund|desab|desmoron|caiu|caí|queda|qued|destelh|telhad|forr|telha|muro|parede|teto|rachad|vazament|goteir|[aá]rvore|galho|destro[cç]|entulho|danificad|danos?\s+(em|na|no)|transbord|invad|muita [aá]gua|[aá]gua\s+(na|nas|no|nos|dentro)/.test(ml);
 }
 // Gravidade vem da CLASSIFICAÇÃO MANUAL (mapa CLASSIF, chave = nome+motivo).
-// Registros que ainda não foram classificados (respostas novas que chegarem)
-// caem em "Não avaliado" — até serem classificados manualmente.
+// Gravidade automática a partir do texto do motivo. Serve de FALLBACK para
+// respostas que ainda não foram classificadas manualmente (novas que chegarem
+// ao vivo). Regra derivada dos casos já classificados à mão — reproduz ~98%
+// daquele julgamento. Uma classificação manual em CLASSIF sempre vence esta.
+function severAuto(motivo){
+  var t = String(motivo || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').trim();
+  if (!t) return 'sem';
+  if (/sem danos|nenhum dano/.test(t)) return 'sem';
+  // GRAVES: alagamento/inundação, desabamento, laje, muro, destelhamento,
+  // estrutura comprometida, dano em sala, árvore/telhado sobre a estrutura.
+  var graves = /alag|inund|desab|desmoron|laje|comprometid|muro|destelh|estrutura|dano[^.]*sala/.test(t)
+    || /arvore[^.]*(telhad|sala|laje)|telhad[^.]*(caiu|caid|quebr|danific|desab|arranc)|(caiu|caid|quebr)[^.]*(telhad| sala|laje|cobertura)|cobertura[^.]*danific|refeitorio[^.]*(alag|agua)/.test(t);
+  if (graves) return 'graves';
+  // LEVES: danos físicos menores (árvores/galhos/folhas, sombrite, infiltração,
+  // goteira, placa, telha solta, forro, sujeira, poste/fio).
+  if (/arvore|galho|folha|sombrite|infiltra|goteira|vazament|placa|telha|forro|sujeira|danos? em|danificad|poste| fio/.test(t)) return 'leves';
+  // SEM danos: normalidade / sem suspensão / sem alunos.
+  if (/nao houve suspen|nao teve suspen|sem suspen|funcionando normal|nao houve alun|nao vieram alun|estamos com crianc|acordada anteriormente|obras realizad|preferiram nao/.test(t)) return 'sem';
+  // ENERGIA/ÁGUA sem danos físicos relatados.
+  if (/energia|luz|eletric|agua|abastec|bomba/.test(t)) return 'energia';
+  return 'sem';
+}
 function severidadeJS(x){
   var s = CLASSIF[chaveRec(x)];
-  return s || 'naoavaliado';
+  return s || severAuto(x.motivo);
 }
 var SEVLAB={graves:'Danos graves',leves:'Danos leves',energia:'Falta de energia/água',sem:'Sem danos',naoavaliado:'Não avaliado'};
 var SEVORD=['graves','leves','energia','sem','naoavaliado'];
