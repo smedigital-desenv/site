@@ -88,6 +88,11 @@
   .switch .slider::before{content:"";position:absolute;left:3px;top:3px;width:20px;height:20px;background:#fff;border-radius:50%;transition:.2s;box-shadow:0 1px 3px rgba(0,0,0,.2);}
   .switch input:checked + .slider{background:var(--navy);}
   .switch input:checked + .slider::before{transform:translateX(20px);}
+  .atual{font-size:12px;color:var(--muted);margin-top:12px;display:flex;align-items:center;gap:7px;}
+  .atual .ldot{width:8px;height:8px;border-radius:50%;background:#adb5bd;flex:none;}
+  .atual.live .ldot{background:var(--norm);box-shadow:0 0 0 0 rgba(47,158,68,.5);animation:pulse2 1.8s infinite;}
+  .atual.snap .ldot{background:var(--alta);}
+  @keyframes pulse2{0%{box-shadow:0 0 0 0 rgba(47,158,68,.5)}70%{box-shadow:0 0 0 6px rgba(47,158,68,0)}100%{box-shadow:0 0 0 0 rgba(47,158,68,0)}}
 
   footer{background:var(--navy);color:#c3d2e6;text-align:center;padding:22px 20px;font-size:12.5px;margin-top:20px;}
   footer b{color:#fff;}
@@ -107,6 +112,7 @@
     <span class="tl">Incluir unidades conveniadas</span>
     <label class="switch"><input type="checkbox" id="swConv" checked onchange="toggleConv()"><span class="slider"></span></label>
   </div>
+  <div class="atual" id="atual"><span class="ldot"></span>Carregando dados da planilha…</div>
 </div></div>
 
 <section><div class="wrap">
@@ -233,7 +239,66 @@ document.getElementById('filtros').addEventListener('click',function(e){
   render();
 });
 
+// ====== ATUALIZAÇÃO AUTOMÁTICA (via Apps Script da planilha) ======
+// Cole abaixo a URL /exec do "App da Web" publicado a partir da planilha.
+// (Extensões -> Apps Script -> cole o DanosWebApp.gs -> Implantar ->
+//  App da Web -> Executar como: Eu -> Quem acessa: Qualquer pessoa.)
+// Enquanto estiver vazio, a página mostra os dados carregados inicialmente.
+var DADOS_URL = "";                 // <-- ex.: https://script.google.com/macros/s/AKfy.../exec
+var INTERVALO_MS = 60*60*1000;      // 1 hora
+
+// Categorização (usada só se o Apps Script devolver registros sem prio/tipos)
+function tiposJS(m){
+  var t=[], ml=(m||'').toLowerCase();
+  if(/energ|luz|el[eé]tric/.test(ml)) t.push('Energia');
+  if(/sem [aá]gua|falta de [aá]gua|caixa d|abastec/.test(ml)) t.push('Água');
+  if(/alag|inund|salas? com [aá]gua|p[aá]tio.*[aá]gua/.test(ml)) t.push('Alagamento');
+  if(/[aá]rvore|galho/.test(ml)) t.push('Árvores');
+  if(/destelh|telhad|forr[oó]|telha/.test(ml)) t.push('Telhado');
+  if(/muro/.test(ml)) t.push('Muro');
+  return t;
+}
+function prioJS(x){
+  if(x.impede==='Sim') return 'critica';
+  if(x.susp==='Sim') return 'alta';
+  if(x.naoimpede==='Sim') return 'atencao';
+  return 'normal';
+}
+function hora(){ var d=new Date(); return ('0'+d.getHours()).slice(-2)+':'+('0'+d.getMinutes()).slice(-2); }
+function statusEl(){ return document.getElementById('atual'); }
+
+function aplicar(recs){
+  recs.forEach(function(x){ if(!x.tipos) x.tipos=tiposJS(x.motivo); if(!x.prio) x.prio=prioJS(x); });
+  var ordem={critica:0,alta:1,atencao:2,normal:3};
+  recs.sort(function(a,b){ return (ordem[a.prio]-ordem[b.prio]) ||
+    String(a.seg).localeCompare(String(b.seg)) || String(a.nome).localeCompare(String(b.nome)); });
+  RECS_ALL=recs; initKPIs(); render();
+  var e=statusEl(); e.className='atual live';
+  e.innerHTML='<span class="ldot"></span>Atualizado às '+hora()+' · '+recs.length+' respostas (ao vivo · atualiza a cada hora)';
+}
+
+function carregarAoVivo(){
+  var e=statusEl();
+  if(!DADOS_URL){
+    e.className='atual snap';
+    e.innerHTML='<span class="ldot"></span>Exibindo os dados carregados inicialmente (atualização automática ainda não configurada).';
+    return;
+  }
+  var cb='__danos_cb_'+Date.now();
+  var s=document.createElement('script');
+  var to=setTimeout(function(){ falhou(); }, 15000);
+  function limpa(){ clearTimeout(to); try{ delete window[cb]; }catch(_){ window[cb]=undefined; } if(s.parentNode) s.parentNode.removeChild(s); }
+  function falhou(){ limpa(); e.className='atual snap';
+    e.innerHTML='<span class="ldot"></span>Não foi possível atualizar agora — mostrando a última leitura. Nova tentativa às '+hora()+'.'; }
+  window[cb]=function(data){ limpa(); if(Array.isArray(data)&&data.length) aplicar(data); else falhou(); };
+  s.onerror=falhou;
+  s.src=DADOS_URL+(DADOS_URL.indexOf('?')===-1?'?':'&')+'callback='+cb+'&_='+Date.now();
+  document.body.appendChild(s);
+}
+
 initKPIs(); render();
+carregarAoVivo();
+setInterval(carregarAoVivo, INTERVALO_MS);
 </script>
 </body>
 </html>
