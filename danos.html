@@ -109,6 +109,10 @@
   .chips{display:flex;gap:6px;flex-wrap:wrap;margin-top:9px;}
   .chip{font-size:11px;font-weight:600;color:var(--navy2);background:#eaf1fa;border:1px solid #d7e3f3;border-radius:6px;padding:2px 8px;}
   .chip.st{background:#fff4e6;border-color:#ffd8a8;color:#c25e00;}
+  .chip.cat-cob{background:#fdeaea;border-color:#f5c2c2;color:#b02525;}
+  .chip.cat-ene{background:#e7effb;border-color:#c3d7f2;color:#1c5bb0;}
+  .chip.cat-arv{background:#e7f4ea;border-color:#bfe0c8;color:#1e7a34;}
+  .chip.cat-mur{background:#fff1e0;border-color:#ffd6a3;color:#c25e00;}
   .motivo{font-size:12.5px;color:var(--muted);margin-top:9px;line-height:1.5;border-top:1px dashed var(--line);padding-top:9px;}
   .vazio{text-align:center;color:var(--muted);padding:30px;font-size:14px;}
   .cont{font-size:12.5px;color:var(--muted);margin-bottom:10px;}
@@ -297,10 +301,13 @@ function initKPIs(){
   barra('chMotSusp', cM);
 }
 
+var CATCHIP={'Cobertura':'cat-cob','Energia e água':'cat-ene','Árvores':'cat-arv','Muro':'cat-mur'};
 function statusChips(x){
   var h='';
   h+='<span class="chip st">'+(x.susp==='Sim'?'Suspensa':'Não suspensa')+'</span>';
-  (x.tipos||[]).forEach(function(t){h+='<span class="chip">'+esc(t)+'</span>';});
+  categoriasMotivoJS(x.motivo).forEach(function(c){
+    h+='<span class="chip '+(CATCHIP[c]||'')+'">'+esc(c)+'</span>';
+  });
   return h;
 }
 
