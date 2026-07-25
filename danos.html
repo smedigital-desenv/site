@@ -58,6 +58,11 @@
   .bar-fill{height:100%;border-radius:6px;background:var(--navy2);display:flex;align-items:center;justify-content:flex-end;padding-right:7px;color:#fff;font-size:11px;font-weight:700;min-width:22px;}
   .bar-fill.c-crit{background:var(--crit)}.bar-fill.c-alta{background:var(--alta)}.bar-fill.c-ener{background:var(--ener)}.bar-fill.c-aten{background:var(--aten);color:#5b4a00}.bar-fill.c-norm{background:var(--norm)}
   .bar-fill.c-gold{background:var(--gold);color:#5b4a00}.bar-fill.c-eval{background:#9aa7b8}
+  .bar-row.clickable{cursor:pointer;border-radius:6px;transition:background .12s;}
+  .bar-row.clickable:hover{background:#f1f5fb;}
+  .bar-row.clickable:hover .lab{color:var(--navy);}
+  .bar-row.on .lab{color:var(--navy);font-weight:700;}
+  .bar-row.on .bar-track{outline:2px solid var(--navy);outline-offset:1px;}
 
   .filtros{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;}
   .fbtn{border:1px solid var(--line);background:#fff;border-radius:999px;padding:8px 15px;font:600 13px 'DM Sans';color:var(--muted);cursor:pointer;transition:.15s;}
@@ -218,7 +223,9 @@ function barra(container, itens, maxOverride){
   var h='';
   itens.forEach(function(i){
     var w=Math.round(i.v/max*100);
-    h+='<div class="bar-row"><span class="lab" title="'+esc(i.lab)+'">'+esc(i.lab)+'</span>'+
+    var extra=(i.cat?' clickable':'')+(i.active?' on':'');
+    var dc=i.cat?' data-cat="'+esc(i.cat)+'"':'';
+    h+='<div class="bar-row'+extra+'"'+dc+'><span class="lab" title="'+esc(i.lab)+'">'+esc(i.lab)+'</span>'+
        '<span class="bar-track"><span class="bar-fill '+(i.cls||'')+'" style="width:'+Math.max(w,4)+'%">'+i.v+'</span></span></div>';
   });
   document.getElementById(container).innerHTML=h;
@@ -276,7 +283,7 @@ function initKPIs(){
     cs.forEach(function(c){ cat[c]=(cat[c]||0)+1; });
   });
   var cC=Object.keys(cat).sort(function(a,b){return cat[b]-cat[a];})
-    .map(function(c){return {lab:c, v:cat[c], cls:CATCLS[c]||'c-gold'};});
+    .map(function(c){return {lab:c, v:cat[c], cls:CATCLS[c]||'c-gold', cat:c, active:(fCat===c)};});
   if(!cC.length) cC=[{lab:'—',v:0}];
   barra('chCat', cC);
   document.getElementById('catInfo').textContent = '· '+comMotivo+' unidades com dano relatado';
@@ -299,10 +306,19 @@ function statusChips(x){
 
 function filtrar(susp, sev){
   fSusp=susp; fSev=sev;
-  initKPIs();   // re-marca as células/cabeçalhos selecionados
+  if(susp==='todas' && sev==='todas') fCat='todas';   // "limpar filtro" zera tudo
+  initKPIs();   // re-marca as células/cabeçalhos e barras selecionados
   render();
   var lista=document.getElementById('lista');
-  if(lista && (susp!=='todas')) lista.scrollIntoView({behavior:'smooth', block:'start'});
+  if(lista && (susp!=='todas' || sev!=='todas')) lista.scrollIntoView({behavior:'smooth', block:'start'});
+}
+// Clique nas barras de "Motivos por categoria" — filtra a lista por categoria.
+function filtrarCat(cat){
+  fCat = (fCat===cat) ? 'todas' : cat;   // clicar de novo na mesma categoria desmarca
+  initKPIs();
+  render();
+  var lista=document.getElementById('lista');
+  if(lista && fCat!=='todas') lista.scrollIntoView({behavior:'smooth', block:'start'});
 }
 
 function render(){
@@ -310,13 +326,17 @@ function render(){
   var arr=RECS().filter(function(x){
     var okS = fSusp==='todas' || (fSusp==='sim' ? x.susp==='Sim' : x.susp!=='Sim');
     var okV = fSev==='todas'  || severidadeJS(x)===fSev;
+    var okC = fCat==='todas'  || categoriasMotivoJS(x.motivo).indexOf(fCat)!==-1;
     var okq = !q || (x.nome||'').toLowerCase().indexOf(q)!==-1 || (x.motivo||'').toLowerCase().indexOf(q)!==-1;
-    return okS && okV && okq;
+    return okS && okV && okC && okq;
   });
-  var rotulo = (fSusp==='todas' && fSev==='todas') ? ''
-    : (fSusp==='sim'?'Suspensas':fSusp==='nao'?'Não suspensas':'Todas') + (fSev!=='todas'?' · '+SEVLAB[fSev]:'');
+  var partes=[];
+  if(fSusp!=='todas') partes.push(fSusp==='sim'?'Suspensas':'Não suspensas');
+  if(fSev!=='todas')  partes.push(SEVLAB[fSev]);
+  if(fCat!=='todas')  partes.push('Motivo: '+fCat);
+  var rotulo = partes.join(' · ');
   document.getElementById('contTxt').textContent = arr.length+' unidade(s)'+(rotulo?' — '+rotulo:'');
-  document.getElementById('btnLimpar').style.display = (fSusp==='todas'&&fSev==='todas') ? 'none' : 'inline';
+  document.getElementById('btnLimpar').style.display = (fSusp==='todas'&&fSev==='todas'&&fCat==='todas') ? 'none' : 'inline';
   if(!arr.length){document.getElementById('lista').innerHTML='<div class="vazio">Nenhuma unidade neste filtro.</div>';return;}
   var h='';
   arr.forEach(function(x){
@@ -439,7 +459,7 @@ function severidadeJS(x){
 var SEVLAB={graves:'Danos graves',leves:'Danos leves',energia:'Falta de energia/água',sem:'Sem danos',naoavaliado:'Não avaliado'};
 var SEVORD=['graves','leves','energia','sem','naoavaliado'];
 var SEVRANK={graves:0,leves:1,energia:2,sem:3,naoavaliado:4};
-var fSusp='todas', fSev='todas';
+var fSusp='todas', fSev='todas', fCat='todas';
 // Recalcula tipos e prioridade em toda a base (aplica a regra atual sempre,
 // independentemente do que veio embutido ou do Apps Script).
 function normaliza(recs){
@@ -475,6 +495,12 @@ function carregarAoVivo(){
   s.src=DADOS_URL+(DADOS_URL.indexOf('?')===-1?'?':'&')+'callback='+cb+'&_='+Date.now();
   document.body.appendChild(s);
 }
+
+// Clique nas barras de categoria (delegação — o #chCat é redesenhado a cada render).
+document.getElementById('chCat').addEventListener('click', function(ev){
+  var row=ev.target.closest('.bar-row[data-cat]');
+  if(row) filtrarCat(row.getAttribute('data-cat'));
+});
 
 normaliza(RECS_ALL);
 initKPIs(); render();
