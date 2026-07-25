@@ -167,6 +167,18 @@
 </div></section>
 
 <section><div class="wrap">
+  <div class="panel">
+    <h3>Motivos por categoria <span id="catInfo" style="font-weight:400;color:var(--muted);font-size:12.5px;"></span></h3>
+    <p style="color:var(--muted);font-size:12.5px;margin:-4px 0 14px;line-height:1.55;">
+      <b>Cobertura</b> = teto caído, salas inundadas, água nas salas, telhado/forro/destelhamento ·
+      <b>Energia e água</b> = falta de energia e/ou de água · <b>Árvores</b> · <b>Muro</b>.
+      Funcionários e alunos ausentes não são contabilizados. Uma unidade pode aparecer em mais de uma categoria.
+    </p>
+    <div id="chCat"></div>
+  </div>
+</div></section>
+
+<section><div class="wrap">
   <div class="sec-t">Situação das unidades</div>
   <div class="matriz">
     <div class="mcat">
@@ -255,6 +267,20 @@ function initKPIs(){
   var cT=Object.keys(tp).sort(function(a,b){return tp[b]-tp[a];}).map(function(t){return {lab:t,v:tp[t],cls:'c-gold'};});
   barra('chTipo', cT);
 
+  // ---- Motivos por categoria (taxonomia agrupada) ----
+  var CATCLS={'Cobertura':'c-crit','Energia e água':'c-ener','Árvores':'c-norm','Muro':'c-alta'};
+  var cat={}, comMotivo=0;
+  RECS().forEach(function(x){
+    var cs=categoriasMotivoJS(x.motivo);
+    if(cs.length) comMotivo++;
+    cs.forEach(function(c){ cat[c]=(cat[c]||0)+1; });
+  });
+  var cC=Object.keys(cat).sort(function(a,b){return cat[b]-cat[a];})
+    .map(function(c){return {lab:c, v:cat[c], cls:CATCLS[c]||'c-gold'};});
+  if(!cC.length) cC=[{lab:'—',v:0}];
+  barra('chCat', cC);
+  document.getElementById('catInfo').textContent = '· '+comMotivo+' unidades com dano relatado';
+
   // Motivos entre quem SUSPENDEU o atendimento
   var suspRecs=RECS().filter(function(x){return x.susp==='Sim';});
   document.getElementById('suspInfo').textContent = '· '+suspRecs.length+' unidades';
@@ -321,6 +347,22 @@ function tiposJS(m){
   if(/alag|inund|salas? com [aá]gua|p[aá]tio.*[aá]gua/.test(ml)) t.push('Alagamento');
   if(/[aá]rvore|galho/.test(ml)) t.push('Árvores');
   if(/destelh|telhad|forr[oó]|telha/.test(ml)) t.push('Telhado');
+  if(/muro/.test(ml)) t.push('Muro');
+  return t;
+}
+// Categorias de motivo (taxonomia agrupada para a visualização "Motivos por
+// categoria"). Uma unidade pode entrar em mais de uma categoria.
+//  - Cobertura: teto caído, telhado/forro/destelhamento, salas inundadas,
+//    água nas salas/pátio, alagamento (entrada d'água pela cobertura).
+//  - Energia e água: falta de energia elétrica E/OU falta d'água (mesma categoria).
+//  - Árvores e Muro: mantidas à parte.
+//  - Funcionários e alunos ausentes: NÃO são contabilizados.
+function categoriasMotivoJS(m){
+  var ml=(m||'').toLowerCase(), t=[];
+  if(/teto|telhad|destelh|forr[oó]|telha|cobertura|laje/.test(ml)
+     || /alag|inund|transbord|invad|muita [aá]gua|sala.{0,25}[aá]gua|[aá]gua.{0,20}(dentro|sala|refeit|p[aá]tio)|p[aá]tio.{0,25}[aá]gua/.test(ml)) t.push('Cobertura');
+  if(/energ|luz|el[eé]tric/.test(ml) || /sem [aá]gua|falta de [aá]gua|abastec|bomba|caixa d/.test(ml)) t.push('Energia e água');
+  if(/[aá]rvore|galho/.test(ml)) t.push('Árvores');
   if(/muro/.test(ml)) t.push('Muro');
   return t;
 }
