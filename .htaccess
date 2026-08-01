@@ -1,0 +1,41 @@
+# ============================================================================
+# .htaccess — política de cache (servidor Apache)
+#
+# Objetivo: as páginas HTML devem SEMPRE ser revalidadas, para que qualquer
+# atualização publicada apareça imediatamente (sem depender de ?v= ou de
+# limpar o cache do navegador). Arquivos estáticos (imagens/fontes) podem ser
+# cacheados por mais tempo; CSS/JS ficam com cache curto e revalidação.
+#
+# Tudo está protegido por <IfModule>: se o módulo não existir no servidor,
+# as diretivas são simplesmente ignoradas (não geram erro).
+# ============================================================================
+
+<IfModule mod_headers.c>
+  # HTML e dados dinâmicos: não usar cache sem antes revalidar com o servidor.
+  <FilesMatch "\.(html|htm|json)$">
+    Header set Cache-Control "no-cache, must-revalidate, max-age=0"
+  </FilesMatch>
+
+  # CSS e JS: cache curto, mas sempre revalidado.
+  <FilesMatch "\.(css|js)$">
+    Header set Cache-Control "public, max-age=3600, must-revalidate"
+  </FilesMatch>
+
+  # Imagens, ícones e fontes: cache longo (troque o nome do arquivo ao alterar).
+  <FilesMatch "\.(png|jpe?g|gif|svg|ico|webp|woff2?|ttf|eot)$">
+    Header set Cache-Control "public, max-age=604800"
+  </FilesMatch>
+</IfModule>
+
+# Reforço: garante revalidação do HTML mesmo sem mod_headers, via Expires.
+<IfModule mod_expires.c>
+  ExpiresActive On
+  ExpiresByType text/html "access plus 0 seconds"
+  ExpiresByType application/json "access plus 0 seconds"
+  ExpiresByType text/css "access plus 1 hour"
+  ExpiresByType application/javascript "access plus 1 hour"
+  ExpiresByType image/png "access plus 1 week"
+  ExpiresByType image/jpeg "access plus 1 week"
+  ExpiresByType image/svg+xml "access plus 1 week"
+  ExpiresByType image/x-icon "access plus 1 week"
+</IfModule>
