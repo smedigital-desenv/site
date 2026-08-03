@@ -81,6 +81,10 @@
       <svg viewBox="0 0 24 24" style="width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6M16 13H8M16 17H8M10 9H8"/></svg>
       Lista de inscritos por palestra (PDF)
     </a>
+    <a id="btnListaEscola" href="lista-presenca-escola.html" style="display:none;align-items:center;justify-content:center;gap:8px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:13px;margin-bottom:12px;color:var(--text);font:600 14px 'DM Sans';text-decoration:none;">
+      <svg viewBox="0 0 24 24" style="width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;"><path d="M3 21h18M6 21V7l6-4 6 4v14M9 9h.01M15 9h.01M9 13h.01M15 13h.01M10 21v-4h4v4"/></svg>
+      Lista de presença por escola (PDF)
+    </a>
     <div class="card">
       <label for="stationSelect">Palestra onde voce esta</label>
       <select id="stationSelect" onchange="setStationFiscal()">
@@ -169,6 +173,7 @@
     document.getElementById("etapa-token").style.display= "block";
     if (LISTA_PERMITIDOS.indexOf(String(email||"").toLowerCase()) !== -1) {
       document.getElementById("btnLista").style.display = "flex";
+      document.getElementById("btnListaEscola").style.display = "flex";
       document.getElementById("btnVagas").style.display = "flex";
     }
     garantirCache(function(total){
