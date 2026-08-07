@@ -1036,7 +1036,8 @@ function iniciarPagina(){
 
 /* ================= PORTÃO DE ACESSO =================
    Só e-mails cadastrados em resultados_consultas.acesso entram — allowlist
-   PRÓPRIA desta página, em schema separado do sistema de presença.
+   PRÓPRIA desta página, em schema separado do sistema de presença. A checagem
+   passa pela função public.tem_acesso_consulta(), que devolve só true/false.
    A sessão usa storageKey "consulta-auth", isolada da do sistema de presença.
    Os dados da consulta só são baixados depois da liberação. */
 (function(){
@@ -1131,29 +1132,28 @@ function iniciarPagina(){
     return cliente.auth.signOut().catch(function(){}).then(function(){ window.location.reload(); });
   };
 
-  // Schema próprio dos resultados de consultas (precisa estar em
-  // Supabase → Settings → API → Exposed schemas).
-  var SCHEMA_CONSULTA = "resultados_consultas";
-
-  // Confere o e-mail logado na allowlist (resultados_consultas.acesso).
-  // A RLS só devolve a linha da própria pessoa — ninguém consegue listar a tabela.
+  // Checagem da allowlist via função public.tem_acesso_consulta() — ver
+  // db/consulta-acesso.sql. Fica em `public`, que é exposto por padrão, então
+  // NÃO depende de "Exposed schemas". A função responde só true/false e a
+  // tabela resultados_consultas.acesso nunca é alcançável pela API.
   function verificarAcesso(){
     return cliente.auth.getSession().then(function(res){
       var sessao = res && res.data ? res.data.session : null;
       if (!sessao || !sessao.user || !sessao.user.email) return { semSessao: true };
       var email = sessao.user.email.toLowerCase();
-      return fetch(
-        SUPA_URL + "/acesso?email=eq." + encodeURIComponent(email) + "&select=email,nome&limit=1",
-        { headers: {
-            "apikey": SUPA_KEY,
-            "Authorization": "Bearer " + sessao.access_token,
-            "Accept-Profile": SCHEMA_CONSULTA
-          } }
-      )
+      return fetch(SUPA_URL + "/rpc/tem_acesso_consulta", {
+        method: "POST",
+        headers: {
+          "apikey": SUPA_KEY,
+          "Authorization": "Bearer " + sessao.access_token,
+          "Content-Type": "application/json"
+        },
+        body: "{}"
+      })
       .then(function(r){ if (!r.ok) throw new Error("http " + r.status); return r.json(); })
-      .then(function(d){
-        if (!Array.isArray(d) || d.length === 0) return { negado: true, email: email };
-        return { ok: true, email: email, nome: d[0].nome || "" };
+      .then(function(liberado){
+        if (liberado !== true) return { negado: true, email: email };
+        return { ok: true, email: email };
       });
     });
   }
@@ -1170,8 +1170,8 @@ function iniciarPagina(){
     liberar();
   }).catch(function(){
     mostrarCaixa('<div class="portao-erro"><b>Não foi possível verificar o acesso.</b>' +
-      "Recarregue a página. Se persistir, confirme se o schema <b>" + SCHEMA_CONSULTA +
-      "</b> foi criado e exposto na API do Supabase.</div>", true);
+      "Recarregue a página. Se persistir, confirme se a função " +
+      "<b>public.tem_acesso_consulta()</b> foi criada no banco.</div>", true);
   });
 })();
 
