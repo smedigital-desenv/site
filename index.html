@@ -8,124 +8,130 @@
   <link rel="apple-touch-icon" href="apple-touch-icon.png?v=1">
   <title>Consultas Públicas — Secretaria Municipal de Educação</title>
   <meta name="description" content="Participe das consultas públicas da Secretaria Municipal de Educação de Ribeirão Preto e contribua para uma educação cada vez melhor.">
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700;9..40,800&display=swap" rel="stylesheet">
   <style>
     :root{
-      --navy:#0f2a52; --navy2:#173257; --blue:#eaf2fb;
+      --navy:#0f2a52; --navy2:#16305c; --navy3:#0b2246;
       --gold:#f6b91e; --gold2:#d99b06;
-      --ink:#16233d; --muted:#5b6d8a; --line:#dbe6f4;
-      --surface:#ffffff; --radius:14px;
+      --ink:#16233d; --muted:#5b6d8a; --line:#e2eaf4;
+      --surface:#ffffff; --page:#eef3fa;
+      --c-gold:#e8a50a; --c-blue:#1c74d4; --c-green:#2b8a3e; --c-purple:#6741d9;
     }
     *{box-sizing:border-box;margin:0;padding:0;}
     html{scroll-behavior:smooth;}
-    body{font-family:'DM Sans',system-ui,sans-serif;background:linear-gradient(180deg,#eaf2fb 0%,#f4f8fd 46%,#eaf2fb 100%);background-attachment:fixed;color:var(--ink);line-height:1.55;-webkit-font-smoothing:antialiased;display:flex;flex-direction:column;min-height:100vh;}
+    body{font-family:'DM Sans',system-ui,-apple-system,Segoe UI,Roboto,sans-serif;background:var(--page);color:var(--ink);line-height:1.55;-webkit-font-smoothing:antialiased;display:flex;flex-direction:column;min-height:100vh;}
     img{max-width:100%;display:block;}
     a{color:inherit;text-decoration:none;}
-    .wrap{max-width:960px;margin:0 auto;padding:0 20px;width:100%;}
+    .wrap{max-width:1040px;margin:0 auto;padding:0 22px;width:100%;}
 
     /* ---- CABEÇALHO OFICIAL ---- */
     .gov-top{background:#fff;border-bottom:1px solid #e6e6e6;}
-    .gov-top .wrap{max-width:1180px;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:16px;padding:11px 20px;}
+    .gov-top .wrap{max-width:1200px;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:16px;padding:11px 22px;}
     .gov-brand{grid-column:2;justify-self:center;display:flex;align-items:center;}
     .gov-logo{height:42px;width:auto;}
     .gov-actions{grid-column:3;justify-self:end;display:flex;align-items:center;}
     .gov-a11y{display:flex;align-items:center;gap:6px;}
-    .gov-a11y button{border:1px solid #cfcfcf;background:#fff;border-radius:4px;width:24px;height:24px;font:700 11px 'DM Sans',sans-serif;cursor:pointer;color:#333;line-height:1;}
+    .gov-a11y button{border:1px solid #cfcfcf;background:#fff;border-radius:5px;width:26px;height:26px;font:700 11px 'DM Sans',sans-serif;cursor:pointer;color:#333;line-height:1;}
     .gov-a11y button:hover{background:#f2f2f2;}
     .gov-a11y button.contrast{border-radius:50%;padding:0;overflow:hidden;position:relative;}
     .gov-a11y button.contrast span{position:absolute;inset:0;}
     .gov-a11y button.contrast span:first-child{background:#fff;clip-path:polygon(0 0,50% 0,50% 100%,0 100%);}
     .gov-a11y button.contrast span:last-child{background:#222;clip-path:polygon(50% 0,100% 0,100% 100%,50% 100%);}
     .gov-sec{background:#4a7fc4;}
-    .gov-sec .wrap{max-width:1180px;padding:10px 20px;}
-    .gov-sec span{display:block;text-align:center;color:#fff;font:600 14.5px 'DM Sans',sans-serif;}
+    .gov-sec .wrap{max-width:1200px;padding:9px 22px;}
+    .gov-sec span{display:block;text-align:center;color:#fff;font:600 14px 'DM Sans',sans-serif;letter-spacing:.01em;}
+
+    /* ---- HERÓI ---- */
+    .phero{position:relative;overflow:hidden;color:#fff;
+      background:
+        radial-gradient(80% 130% at 88% -20%,#23508f 0%,rgba(35,80,143,0) 55%),
+        linear-gradient(125deg,var(--navy2) 0%,var(--navy) 52%,var(--navy3) 100%);}
+    .phero .wrap{position:relative;z-index:2;display:flex;align-items:center;justify-content:space-between;gap:30px;padding:52px 22px 56px;}
+    .phero-txt{max-width:620px;}
+    .eyebrow{display:inline-flex;align-items:center;gap:11px;font:800 12.5px 'DM Sans',sans-serif;letter-spacing:.16em;text-transform:uppercase;color:var(--gold);margin-bottom:16px;}
+    .eyebrow::before{content:"";width:32px;height:3px;border-radius:3px;background:var(--gold);}
+    .phero h1{font-size:clamp(34px,6vw,56px);line-height:1.02;font-weight:800;letter-spacing:-.025em;text-wrap:balance;}
+    .phero h1 b{color:var(--gold);font-weight:800;}
+    .phero p{margin-top:18px;max-width:48ch;font-size:clamp(15px,1.7vw,18px);color:#c8d7ec;}
+    .phero-meta{display:flex;align-items:center;gap:16px;flex-wrap:wrap;margin-top:26px;}
+    .pill{display:inline-flex;align-items:center;gap:9px;background:rgba(246,185,30,.14);border:1px solid rgba(246,185,30,.42);color:#ffe3a3;border-radius:999px;padding:8px 16px;font:700 13.5px 'DM Sans',sans-serif;}
+    .pill b{color:var(--gold);font-size:16px;}
+    .pill .d{width:8px;height:8px;border-radius:50%;background:#37d67a;box-shadow:0 0 0 4px rgba(55,214,122,.2);}
+    .phero-hint{font-size:13px;color:#9fb6d6;}
+    .phero-deco{position:absolute;inset:0;z-index:1;pointer-events:none;opacity:.85;}
+    .phero-deco svg{position:absolute;right:-40px;top:50%;transform:translateY(-50%);width:440px;height:340px;}
+
+    /* ---- LISTA DE CONSULTAS ---- */
+    main{flex:1;padding:40px 0 56px;}
+    .sec-h{display:flex;align-items:baseline;justify-content:space-between;gap:14px;margin-bottom:20px;flex-wrap:wrap;}
+    .sec-h h2{font-size:22px;font-weight:800;color:var(--navy);letter-spacing:-.01em;}
+    .sec-h .sub{font-size:13.5px;color:var(--muted);}
+    .consultas{display:flex;flex-direction:column;gap:16px;}
+    .consulta{position:relative;display:flex;align-items:center;gap:20px;background:var(--surface);
+      border:1px solid var(--line);border-radius:18px;padding:22px 24px 22px 26px;overflow:hidden;
+      transition:transform .15s,box-shadow .2s,border-color .2s;}
+    .consulta::before{content:"";position:absolute;left:0;top:0;bottom:0;width:5px;background:var(--cc,#ccc);}
+    .consulta:hover{transform:translateY(-3px);box-shadow:0 18px 38px -18px rgba(15,42,82,.28);border-color:#cdddf0;}
+    .consulta:focus-visible{outline:3px solid var(--gold);outline-offset:2px;}
+    .c-ico{width:56px;height:56px;border-radius:15px;flex:none;display:flex;align-items:center;justify-content:center;color:#fff;
+      background:var(--cc);box-shadow:0 12px 24px -10px var(--ccs,rgba(0,0,0,.4));}
+    .c-ico svg{width:27px;height:27px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+    .c-body{flex:1;min-width:0;}
+    .c-tag{font:800 10.5px 'DM Sans',sans-serif;letter-spacing:.09em;text-transform:uppercase;color:var(--cc);}
+    .c-body h3{margin:5px 0 0;font-size:17px;font-weight:700;color:var(--navy);line-height:1.32;}
+    .c-chips{display:flex;flex-wrap:wrap;gap:7px;margin-top:11px;}
+    .chip{display:inline-flex;align-items:center;gap:6px;font:600 12px 'DM Sans',sans-serif;color:var(--muted);background:#f1f5fa;border:1px solid #e3ebf5;border-radius:999px;padding:3px 11px;}
+    .chip.open{color:#1e7a34;background:#e7f4ea;border-color:#c6e6ce;}
+    .chip.open .d{width:7px;height:7px;border-radius:50%;background:#2fb455;}
+    .c-cta{flex:none;display:inline-flex;align-items:center;gap:8px;background:var(--navy);color:#fff;
+      border-radius:11px;padding:12px 20px;font:700 14px 'DM Sans',sans-serif;transition:background .15s,transform .15s;}
+    .c-cta svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round;transition:transform .15s;}
+    .consulta:hover .c-cta{background:var(--gold);color:var(--navy);}
+    .consulta:hover .c-cta svg{transform:translateX(3px);}
+
+    .consulta.gold{--cc:var(--c-gold);--ccs:rgba(216,155,6,.5);}
+    .consulta.blue{--cc:var(--c-blue);--ccs:rgba(28,116,212,.5);}
+    .consulta.green{--cc:var(--c-green);--ccs:rgba(43,138,62,.5);}
+    .consulta.purple{--cc:var(--c-purple);--ccs:rgba(103,65,217,.5);}
+
+    /* ---- FAIXA FINAL ---- */
+    .cta-band{margin-top:34px;background:linear-gradient(120deg,var(--navy2),var(--navy3));border-radius:20px;
+      padding:28px 30px;display:flex;align-items:center;justify-content:space-between;gap:20px;color:#fff;flex-wrap:wrap;}
+    .cta-band b{display:block;font-size:18px;font-weight:800;}
+    .cta-band span{color:#c8d7ec;font-size:14px;}
+    .cta-band .gold-dot{color:var(--gold);}
+
+    /* ---- RODAPÉ ---- */
+    footer{background:var(--navy);color:#c3d2e6;text-align:center;padding:26px 22px;font-size:12.5px;margin-top:auto;}
+    footer .fmark{font-weight:800;color:#fff;font-size:14px;margin-bottom:5px;}
+
+    /* ---- RESPONSIVO ---- */
+    @media (max-width:760px){
+      .phero-deco{display:none;}
+      .phero .wrap{padding:40px 22px 44px;}
+      .consulta{flex-wrap:wrap;padding:20px;gap:14px;}
+      .c-ico{width:48px;height:48px;border-radius:13px;}
+      .c-cta{width:100%;justify-content:center;order:3;}
+      .c-body{flex-basis:calc(100% - 62px);}
+    }
     @media (max-width:640px){
       .gov-top .wrap{grid-template-columns:1fr;justify-items:center;gap:8px;}
       .gov-brand,.gov-actions{grid-column:1;justify-self:center;}
       .gov-logo{height:36px;}
     }
 
-    /* ---- HERO compacto ---- */
-    .hero{text-align:center;padding:30px 20px 10px;}
-    .badge{display:inline-flex;align-items:center;gap:8px;background:var(--navy);color:#fff;border-radius:999px;padding:7px 18px 7px 9px;font:800 13.5px 'DM Sans',sans-serif;box-shadow:0 8px 20px rgba(15,42,82,.2);}
-    .badge .ic{width:26px;height:26px;border-radius:50%;background:var(--gold);display:flex;align-items:center;justify-content:center;flex:none;}
-    .badge .ic svg{width:15px;height:15px;stroke:var(--navy);fill:none;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round;}
-    .badge .em{color:var(--gold);}
-    .hero h1{margin:16px auto 0;font-size:clamp(21px,3.6vw,29px);font-weight:800;color:var(--navy);letter-spacing:-.01em;line-height:1.2;max-width:16ch;}
-    .hero p{margin:9px auto 0;max-width:52ch;font-size:14.5px;color:var(--muted);}
-
-    /* ---- GRADE COMPACTA ---- */
-    main{flex:1;padding:22px 0 40px;}
-    .grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;}
-    .card{position:relative;background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:18px 18px 16px 22px;display:flex;flex-direction:column;overflow:hidden;transition:transform .14s,box-shadow .18s,border-color .18s;}
-    .card::before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--gold);}
-    .card:hover{transform:translateY(-3px);box-shadow:0 12px 26px rgba(15,42,82,.13);border-color:#c3d6ee;}
-    .card-head{display:flex;align-items:center;gap:11px;margin-bottom:11px;}
-    .card .icon{width:38px;height:38px;border-radius:10px;flex:none;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,var(--navy2),var(--navy));}
-    .card .icon svg{width:19px;height:19px;stroke:#fff;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
-    .card .tag{font:700 10px 'DM Sans',sans-serif;letter-spacing:.07em;text-transform:uppercase;color:var(--gold2);}
-    .card h3{font-size:15px;font-weight:700;color:var(--navy);line-height:1.35;margin-bottom:16px;flex:1;}
-    .card .go{display:inline-flex;align-items:center;gap:6px;align-self:flex-start;margin-top:auto;font:700 13px 'DM Sans',sans-serif;color:#fff;background:var(--navy);border-radius:9px;padding:9px 15px;transition:background .15s;}
-    .card:hover .go{background:var(--gold);color:var(--navy);}
-    .card .go svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round;transition:transform .15s;}
-    .card:hover .go svg{transform:translateX(2px);}
-
-    @media (max-width:600px){
-      .grid{grid-template-columns:1fr;}
-      .card .go{width:100%;justify-content:center;}
-    }
-
-    /* ---- RODAPÉ ---- */
-    footer{background:var(--navy);color:#c3d2e6;text-align:center;padding:24px 20px;font-size:12.5px;}
-    footer .fmark{font-weight:800;color:#fff;font-size:14px;margin-bottom:5px;}
-
-    /* ---- Banner (imagem 1600x320) ---- */
-    .banner-hero{margin:24px auto 4px;max-width:1180px;padding:0 20px;width:100%;}
-    .banner-hero img{width:100%;height:auto;border-radius:20px;box-shadow:0 22px 48px -22px rgba(15,42,82,.55);display:block;}
-
-    /* ---- Rótulo de seção ---- */
-    .sec-label{max-width:960px;margin:30px auto 0;padding:0 20px;width:100%;}
-    .sec-label .eyebrow{display:inline-flex;align-items:center;gap:9px;font:800 12px 'DM Sans',sans-serif;letter-spacing:.12em;text-transform:uppercase;color:var(--gold2);}
-    .sec-label .eyebrow::before{content:"";width:22px;height:3px;border-radius:3px;background:var(--gold);}
-    .sec-label h2{margin:9px 0 0;font-size:clamp(20px,3vw,26px);font-weight:800;color:var(--navy);letter-spacing:-.01em;}
-    .sec-label p{margin:7px 0 0;color:var(--muted);font-size:14.5px;max-width:58ch;}
-
-    /* ---- Cards modernizados (ícones coloridos, no padrão do banner) ---- */
-    .card{border-radius:18px;padding:20px 20px 18px;border-color:#e4edf8;}
-    .card::before{display:none;}
-    .card .icon{width:46px;height:46px;border-radius:13px;box-shadow:0 10px 20px -8px rgba(15,42,82,.4);}
-    .card .icon svg{width:22px;height:22px;}
-    .card.gold .icon{background:linear-gradient(135deg,#f6b91e,#d99b06);}
-    .card.blue .icon{background:linear-gradient(135deg,#3b8ae6,#1c74d4);}
-    .card.green .icon{background:linear-gradient(135deg,#37b24d,#2b8a3e);}
-    .card .tag{color:var(--muted);}
-    .card.gold:hover{border-color:#f2cf7a;box-shadow:0 16px 32px -14px rgba(246,185,30,.5);}
-    .card.blue:hover{border-color:#bcd6f5;box-shadow:0 16px 32px -14px rgba(28,116,212,.45);}
-    .card.green:hover{border-color:#bfe3c8;box-shadow:0 16px 32px -14px rgba(47,158,68,.45);}
-
-    /* ---- Herói do mobile (substitui o banner 5:1, que fica pequeno demais) ---- */
-    .hero-m{display:none;}
-    @media (max-width:640px){
-      .banner-hero{display:none;}
-      .hero-m{display:block;margin:20px 16px 4px;border-radius:18px;padding:22px 20px;
-        background:linear-gradient(120deg,#16305c 0%,#0f2a52 55%,#0b2246 100%);
-        box-shadow:0 18px 40px -20px rgba(15,42,82,.55);}
-      .hero-m .eyebrow{display:flex;align-items:center;gap:9px;font:800 11px 'DM Sans',sans-serif;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);margin-bottom:10px;}
-      .hero-m .eyebrow::before{content:"";width:24px;height:3px;border-radius:3px;background:var(--gold);}
-      .hero-m h1{margin:0;color:#fff;font-size:26px;line-height:1.1;font-weight:800;letter-spacing:-.02em;}
-      .hero-m h1 b{color:var(--gold);}
-      .hero-m p{margin:12px 0 0;color:#c8d7ec;font-size:14px;line-height:1.45;}
-    }
-
-    /* ---- Alto contraste ---- */
+    /* ---- ALTO CONTRASTE ---- */
     body.alto-contraste{background:#000!important;color:#ffe066!important;}
-    body.alto-contraste .gov-top,body.alto-contraste footer,body.alto-contraste .card{background:#000!important;color:#ffe066!important;}
-    body.alto-contraste .hero h1,body.alto-contraste .card h3{color:#ffe066!important;}
-    body.alto-contraste .sec-label h2{color:#ffe066!important;}
-    body.alto-contraste .hero p,body.alto-contraste .card p,body.alto-contraste footer{color:#ffe066!important;opacity:.9;}
-    body.alto-contraste .card{border-color:#ffe066!important;}
-    body.alto-contraste .card .go,body.alto-contraste .badge{background:#ffe066!important;color:#000!important;}
+    body.alto-contraste .gov-top,body.alto-contraste footer,body.alto-contraste .consulta,
+    body.alto-contraste .phero,body.alto-contraste .cta-band{background:#000!important;color:#ffe066!important;}
+    body.alto-contraste .phero h1,body.alto-contraste .phero h1 b,body.alto-contraste .sec-h h2,
+    body.alto-contraste .c-body h3,body.alto-contraste .c-tag,body.alto-contraste .cta-band b{color:#ffe066!important;}
+    body.alto-contraste .phero p,body.alto-contraste .phero-hint,body.alto-contraste .sec-h .sub,
+    body.alto-contraste .chip,body.alto-contraste .cta-band span,body.alto-contraste footer{color:#ffe066!important;opacity:.92;}
+    body.alto-contraste .consulta,body.alto-contraste .chip{border-color:#ffe066!important;}
+    body.alto-contraste .c-cta,body.alto-contraste .pill{background:#ffe066!important;color:#000!important;border-color:#ffe066!important;}
     body.alto-contraste .gov-logo{background:#fff;padding:3px 7px;border-radius:6px;}
+    @media (prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto;}}
   </style>
 </head>
 <body>
@@ -146,56 +152,91 @@
 </header>
 <div class="gov-sec"><div class="wrap"><span>Secretaria de Educação</span></div></div>
 
-<div class="banner-hero">
-  <img src="banner.png?v=1"
-       srcset="banner.png?v=1 1600w, banner@2x.png?v=1 3200w"
-       sizes="(max-width:1180px) 100vw, 1140px"
-       alt="Secretaria Municipal de Educação — Acompanhe a Educação em movimento: ações, consultas públicas, notícias e novidades.">
-</div>
-
-<div class="hero-m">
-  <div class="eyebrow">Secretaria Municipal de Educação</div>
-  <h1>Acompanhe a Educação <b>em movimento</b></h1>
-  <p>Ações, consultas públicas, notícias e novidades da rede — em um só lugar.</p>
-</div>
-
-<div class="sec-label">
-  <span class="eyebrow">Consultas em andamento</span>
-  <h2>Participe e dê sua opinião</h2>
-  <p>Contribua com as consultas públicas da Educação e ajude a construir uma rede cada vez melhor.</p>
-</div>
+<section class="phero">
+  <div class="phero-deco" aria-hidden="true">
+    <svg viewBox="0 0 440 340" fill="none">
+      <g stroke="#f6b91e" stroke-opacity=".28" stroke-width="1.5">
+        <path d="M70 60 L200 120 L150 240 L300 180 L380 90"/>
+        <path d="M200 120 L260 250 L150 240"/>
+        <path d="M300 180 L340 280"/>
+      </g>
+      <g fill="#f6b91e">
+        <circle cx="70" cy="60" r="5" fill-opacity=".9"/>
+        <circle cx="200" cy="120" r="7"/>
+        <circle cx="150" cy="240" r="5" fill-opacity=".8"/>
+        <circle cx="300" cy="180" r="6" fill-opacity=".9"/>
+        <circle cx="380" cy="90" r="4" fill-opacity=".7"/>
+        <circle cx="260" cy="250" r="4.5" fill-opacity=".7"/>
+        <circle cx="340" cy="280" r="4" fill-opacity=".6"/>
+      </g>
+    </svg>
+  </div>
+  <div class="wrap">
+    <div class="phero-txt">
+      <span class="eyebrow">Secretaria Municipal de Educação</span>
+      <h1>Consultas <b>Públicas</b></h1>
+      <p>A sua opinião orienta as decisões da rede municipal de ensino. Escolha uma consulta aberta e contribua para uma educação cada vez melhor.</p>
+      <div class="phero-meta">
+        <span class="pill"><span class="d"></span><b id="abertasN">0</b>&nbsp;consultas abertas</span>
+        <span class="phero-hint">Escolha abaixo e clique em <strong style="color:#dfe9f7">Responder</strong>.</span>
+      </div>
+    </div>
+  </div>
+</section>
 
 <main>
   <div class="wrap">
-    <div class="grid">
+    <div class="sec-h">
+      <h2>Participe</h2>
+      <span class="sub">Cada formulário abre em uma nova aba.</span>
+    </div>
 
-      <a class="card gold" href="https://docs.google.com/forms/d/e/1FAIpQLSd8vIU-dP5UV89hYxD-BSXj8CUeyXwKuZjLMQ7nDBSeLNkHrA/viewform" target="_blank" rel="noopener">
-        <div class="card-head">
-          <span class="icon"><svg viewBox="0 0 24 24"><path d="M12 2l2.9 6.6 7.1.6-5.4 4.7 1.6 7-6.2-3.8-6.2 3.8 1.6-7-5.4-4.7 7.1-.6z"/></svg></span>
-          <span class="tag">Avaliação do evento</span>
+    <div class="consultas">
+
+      <a class="consulta gold" href="https://docs.google.com/forms/d/e/1FAIpQLSd8vIU-dP5UV89hYxD-BSXj8CUeyXwKuZjLMQ7nDBSeLNkHrA/viewform" target="_blank" rel="noopener">
+        <span class="c-ico"><svg viewBox="0 0 24 24"><path d="M12 2l2.9 6.6 7.1.6-5.4 4.7 1.6 7-6.2-3.8-6.2 3.8 1.6-7-5.4-4.7 7.1-.6z"/></svg></span>
+        <div class="c-body">
+          <span class="c-tag">Avaliação do evento</span>
+          <h3>Avaliação do Congresso Municipal de Educação — 2026</h3>
+          <div class="c-chips">
+            <span class="chip">Participantes do Congresso</span>
+            <span class="chip open"><span class="d"></span>Aberta</span>
+          </div>
         </div>
-        <h3>Avaliação do Congresso Municipal de Educação - 2026</h3>
-        <span class="go">Responder <svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+        <span class="c-cta">Responder <svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
       </a>
 
-      <a class="card blue" href="https://docs.google.com/forms/d/1rtWBo7JcizSzW2JpeTZj6Drqdtu-NsNLV1cdCkoNuJw/viewform" target="_blank" rel="noopener">
-        <div class="card-head">
-          <span class="icon"><svg viewBox="0 0 24 24"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h5"/></svg></span>
-          <span class="tag">Materiais pedagógicos</span>
+      <a class="consulta blue" href="https://docs.google.com/forms/d/1rtWBo7JcizSzW2JpeTZj6Drqdtu-NsNLV1cdCkoNuJw/viewform" target="_blank" rel="noopener">
+        <span class="c-ico"><svg viewBox="0 0 24 24"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h5"/></svg></span>
+        <div class="c-body">
+          <span class="c-tag">Materiais pedagógicos</span>
+          <h3>Aquisição de jogos e materiais pedagógicos para a rede municipal</h3>
+          <div class="c-chips">
+            <span class="chip">Profissionais da educação</span>
+            <span class="chip open"><span class="d"></span>Aberta</span>
+          </div>
         </div>
-        <h3>Consulta pública aos profissionais da educação da rede municipal de ensino: aquisição de jogos e materiais pedagógicos.</h3>
-        <span class="go">Responder <svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+        <span class="c-cta">Responder <svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
       </a>
 
-      <a class="card green" href="https://docs.google.com/forms/d/1zX1UFU25Zs2oOXxdkpDnpfNOW33jp26hEbxwTooxxgk/viewform" target="_blank" rel="noopener">
-        <div class="card-head">
-          <span class="icon"><svg viewBox="0 0 24 24"><path d="M12 22s8-4.5 8-11V5l-8-3-8 3v6c0 6.5 8 11 8 11z"/></svg></span>
-          <span class="tag">Segurança escolar</span>
+      <a class="consulta green" href="https://docs.google.com/forms/d/1zX1UFU25Zs2oOXxdkpDnpfNOW33jp26hEbxwTooxxgk/viewform" target="_blank" rel="noopener">
+        <span class="c-ico"><svg viewBox="0 0 24 24"><path d="M12 22s8-4.5 8-11V5l-8-3-8 3v6c0 6.5 8 11 8 11z"/></svg></span>
+        <div class="c-body">
+          <span class="c-tag">Segurança escolar</span>
+          <h3>Protocolo de Segurança e Paz para as Escolas Municipais de Ribeirão Preto</h3>
+          <div class="c-chips">
+            <span class="chip">Comunidade escolar</span>
+            <span class="chip open"><span class="d"></span>Aberta</span>
+          </div>
         </div>
-        <h3>Consulta Pública: Contribuições para o Protocolo de Segurança e Paz para as Escolas Municipais de Ribeirão Preto</h3>
-        <span class="go">Responder <svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+        <span class="c-cta">Responder <svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
       </a>
 
+    </div>
+
+    <div class="cta-band">
+      <div><b>Sua participação faz a diferença.</b><span>Transparência e diálogo por uma educação de qualidade.</span></div>
+      <span class="gold-dot" style="font-size:30px;line-height:1;">•••</span>
     </div>
   </div>
 </main>
@@ -221,6 +262,13 @@
   }
   aplicarFonte();
   if (localStorage.getItem("alto_contraste") === "1") document.body.classList.add("alto-contraste");
+
+  // Conta automaticamente quantas consultas estão na página (evita número desatualizado).
+  (function(){
+    var n = document.querySelectorAll(".consulta").length;
+    var el = document.getElementById("abertasN");
+    if (el) el.textContent = n;
+  })();
 </script>
 </body>
 </html>
