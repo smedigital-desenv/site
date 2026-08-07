@@ -81,6 +81,12 @@
     .chip.open .d{width:7px;height:7px;border-radius:50%;background:#2fb455;}
     .chip.done{color:#5a48b5;background:#efeaff;border-color:#ddd4f6;}
     .chip.done .d{width:7px;height:7px;border-radius:50%;background:#6741d9;}
+    .chip.closed{color:#6b7688;background:#eef1f5;border-color:#dde4ee;}
+    .chip.closed .d{width:7px;height:7px;border-radius:50%;background:#9aa7b8;}
+    .c-status{flex:none;display:inline-flex;align-items:center;gap:8px;background:#fff4e0;color:#9a6a00;border:1px solid #f3cf7a;border-radius:11px;padding:11px 18px;font:700 13.5px 'DM Sans',sans-serif;}
+    .c-status svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;}
+    .consulta.static{cursor:default;}
+    .consulta.static:hover{transform:none;box-shadow:none;border-color:var(--line);}
     .c-cta{flex:none;display:inline-flex;align-items:center;gap:8px;background:var(--navy);color:#fff;
       border-radius:11px;padding:12px 20px;font:700 14px 'DM Sans',sans-serif;transition:background .15s,transform .15s;}
     .c-cta svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round;transition:transform .15s;}
@@ -198,27 +204,27 @@
 <main>
   <div class="wrap">
     <div class="tabs" role="tablist" aria-label="Consultas">
-      <button class="tab active" id="tab-abertas" role="tab" aria-selected="true" aria-controls="p-abertas" onclick="mostrarAba('abertas')">Consultas em aberto <span class="tab-badge" id="cAbertas">0</span></button>
+      <button class="tab active" id="tab-abertas" role="tab" aria-selected="true" aria-controls="p-abertas" onclick="mostrarAba('abertas')">Recentes <span class="tab-badge" id="cAbertas">0</span></button>
       <button class="tab" id="tab-result" role="tab" aria-selected="false" aria-controls="p-result" onclick="mostrarAba('result')">Resultados <span class="tab-badge" id="cResult">0</span></button>
     </div>
 
     <section class="painel" id="p-abertas" role="tabpanel" aria-labelledby="tab-abertas">
-      <div class="sec-h"><span class="sub">Cada formulário abre em uma nova aba.</span></div>
+      <div class="sec-h"><span class="sub">Consultas mais recentes da rede — abertas e encerradas.</span></div>
 
       <div class="consultas">
 
-      <a class="consulta gold" href="https://docs.google.com/forms/d/e/1FAIpQLSd8vIU-dP5UV89hYxD-BSXj8CUeyXwKuZjLMQ7nDBSeLNkHrA/viewform" target="_blank" rel="noopener">
+      <div class="consulta gold static">
         <span class="c-ico"><svg viewBox="0 0 24 24"><path d="M12 2l2.9 6.6 7.1.6-5.4 4.7 1.6 7-6.2-3.8-6.2 3.8 1.6-7-5.4-4.7 7.1-.6z"/></svg></span>
         <div class="c-body">
           <span class="c-tag">Avaliação do evento</span>
           <h3>Avaliação do Congresso Municipal de Educação — 2026</h3>
           <div class="c-chips">
             <span class="chip">Participantes do Congresso</span>
-            <span class="chip open"><span class="d"></span>Aberta</span>
+            <span class="chip closed"><span class="d"></span>Prazo encerrado</span>
           </div>
         </div>
-        <span class="c-cta">Responder <svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
-      </a>
+        <span class="c-status"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>Em análise</span>
+      </div>
 
       <a class="consulta blue" href="https://docs.google.com/forms/d/1rtWBo7JcizSzW2JpeTZj6Drqdtu-NsNLV1cdCkoNuJw/viewform" target="_blank" rel="noopener">
         <span class="c-ico"><svg viewBox="0 0 24 24"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h5"/></svg></span>
@@ -244,6 +250,19 @@
           </div>
         </div>
         <span class="c-cta">Responder <svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+      </a>
+
+      <a class="consulta purple" href="divulga_atrib.html">
+        <span class="c-ico"><svg viewBox="0 0 24 24"><path d="M4 20V10M10 20V4M16 20v-7M21 20H3"/></svg></span>
+        <div class="c-body">
+          <span class="c-tag">Vida funcional</span>
+          <h3>Remoção e Atribuição de Aulas 2026/2027 — devolutivas</h3>
+          <div class="c-chips">
+            <span class="chip">Profissionais da educação</span>
+            <span class="chip done"><span class="d"></span>Resultado publicado</span>
+          </div>
+        </div>
+        <span class="c-cta">Ver resultados <svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
       </a>
 
       </div>
