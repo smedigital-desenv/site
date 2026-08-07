@@ -101,6 +101,27 @@
     .bar-row.clic:focus-visible{outline:2px solid var(--c-blue);outline-offset:1px;}
     .bar-row.clic .bar-lab::after{content:"›";margin-left:7px;color:var(--c-blue);font-weight:800;}
 
+    /* ---- PORTÃO DE ACESSO ---- */
+    #portao{position:fixed;inset:0;z-index:300;background:linear-gradient(125deg,var(--navy2) 0%,var(--navy) 52%,var(--navy3) 100%);
+      display:flex;align-items:center;justify-content:center;padding:22px;color:#fff;}
+    #portao[hidden]{display:none;}
+    .portao-cx{background:var(--surface);color:var(--ink);border-radius:16px;max-width:430px;width:100%;padding:32px 30px;text-align:center;
+      box-shadow:0 26px 60px -20px rgba(11,34,70,.5);}
+    .portao-cx img{height:56px;width:auto;margin:0 auto 18px;}
+    .portao-cx h2{font-size:19px;font-weight:800;letter-spacing:-.015em;margin-bottom:8px;}
+    .portao-cx p{font-size:14px;color:var(--muted);margin-bottom:20px;}
+    .portao-cx .btn-google{display:inline-flex;align-items:center;justify-content:center;gap:10px;width:100%;
+      background:var(--navy);color:#fff;border:none;border-radius:11px;padding:13px 20px;
+      font:700 14.5px 'DM Sans',sans-serif;cursor:pointer;transition:background .15s;}
+    .portao-cx .btn-google:hover{background:var(--navy2);}
+    .portao-cx .btn-sec{margin-top:11px;background:none;border:1px solid var(--line);color:var(--muted);
+      border-radius:11px;padding:10px 20px;width:100%;font:600 13.5px 'DM Sans',sans-serif;cursor:pointer;}
+    .portao-cx .btn-sec:hover{background:#f5f9ff;color:var(--ink);}
+    .portao-erro{background:#fff5f5;border:1px solid #ffc9c9;color:#a51111;border-radius:10px;
+      padding:12px 14px;font-size:13.5px;margin-bottom:18px;text-align:left;}
+    .portao-erro b{display:block;margin-bottom:3px;}
+    .portao-carregando{color:#c8d7ec;font:600 14px 'DM Sans',sans-serif;}
+
     /* ---- MODAL DE RESPONDENTES ---- */
     .modal-fundo{position:fixed;inset:0;z-index:200;background:rgba(11,34,70,.55);display:flex;align-items:center;justify-content:center;padding:22px;}
     .modal-fundo[hidden]{display:none;}
@@ -222,6 +243,18 @@
   </style>
 </head>
 <body>
+
+<div id="portao">
+  <div class="portao-carregando" id="portaoCarregando">Verificando acesso…</div>
+  <div class="portao-cx" id="portaoCx" hidden>
+    <img src="pmrp.png" alt="Prefeitura da Cidade de Ribeirão Preto">
+    <div id="portaoMsg"></div>
+    <h2>Acesso restrito</h2>
+    <p>Esta página contém a identificação dos respondentes da consulta. O acesso é liberado apenas para e-mails autorizados.</p>
+    <button type="button" class="btn-google" id="portaoLogin">Entrar com conta Google</button>
+    <button type="button" class="btn-sec" id="portaoSair" hidden>Sair e usar outra conta</button>
+  </div>
+</div>
 
 <header class="gov-top">
   <div class="wrap">
@@ -608,9 +641,11 @@
   Prefeitura de Ribeirão Preto · Transparência e diálogo por uma educação de qualidade.
 </footer>
 
-<script src="dados-consulta-remocao.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="config.js"></script>
+<script src="auth.js?v=19"></script>
 <script>
-(function(){
+function iniciarPagina(){
   "use strict";
   var D = window.DADOS_CONSULTA;
   var TEMAS = D.temas, REG = D.registros, META = D.meta;
@@ -992,6 +1027,87 @@
     aplicar();
   });
   aplicar();
+}
+
+/* ================= PORTÃO DE ACESSO =================
+   Só e-mails da allowlist (presenca.validadores) com perfil autorizado entram.
+   Os dados da consulta só são baixados depois da liberação. */
+(function(){
+  var PERFIS_OK = ["gerente", "consulta"];   // perfis com acesso a esta página
+  var portao   = document.getElementById("portao"),
+      carreg   = document.getElementById("portaoCarregando"),
+      caixa    = document.getElementById("portaoCx"),
+      msg      = document.getElementById("portaoMsg"),
+      btnLogin = document.getElementById("portaoLogin"),
+      btnSair  = document.getElementById("portaoSair");
+
+  function mostrarCaixa(html, comSair){
+    carreg.hidden = true;
+    caixa.hidden = false;
+    msg.innerHTML = html || "";
+    btnSair.hidden = !comSair;
+  }
+
+  function liberar(){
+    var s = document.createElement("script");
+    s.src = "dados-consulta-remocao.js";
+    s.onload = function(){
+      iniciarPagina();
+      portao.hidden = true;
+      document.body.style.overflow = "";
+    };
+    s.onerror = function(){
+      mostrarCaixa('<div class="portao-erro"><b>Falha ao carregar os dados.</b>Recarregue a página. Se persistir, avise a equipe.</div>', false);
+      btnLogin.hidden = true;
+    };
+    document.body.appendChild(s);
+  }
+
+  btnLogin.addEventListener("click", function(){
+    btnLogin.disabled = true;
+    btnLogin.textContent = "Redirecionando…";
+    window.loginGoogle().catch(function(){
+      btnLogin.disabled = false;
+      btnLogin.textContent = "Entrar com conta Google";
+      mostrarCaixa('<div class="portao-erro"><b>Não foi possível iniciar o login.</b>Tente novamente em instantes.</div>', false);
+    });
+  });
+  btnSair.addEventListener("click", function(){
+    localStorage.removeItem("fiscal_email");
+    localStorage.removeItem("fiscal_perfil");
+    localStorage.removeItem("fiscal_nome");
+    window.sb.auth.signOut().catch(function(){}).then(function(){ window.location.reload(); });
+  });
+
+  document.body.style.overflow = "hidden";
+
+  if (!window.verificarSessao){
+    mostrarCaixa('<div class="portao-erro"><b>Autenticação indisponível.</b>Não foi possível carregar o serviço de login.</div>', false);
+    btnLogin.hidden = true;
+    return;
+  }
+
+  window.verificarSessao().then(function(user){
+    if (!user){ mostrarCaixa("", false); return; }              // sem sessão → oferece login
+    if (user.naoAutorizado){
+      mostrarCaixa('<div class="portao-erro"><b>Conta sem autorização.</b>' +
+        (user.email ? "O e-mail <b>" + user.email + "</b> não está na lista de acesso desta página." :
+                      "Este e-mail não está na lista de acesso desta página.") +
+        "</div>", true);
+      btnLogin.textContent = "Entrar com outra conta";
+      return;
+    }
+    if (PERFIS_OK.indexOf(user.perfil) === -1){
+      mostrarCaixa('<div class="portao-erro"><b>Sem permissão para esta página.</b>' +
+        "A conta <b>" + user.email + "</b> está cadastrada, mas o perfil “" + user.perfil +
+        "” não tem acesso aos resultados nominais.</div>", true);
+      btnLogin.hidden = true;
+      return;
+    }
+    liberar();
+  }).catch(function(){
+    mostrarCaixa('<div class="portao-erro"><b>Não foi possível verificar o acesso.</b>Recarregue a página e tente novamente.</div>', true);
+  });
 })();
 
 // ---- Acessibilidade: tamanho de fonte e alto contraste ----
