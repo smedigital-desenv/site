@@ -101,6 +101,8 @@
     .bar-row.clic:focus-visible{outline:2px solid var(--c-blue);outline-offset:1px;}
     .bar-row.clic .bar-lab::after{content:"›";margin-left:7px;color:var(--c-blue);font-weight:800;}
 
+    .aviso-nomes{background:#fff8e6;border:1px solid #ffe3a3;color:#7a5b00;border-radius:10px;
+      padding:11px 14px;font-size:13.5px;margin:16px 0 4px;}
     .sessao-info{display:flex;align-items:center;gap:9px;margin-right:14px;font-size:12.5px;color:var(--muted);}
     .sessao-info button{border:1px solid #cfcfcf;background:#fff;border-radius:6px;padding:4px 11px;
       font:700 12px 'DM Sans',sans-serif;cursor:pointer;color:#333;}
@@ -1048,6 +1050,19 @@ function iniciarPagina(){
       btnLogin = document.getElementById("portaoLogin"),
       btnSair  = document.getElementById("portaoSair");
 
+  var tokenAtual = null;
+
+  // Se a identificação não vier, a página continua útil (números, temas e
+  // devolutivas anônimas) — mas o usuário precisa saber que falta algo.
+  function avisarSemNomes(){
+    var alvo = document.querySelector("#devolutivas .res-info") || document.body;
+    var av = document.createElement("p");
+    av.className = "aviso-nomes";
+    av.textContent = "Não foi possível carregar a identificação dos respondentes. " +
+      "Os nomes e as unidades não serão exibidos nesta sessão.";
+    alvo.parentNode.insertBefore(av, alvo);
+  }
+
   function mostrarCaixa(html, comSair){
     carreg.hidden = true;
     caixa.hidden = false;
@@ -1055,13 +1070,43 @@ function iniciarPagina(){
     btnSair.hidden = !comSair;
   }
 
+  // Nome e unidade NÃO estão no arquivo estático: vêm do banco, pela função
+  // public.consulta_respondentes(), que só devolve linhas para quem está na
+  // allowlist. Ver db/consulta-respondentes.sql.
+  function carregarNomes(token){
+    return fetch(SUPA_URL + "/rpc/consulta_respondentes", {
+      method: "POST",
+      headers: {
+        "apikey": SUPA_KEY,
+        "Authorization": "Bearer " + token,
+        "Content-Type": "application/json"
+      },
+      body: "{}"
+    })
+    .then(function(r){ if (!r.ok) throw new Error("http " + r.status); return r.json(); })
+    .then(function(linhas){
+      if (!Array.isArray(linhas) || !linhas.length) return false;
+      var porId = {};
+      linhas.forEach(function(l){ porId[l.id] = l; });
+      window.DADOS_CONSULTA.registros.forEach(function(r){
+        var n = porId[r.id];
+        if (n){ r.nome = n.nome || ""; r.unidade = n.unidade || ""; }
+      });
+      return true;
+    })
+    .catch(function(){ return false; });
+  }
+
   function liberar(){
     var s = document.createElement("script");
     s.src = "dados-consulta-remocao.js";
     s.onload = function(){
-      iniciarPagina();
-      portao.hidden = true;
-      document.body.style.overflow = "";
+      carregarNomes(tokenAtual).then(function(ok){
+        if (!ok) avisarSemNomes();
+        iniciarPagina();
+        portao.hidden = true;
+        document.body.style.overflow = "";
+      });
     };
     s.onerror = function(){
       mostrarCaixa('<div class="portao-erro"><b>Falha ao carregar os dados.</b>Recarregue a página. Se persistir, avise a equipe.</div>', false);
@@ -1140,6 +1185,7 @@ function iniciarPagina(){
     return cliente.auth.getSession().then(function(res){
       var sessao = res && res.data ? res.data.session : null;
       if (!sessao || !sessao.user || !sessao.user.email) return { semSessao: true };
+      tokenAtual = sessao.access_token;
       var email = sessao.user.email.toLowerCase();
       return fetch(SUPA_URL + "/rpc/tem_acesso_consulta", {
         method: "POST",
