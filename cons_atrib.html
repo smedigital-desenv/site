@@ -96,6 +96,36 @@
     .bar-fill.red{background:var(--c-red);}
     .bar-fill.mut{background:#a9bcd6;}
     .nota-bar{font-size:12.5px;color:var(--muted);margin-top:14px;padding-top:13px;border-top:1px dashed var(--line);}
+    .bar-row.clic{cursor:pointer;border:none;background:none;font:inherit;color:inherit;text-align:left;width:100%;padding:5px 7px;margin:-5px -7px;border-radius:8px;transition:background .15s;}
+    .bar-row.clic:hover{background:#f2f7fe;}
+    .bar-row.clic:focus-visible{outline:2px solid var(--c-blue);outline-offset:1px;}
+    .bar-row.clic .bar-lab::after{content:"›";margin-left:7px;color:var(--c-blue);font-weight:800;}
+
+    /* ---- MODAL DE RESPONDENTES ---- */
+    .modal-fundo{position:fixed;inset:0;z-index:200;background:rgba(11,34,70,.55);display:flex;align-items:center;justify-content:center;padding:22px;}
+    .modal-fundo[hidden]{display:none;}
+    .modal{background:var(--surface);border-radius:16px;width:100%;max-width:660px;max-height:85vh;display:flex;flex-direction:column;box-shadow:0 26px 60px -20px rgba(11,34,70,.5);}
+    .modal-h{padding:20px 22px 16px;border-bottom:1px solid var(--line);display:flex;align-items:flex-start;gap:14px;}
+    .modal-h h3{font-size:17px;font-weight:800;letter-spacing:-.015em;line-height:1.3;flex:1;}
+    .modal-h p{font-size:13px;color:var(--muted);margin-top:4px;}
+    .modal-x{flex:none;border:1px solid var(--line);background:#fff;border-radius:9px;width:32px;height:32px;font:700 17px 'DM Sans',sans-serif;line-height:1;cursor:pointer;color:var(--muted);}
+    .modal-x:hover{background:#f5f9ff;color:var(--ink);}
+    .modal-busca{padding:13px 22px;border-bottom:1px solid var(--line);}
+    .modal-busca input{width:100%;border:1px solid var(--line);border-radius:9px;padding:9px 11px;font:500 14px 'DM Sans',sans-serif;color:var(--ink);}
+    .modal-corpo{overflow-y:auto;padding:8px 12px 14px;}
+    .pessoa{display:grid;grid-template-columns:auto 1fr;gap:2px 11px;align-items:baseline;width:100%;text-align:left;border:none;background:none;font:inherit;color:inherit;padding:9px 10px;border-radius:9px;cursor:pointer;transition:background .15s;}
+    .pessoa:hover{background:#f5f9ff;}
+    .pessoa:focus-visible{outline:2px solid var(--c-blue);outline-offset:-2px;}
+    .pessoa .pid{font-size:11.5px;font-weight:800;color:#fff;background:var(--navy);border-radius:6px;padding:2px 7px;grid-row:span 2;}
+    .pessoa .pnome{font-size:14.5px;font-weight:700;}
+    .pessoa .puni{font-size:12.5px;color:var(--muted);}
+    .modal-rod{padding:12px 22px;border-top:1px solid var(--line);font-size:12.5px;color:var(--muted);}
+    .modal-vazio{padding:26px 12px;text-align:center;color:var(--muted);font-size:14px;}
+    body.contraste .modal{background:#111;border:1px solid #555;}
+    body.contraste .modal-h,body.contraste .modal-busca,body.contraste .modal-rod{border-color:#555;}
+    body.contraste .modal-x,body.contraste .modal-busca input{background:#111;color:#eee;border-color:#555;}
+    body.contraste .pessoa:hover,body.contraste .bar-row.clic:hover{background:#222;}
+    body.contraste .pessoa .pid{background:#ffe066;color:#000;}
 
     /* ---- TEMAS ---- */
     .tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px;}
@@ -146,6 +176,8 @@
     .tagi.n{background:var(--navy);color:#fff;}
     .tagi.g{background:#fff5db;color:#8a6400;}
     .tagi.gr{background:#e9f7ee;color:#1e6b30;}
+    .tagi.nome{background:var(--navy);color:#fff;}
+    .tagi.uni{background:#f4f7fc;color:var(--muted);border:1px solid var(--line);font-weight:600;}
     .dev-q{margin-top:12px;}
     .dev-q:first-of-type{margin-top:0;}
     .dev-q .qh{font-size:11.5px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;color:var(--c-blue);margin-bottom:5px;}
@@ -534,6 +566,24 @@
       <div class="paginacao" id="paginacao"></div>
     </section>
 
+    <!-- ====== MODAL DE RESPONDENTES ====== -->
+    <div class="modal-fundo" id="modal" hidden role="dialog" aria-modal="true" aria-labelledby="modalTitulo">
+      <div class="modal">
+        <div class="modal-h">
+          <div>
+            <h3 id="modalTitulo">—</h3>
+            <p id="modalSub">—</p>
+          </div>
+          <button type="button" class="modal-x" id="modalX" aria-label="Fechar">×</button>
+        </div>
+        <div class="modal-busca">
+          <input type="search" id="modalBusca" placeholder="Filtrar por nome ou escola…" autocomplete="off">
+        </div>
+        <div class="modal-corpo" id="modalCorpo"></div>
+        <div class="modal-rod">Clique em um nome para abrir a devolutiva correspondente.</div>
+      </div>
+    </div>
+
     <!-- ====== NOTA ====== -->
     <section class="bloco" id="metodologia">
       <div class="sec-h"><h2>Nota metodológica</h2></div>
@@ -593,13 +643,81 @@
     kw.appendChild(c);
   });
 
+  /* ---------- Modal de respondentes ---------- */
+  var modal = document.getElementById("modal"),
+      modalCorpo = document.getElementById("modalCorpo"),
+      modalBusca = document.getElementById("modalBusca"),
+      listaModal = [], focoAnterior = null;
+
+  function abrirModal(titulo, filtro, sub){
+    listaModal = REG.filter(filtro).sort(function(a, b){
+      return (a.nome || "").localeCompare(b.nome || "", "pt-BR");
+    });
+    document.getElementById("modalTitulo").textContent = titulo;
+    document.getElementById("modalSub").textContent =
+      (sub ? sub + " · " : "") + listaModal.length +
+      (listaModal.length === 1 ? " contribuição" : " contribuições");
+    modalBusca.value = "";
+    renderModal();
+    focoAnterior = document.activeElement;
+    modal.hidden = false;
+    document.body.style.overflow = "hidden";
+    modalBusca.focus();
+  }
+
+  function fecharModal(){
+    modal.hidden = true;
+    document.body.style.overflow = "";
+    if (focoAnterior && focoAnterior.focus) focoAnterior.focus();
+  }
+
+  function renderModal(){
+    var q = semAcento(modalBusca.value.trim());
+    modalCorpo.innerHTML = "";
+    var vis = listaModal.filter(function(r){
+      return !q || semAcento((r.nome || "") + " " + (r.unidade || "")).indexOf(q) >= 0;
+    });
+    if (!vis.length){
+      modalCorpo.appendChild(el("div", "modal-vazio", "Nenhum respondente encontrado."));
+      return;
+    }
+    vis.forEach(function(r){
+      var b = el("button", "pessoa");
+      b.type = "button";
+      b.title = "Abrir a devolutiva #" + r.id;
+      b.appendChild(el("span", "pid", "#" + r.id));
+      b.appendChild(el("span", "pnome", r.nome || "(nome não informado)"));
+      b.appendChild(el("span", "puni", r.unidade || "(unidade não informada)"));
+      b.addEventListener("click", function(){ verDevolutiva(r.id); });
+      modalCorpo.appendChild(b);
+    });
+  }
+
+  function verDevolutiva(id){
+    fecharModal();
+    idFiltro = id;
+    busca.value = ""; selCargo.value = ""; selTipo.value = ""; selTema.value = ""; selQ.value = "";
+    aplicar();
+    document.getElementById("devolutivas").scrollIntoView({ behavior: "smooth" });
+  }
+
+  modalBusca.addEventListener("input", renderModal);
+  document.getElementById("modalX").addEventListener("click", fecharModal);
+  modal.addEventListener("click", function(e){ if (e.target === modal) fecharModal(); });
+  document.addEventListener("keydown", function(e){ if (e.key === "Escape" && !modal.hidden) fecharModal(); });
+
   /* ---------- Barras genéricas ---------- */
   function barras(alvo, itens, total, cor){
     var box = document.getElementById(alvo);
     box.innerHTML = "";
     itens.forEach(function(it){
       var pct = 100 * it.val / (it.base || total);
-      var row = el("div", "bar-row");
+      var row = el(it.filtro ? "button" : "div", "bar-row" + (it.filtro ? " clic" : ""));
+      if (it.filtro){
+        row.type = "button";
+        row.title = "Ver quem respondeu";
+        row.addEventListener("click", function(){ abrirModal(it.modalTitulo || it.lab, it.filtro, it.modalSub); });
+      }
       row.appendChild(el("div", "bar-lab", it.lab));
       row.appendChild(el("div", "bar-val", it.txt || (it.val + " · " + Math.round(pct) + "%")));
       var tr = el("div", "bar-track"), fl = el("div", "bar-fill " + (it.cor || cor || ""));
@@ -610,11 +728,26 @@
   }
   function deObj(o){ return Object.keys(o).map(function(k){ return { lab: k, val: o[k] }; }); }
 
-  barras("chCargo", deObj(D.perfil.cargo), META.total, "navy");
-  barras("chTipo", deObj(D.perfil.tipo), META.total, "purple");
+  barras("chCargo", deObj(D.perfil.cargo).map(function(i){
+    i.modalSub = "Cargo declarado";
+    i.filtro = function(r){ return r.cargo === i.lab; };
+    return i;
+  }), META.total, "navy");
+
+  barras("chTipo", deObj(D.perfil.tipo).map(function(i){
+    i.modalTitulo = "Sede em " + i.lab;
+    i.modalSub = "Tipo de unidade";
+    i.filtro = function(r){ return r.tipo === i.lab; };
+    return i;
+  }), META.total, "purple");
+
   barras("chComissao", [
-    { lab: "Sim, tenho interesse", val: D.perfil.comissao["Sim"] || 0, cor: "green" },
-    { lab: "Não tenho interesse", val: D.perfil.comissao["Não"] || 0, cor: "mut" }
+    { lab: "Sim, tenho interesse", val: D.perfil.comissao["Sim"] || 0, cor: "green",
+      modalTitulo: "Interessados em compor a Comissão", modalSub: "Responderam “Sim”",
+      filtro: function(r){ return r.com === "Sim"; } },
+    { lab: "Não tenho interesse", val: D.perfil.comissao["Não"] || 0, cor: "mut",
+      modalTitulo: "Sem interesse em compor a Comissão", modalSub: "Responderam “Não”",
+      filtro: function(r){ return r.com === "Não"; } }
   ], META.total);
 
   /* ---------- Interesse na Comissão detalhado por cargo ---------- */
@@ -623,7 +756,9 @@
     var itens = Object.keys(cc).map(function(k){
       totalSim += cc[k].sim;
       return { lab: k, val: cc[k].sim, base: cc[k].total, cor: "green",
-               txt: cc[k].sim + " de " + cc[k].total + " · " + Math.round(100 * cc[k].sim / cc[k].total) + "%" };
+               txt: cc[k].sim + " de " + cc[k].total + " · " + Math.round(100 * cc[k].sim / cc[k].total) + "%",
+               modalTitulo: k + " interessados na Comissão", modalSub: "de " + cc[k].total + " respondentes do cargo",
+               filtro: function(r){ return r.com === "Sim" && r.cargo === k; } };
     }).sort(function(a, b){ return (b.val / b.base) - (a.val / a.base); });
     barras("chComissaoCargo", itens, 1);
     var comp = itens.slice().sort(function(a, b){ return b.val - a.val; }).map(function(i){
@@ -637,11 +772,17 @@
   var esp = [];
   (function(){
     var e = D.perfil.eventuais, be = somaObj(e);
-    esp.push({ lab: "Pretende atribuir aulas eventuais em 2027 (PEB II 19 h/a)", val: e["Sim"] || 0, base: be, cor: "gold" });
+    esp.push({ lab: "Pretende atribuir aulas eventuais em 2027 (PEB II 19 h/a)", val: e["Sim"] || 0, base: be, cor: "gold",
+      modalTitulo: "Pretendem atribuir aulas eventuais em 2027", modalSub: "PEB II 19 h/a que responderam “Sim”",
+      filtro: function(r){ return r.ev === "Sim"; } });
     var p = D.perfil.pra, bp = (p["Sim"] || 0) + (p["Não"] || 0);
-    esp.push({ lab: "Quer assumir o P.R.A. da própria turma (atuantes no Fundamental)", val: p["Sim"] || 0, base: bp, cor: "gold" });
+    esp.push({ lab: "Quer assumir o P.R.A. da própria turma (atuantes no Fundamental)", val: p["Sim"] || 0, base: bp, cor: "gold",
+      modalTitulo: "Querem assumir o P.R.A. da própria turma", modalSub: "Atuantes no Ensino Fundamental que responderam “Sim”",
+      filtro: function(r){ return r.pra === "Sim"; } });
     var i = D.perfil.integral, bi = (i["Sim"] || 0) + (i["Não"] || 0);
-    esp.push({ lab: "Quer assumir Práticas de Alimentação/Relaxamento (Ed. Infantil integral)", val: i["Sim"] || 0, base: bi, cor: "gold" });
+    esp.push({ lab: "Quer assumir Práticas de Alimentação/Relaxamento (Ed. Infantil integral)", val: i["Sim"] || 0, base: bi, cor: "gold",
+      modalTitulo: "Querem assumir Práticas de Alimentação/Relaxamento", modalSub: "Atuantes na Ed. Infantil integral que responderam “Sim”",
+      filtro: function(r){ return r.int === "Sim"; } });
   })();
   barras("chEspecificas", esp, 1);
   (function(){
@@ -654,12 +795,18 @@
   })();
 
   barras("chVolume", [
-    { lab: "Remoção — preenchidas", val: META.preenchidas.rem, base: META.total, cor: "mut" },
-    { lab: "Remoção — com proposta concreta", val: D.stats.remocao.base, base: META.total, cor: "navy" },
-    { lab: "Atribuição — preenchidas", val: META.preenchidas.atr, base: META.total, cor: "mut" },
-    { lab: "Atribuição — com proposta concreta", val: D.stats.atribuicao.base, base: META.total, cor: "purple" },
-    { lab: "Projetos / jornada — preenchidas (só PEB II 28-32 h/a)", val: META.preenchidas.proj, base: META.total, cor: "mut" },
-    { lab: "Projetos / jornada — com proposta concreta", val: D.stats.projetos.base, base: META.total, cor: "green" }
+    { lab: "Remoção — preenchidas", val: META.preenchidas.rem, base: META.total, cor: "mut",
+      filtro: function(r){ return !!r.rem; } },
+    { lab: "Remoção — com proposta concreta", val: D.stats.remocao.base, base: META.total, cor: "navy",
+      filtro: function(r){ return r.tr.length > 0; } },
+    { lab: "Atribuição — preenchidas", val: META.preenchidas.atr, base: META.total, cor: "mut",
+      filtro: function(r){ return !!r.atr; } },
+    { lab: "Atribuição — com proposta concreta", val: D.stats.atribuicao.base, base: META.total, cor: "purple",
+      filtro: function(r){ return r.ta.length > 0; } },
+    { lab: "Projetos / jornada — preenchidas (só PEB II 28-32 h/a)", val: META.preenchidas.proj, base: META.total, cor: "mut",
+      filtro: function(r){ return !!r.proj; } },
+    { lab: "Projetos / jornada — com proposta concreta", val: D.stats.projetos.base, base: META.total, cor: "green",
+      filtro: function(r){ return r.tp.length > 0; } }
   ], META.total);
 
   /* ---------- Temas ---------- */
@@ -687,6 +834,7 @@
       fl.style.width = (100 * v / max) + "%";
       tr.appendChild(fl); row.appendChild(tr);
       row.addEventListener("click", function(){
+        idFiltro = null;
         document.getElementById("fTema").value = k;
         document.getElementById("fQuestao").value = escopoAtual === "geral" ? "" :
           (escopoAtual === "remocao" ? "rem" : escopoAtual === "atribuicao" ? "atr" : "proj");
@@ -732,9 +880,10 @@
   var QLABEL = { rem: "Sugestões para o processo de Remoção", atr: "Sugestões para o processo de Atribuição de aulas", proj: "Sugestões para atribuição de projetos na composição da jornada" };
   var QCLS = { rem: "", atr: "atr", proj: "proj" };
   var TCAMPO = { rem: "tr", atr: "ta", proj: "tp" };
-  var POR_PAGINA = 20, pagina = 1, filtrados = REG;
+  var POR_PAGINA = 20, pagina = 1, filtrados = REG, idFiltro = null;
 
   function filtrar(){
+    if (idFiltro) return REG.filter(function(r){ return r.id === idFiltro; });
     var q = semAcento(busca.value.trim()), c = selCargo.value, tp = selTipo.value,
         tm = selTema.value, qs = selQ.value;
     return REG.filter(function(r){
@@ -773,9 +922,11 @@
     var maxPag = Math.max(1, Math.ceil(total / POR_PAGINA));
     if (pagina > maxPag) pagina = maxPag;
 
-    document.getElementById("resInfo").textContent = total === 0 ? "Nenhuma devolutiva encontrada com os filtros atuais." :
-      total + (total === 1 ? " devolutiva encontrada" : " devolutivas encontradas") +
-      " · exibindo " + ((pagina - 1) * POR_PAGINA + 1) + "–" + Math.min(pagina * POR_PAGINA, total);
+    document.getElementById("resInfo").textContent = idFiltro ?
+      "Exibindo apenas a devolutiva #" + idFiltro + " — use “Limpar filtros” para ver todas." :
+      (total === 0 ? "Nenhuma devolutiva encontrada com os filtros atuais." :
+        total + (total === 1 ? " devolutiva encontrada" : " devolutivas encontradas") +
+        " · exibindo " + ((pagina - 1) * POR_PAGINA + 1) + "–" + Math.min(pagina * POR_PAGINA, total));
 
     if (total === 0){
       box.appendChild(el("div", "card vazio", "Tente remover um filtro ou usar outro termo de busca."));
@@ -786,6 +937,8 @@
       var c = el("article", "card dev");
       var h = el("div", "dev-h");
       h.appendChild(el("span", "tagi n", "#" + r.id));
+      if (r.nome) h.appendChild(el("span", "tagi nome", r.nome));
+      if (r.unidade) h.appendChild(el("span", "tagi uni", r.unidade));
       h.appendChild(el("span", "tagi", r.cargo));
       h.appendChild(el("span", "tagi g", r.tipo));
       if (r.seg) h.appendChild(el("span", "tagi gr", r.seg));
@@ -829,9 +982,12 @@
   function aplicar(){ filtrados = filtrar(); pagina = 1; render(); }
 
   var timer;
-  busca.addEventListener("input", function(){ clearTimeout(timer); timer = setTimeout(aplicar, 200); });
-  [selCargo, selTipo, selTema, selQ].forEach(function(s){ s.addEventListener("change", aplicar); });
+  busca.addEventListener("input", function(){ clearTimeout(timer); timer = setTimeout(function(){ idFiltro = null; aplicar(); }, 200); });
+  [selCargo, selTipo, selTema, selQ].forEach(function(s){
+    s.addEventListener("change", function(){ idFiltro = null; aplicar(); });
+  });
   document.getElementById("btnLimpar").addEventListener("click", function(){
+    idFiltro = null;
     busca.value = ""; selCargo.value = ""; selTipo.value = ""; selTema.value = ""; selQ.value = "";
     aplicar();
   });
