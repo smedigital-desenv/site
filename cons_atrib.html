@@ -101,6 +101,12 @@
     .bar-row.clic:focus-visible{outline:2px solid var(--c-blue);outline-offset:1px;}
     .bar-row.clic .bar-lab::after{content:"›";margin-left:7px;color:var(--c-blue);font-weight:800;}
 
+    .sessao-info{display:flex;align-items:center;gap:9px;margin-right:14px;font-size:12.5px;color:var(--muted);}
+    .sessao-info button{border:1px solid #cfcfcf;background:#fff;border-radius:6px;padding:4px 11px;
+      font:700 12px 'DM Sans',sans-serif;cursor:pointer;color:#333;}
+    .sessao-info button:hover{background:#f2f2f2;}
+    @media (max-width:640px){ .sessao-info span{display:none;} }
+
     /* ---- PORTÃO DE ACESSO ---- */
     #portao{position:fixed;inset:0;z-index:300;background:linear-gradient(125deg,var(--navy2) 0%,var(--navy) 52%,var(--navy3) 100%);
       display:flex;align-items:center;justify-content:center;padding:22px;color:#fff;}
@@ -643,7 +649,6 @@
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="config.js"></script>
-<script src="auth.js?v=19"></script>
 <script>
 function iniciarPagina(){
   "use strict";
@@ -1030,10 +1035,11 @@ function iniciarPagina(){
 }
 
 /* ================= PORTÃO DE ACESSO =================
-   Só e-mails da allowlist (presenca.validadores) com perfil autorizado entram.
+   Só e-mails cadastrados em presenca.consulta_acesso entram — allowlist
+   PRÓPRIA desta página, independente de presenca.validadores.
+   A sessão usa storageKey "consulta-auth", isolada da do sistema de presença.
    Os dados da consulta só são baixados depois da liberação. */
 (function(){
-  var PERFIS_OK = ["gerente", "consulta"];   // perfis com acesso a esta página
   var portao   = document.getElementById("portao"),
       carreg   = document.getElementById("portaoCarregando"),
       caixa    = document.getElementById("portaoCx"),
@@ -1066,47 +1072,101 @@ function iniciarPagina(){
   btnLogin.addEventListener("click", function(){
     btnLogin.disabled = true;
     btnLogin.textContent = "Redirecionando…";
-    window.loginGoogle().catch(function(){
+    window.entrarConsulta().catch(function(){
       btnLogin.disabled = false;
       btnLogin.textContent = "Entrar com conta Google";
       mostrarCaixa('<div class="portao-erro"><b>Não foi possível iniciar o login.</b>Tente novamente em instantes.</div>', false);
     });
   });
-  btnSair.addEventListener("click", function(){
-    localStorage.removeItem("fiscal_email");
-    localStorage.removeItem("fiscal_perfil");
-    localStorage.removeItem("fiscal_nome");
-    window.sb.auth.signOut().catch(function(){}).then(function(){ window.location.reload(); });
-  });
+  btnSair.addEventListener("click", function(){ window.sairConsulta(); });
+
+  // Identificação de quem está logado + saída, no cabeçalho.
+  function identificar(email){
+    var alvo = document.querySelector(".gov-actions");
+    if (!alvo) return;
+    var cx = document.createElement("div");
+    cx.className = "sessao-info";
+    var quem = document.createElement("span");
+    quem.textContent = email;
+    var sair = document.createElement("button");
+    sair.type = "button";
+    sair.textContent = "Sair";
+    sair.addEventListener("click", function(){ window.sairConsulta(); });
+    cx.appendChild(quem); cx.appendChild(sair);
+    alvo.insertBefore(cx, alvo.firstChild);
+  }
 
   document.body.style.overflow = "hidden";
 
-  if (!window.verificarSessao){
-    mostrarCaixa('<div class="portao-erro"><b>Autenticação indisponível.</b>Não foi possível carregar o serviço de login.</div>', false);
+  if (!window.supabase || !window.supabase.createClient){
+    mostrarCaixa('<div class="portao-erro"><b>Autenticação indisponível.</b>Não foi possível carregar o serviço de login. Verifique a conexão e recarregue.</div>', false);
     btnLogin.hidden = true;
     return;
   }
 
-  window.verificarSessao().then(function(user){
-    if (!user){ mostrarCaixa("", false); return; }              // sem sessão → oferece login
-    if (user.naoAutorizado){
+  // Cliente com storageKey PRÓPRIO: a sessão desta página é independente da do
+  // sistema de presença. Entrar ou sair aqui não afeta a sessão de lá.
+  var cliente = window.supabase.createClient(SUPA_PROJECT_URL, SUPA_KEY, {
+    auth: {
+      persistSession:     true,
+      autoRefreshToken:   true,
+      detectSessionInUrl: true,
+      flowType:           "pkce",
+      storage:            window.localStorage,
+      storageKey:         "consulta-auth"
+    }
+  });
+  window.consultaAuth = cliente;
+
+  window.entrarConsulta = function(){
+    return cliente.auth.signInWithOAuth({
+      provider: "google",
+      options: {
+        redirectTo: window.location.origin + window.location.pathname,
+        queryParams: { prompt: "select_account" }
+      }
+    });
+  };
+  window.sairConsulta = function(){
+    return cliente.auth.signOut().catch(function(){}).then(function(){ window.location.reload(); });
+  };
+
+  // Confere o e-mail logado na allowlist própria (presenca.consulta_acesso).
+  // A RLS só devolve a linha da própria pessoa — ninguém consegue listar a tabela.
+  function verificarAcesso(){
+    return cliente.auth.getSession().then(function(res){
+      var sessao = res && res.data ? res.data.session : null;
+      if (!sessao || !sessao.user || !sessao.user.email) return { semSessao: true };
+      var email = sessao.user.email.toLowerCase();
+      return fetch(
+        SUPA_URL + "/consulta_acesso?email=eq." + encodeURIComponent(email) + "&select=email,nome&limit=1",
+        { headers: {
+            "apikey": SUPA_KEY,
+            "Authorization": "Bearer " + sessao.access_token,
+            "Accept-Profile": SUPA_SCHEMA
+          } }
+      )
+      .then(function(r){ if (!r.ok) throw new Error("http " + r.status); return r.json(); })
+      .then(function(d){
+        if (!Array.isArray(d) || d.length === 0) return { negado: true, email: email };
+        return { ok: true, email: email, nome: d[0].nome || "" };
+      });
+    });
+  }
+
+  (window.verificarAcessoConsulta || verificarAcesso)().then(function(r){
+    if (r.semSessao){ mostrarCaixa("", false); return; }
+    if (r.negado){
       mostrarCaixa('<div class="portao-erro"><b>Conta sem autorização.</b>' +
-        (user.email ? "O e-mail <b>" + user.email + "</b> não está na lista de acesso desta página." :
-                      "Este e-mail não está na lista de acesso desta página.") +
-        "</div>", true);
+        "O e-mail <b>" + r.email + "</b> não está na lista de acesso desta página.</div>", true);
       btnLogin.textContent = "Entrar com outra conta";
       return;
     }
-    if (PERFIS_OK.indexOf(user.perfil) === -1){
-      mostrarCaixa('<div class="portao-erro"><b>Sem permissão para esta página.</b>' +
-        "A conta <b>" + user.email + "</b> está cadastrada, mas o perfil “" + user.perfil +
-        "” não tem acesso aos resultados nominais.</div>", true);
-      btnLogin.hidden = true;
-      return;
-    }
+    identificar(r.email);
     liberar();
   }).catch(function(){
-    mostrarCaixa('<div class="portao-erro"><b>Não foi possível verificar o acesso.</b>Recarregue a página e tente novamente.</div>', true);
+    mostrarCaixa('<div class="portao-erro"><b>Não foi possível verificar o acesso.</b>' +
+      "Recarregue a página. Se persistir, confirme se a tabela de acesso foi criada no banco.</div>", true);
   });
 })();
 

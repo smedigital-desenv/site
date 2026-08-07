@@ -1,43 +1,66 @@
 -- ============================================================================
--- consulta-acesso.sql — Libera cons_atrib.html para e-mails específicos
+-- consulta-acesso.sql — Allowlist PRÓPRIA da página cons_atrib.html
 --
 -- A página cons_atrib.html (resultados da consulta Remoção e Atribuição
 -- 2026/2027, COM a identificação dos respondentes) exige login Google e só
--- abre para e-mails cadastrados em `presenca.validadores` cujo `perfil` esteja
--- na lista PERFIS_OK do próprio HTML — hoje: 'gerente' e 'consulta'.
+-- abre para e-mails cadastrados na tabela `presenca.consulta_acesso`.
 --
--- Não é preciso criar tabela: reaproveita a allowlist que já existe.
+-- Esta tabela é INDEPENDENTE de `presenca.validadores`: estar em uma não dá
+-- acesso à outra. A sessão também é isolada (storageKey "consulta-auth"),
+-- então entrar aqui não desloga ninguém do sistema de presença, e vice-versa.
+--
 -- Rode no Supabase → SQL Editor.
 -- ============================================================================
 
--- 1) AUTORIZAR --------------------------------------------------------------
--- Cadastre cada e-mail EM MINÚSCULAS, exatamente como aparece na conta Google.
--- O perfil 'consulta' dá acesso a esta página SEM dar acesso ao sistema de
--- presença (validar/dashboard exigem 'fiscal' ou 'gerente').
+-- 1) TABELA -----------------------------------------------------------------
+create table if not exists presenca.consulta_acesso (
+  email      text primary key,
+  nome       text,
+  criado_em  timestamptz not null default now()
+);
 
-insert into presenca.validadores (email, nome, perfil) values
-  ('desenv.sme@gmail.com', 'Desenvolvimento SME', 'consulta')
-  -- ,('fulano@exemplo.com',  'Nome da Pessoa',      'consulta')
-  -- ,('ciclano@exemplo.com', 'Nome da Pessoa',      'consulta')
+comment on table presenca.consulta_acesso is
+  'Allowlist da pagina cons_atrib.html (resultados nominais da consulta 2026/2027).';
+
+
+-- 2) RLS --------------------------------------------------------------------
+-- Sem policy de leitura ampla: cada pessoa autenticada só enxerga a PRÓPRIA
+-- linha. Assim ninguém consegue baixar a lista de quem tem acesso, e o
+-- visitante anônimo não lê nada.
+
+alter table presenca.consulta_acesso enable row level security;
+
+drop policy if exists consulta_acesso_self on presenca.consulta_acesso;
+create policy consulta_acesso_self
+  on presenca.consulta_acesso
+  for select
+  to authenticated
+  using (lower(email) = lower(auth.jwt() ->> 'email'));
+
+-- Privilégios de tabela (a RLS filtra as linhas; o grant libera o verbo).
+grant usage  on schema presenca            to anon, authenticated;
+grant select on presenca.consulta_acesso   to authenticated;
+revoke all   on presenca.consulta_acesso   from anon;
+
+
+-- 3) AUTORIZAR --------------------------------------------------------------
+-- Cadastre EM MINÚSCULAS, exatamente como o e-mail aparece na conta Google.
+
+insert into presenca.consulta_acesso (email, nome) values
+  ('desenv.sme@gmail.com', 'Desenvolvimento SME')
+  -- ,('fulano@exemplo.com',  'Nome da Pessoa')
+  -- ,('ciclano@exemplo.com', 'Nome da Pessoa')
 on conflict (email) do update
-  set nome   = coalesce(excluded.nome, presenca.validadores.nome),
-      perfil = excluded.perfil;
-
--- Atenção: quem já é 'gerente' do sistema de presença JÁ tem acesso à página.
--- Se não for essa a intenção, troque PERFIS_OK em cons_atrib.html para
--- apenas ["consulta"] e cadastre nominalmente quem deve entrar.
+  set nome = coalesce(excluded.nome, presenca.consulta_acesso.nome);
 
 
--- 2) CONFERIR ---------------------------------------------------------------
-select email, nome, perfil
-  from presenca.validadores
- where perfil in ('gerente', 'consulta')
- order by perfil, email;
+-- 4) CONFERIR ---------------------------------------------------------------
+-- (rode como service_role / pelo SQL Editor; a policy acima não permite que
+--  um usuário comum liste a tabela inteira)
+select email, nome, criado_em
+  from presenca.consulta_acesso
+ order by email;
 
 
--- 3) REVOGAR ----------------------------------------------------------------
--- Tira o acesso à página mas mantém a pessoa no sistema de presença:
--- update presenca.validadores set perfil = 'fiscal' where email = 'fulano@exemplo.com';
-
--- Remove a pessoa de tudo:
--- delete from presenca.validadores where email = 'fulano@exemplo.com';
+-- 5) REVOGAR ----------------------------------------------------------------
+-- delete from presenca.consulta_acesso where email = 'fulano@exemplo.com';
