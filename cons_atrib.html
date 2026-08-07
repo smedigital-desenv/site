@@ -1,0 +1,834 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png?v=1">
+  <link rel="icon" href="favicon.ico?v=1">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png?v=1">
+  <title>Consulta Pública — Remoção e Atribuição de Aulas 2026/2027 | Secretaria Municipal de Educação</title>
+  <meta name="description" content="Resumo quantitativo e qualitativo das contribuições recebidas na consulta pública sobre os processos de Remoção e Atribuição de Aulas 2026/2027 da rede municipal de Ribeirão Preto.">
+  <!-- Página ainda não divulgada: não indexar em buscadores. Remover ao publicar. -->
+  <meta name="robots" content="noindex, nofollow">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700;9..40,800&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --navy:#0f2a52; --navy2:#16305c; --navy3:#0b2246;
+      --gold:#f6b91e; --gold2:#d99b06;
+      --ink:#16233d; --muted:#5b6d8a; --line:#e2eaf4;
+      --surface:#ffffff; --page:#eef3fa;
+      --c-gold:#e8a50a; --c-blue:#1c74d4; --c-green:#2b8a3e; --c-purple:#6741d9; --c-red:#c92a2a;
+    }
+    *{box-sizing:border-box;margin:0;padding:0;}
+    html{scroll-behavior:smooth;}
+    body{font-family:'DM Sans',system-ui,-apple-system,Segoe UI,Roboto,sans-serif;background:var(--page);color:var(--ink);line-height:1.55;-webkit-font-smoothing:antialiased;display:flex;flex-direction:column;min-height:100vh;}
+    img{max-width:100%;display:block;}
+    a{color:inherit;text-decoration:none;}
+    .wrap{max-width:1120px;margin:0 auto;padding:0 22px;width:100%;}
+
+    /* ---- CABEÇALHO OFICIAL ---- */
+    .gov-top{background:#fff;border-bottom:1px solid #e6e6e6;}
+    .gov-top .wrap{max-width:1200px;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:16px;padding:11px 22px;}
+    .gov-brand{grid-column:2;justify-self:center;display:flex;align-items:center;}
+    .gov-logo{height:63px;width:auto;}
+    .gov-actions{grid-column:3;justify-self:end;display:flex;align-items:center;}
+    .gov-a11y{display:flex;align-items:center;gap:6px;}
+    .gov-a11y button{border:1px solid #cfcfcf;background:#fff;border-radius:5px;width:26px;height:26px;font:700 11px 'DM Sans',sans-serif;cursor:pointer;color:#333;line-height:1;}
+    .gov-a11y button:hover{background:#f2f2f2;}
+    .gov-a11y button.contrast{border-radius:50%;padding:0;overflow:hidden;position:relative;}
+    .gov-a11y button.contrast span{position:absolute;inset:0;}
+    .gov-a11y button.contrast span:first-child{background:#fff;clip-path:polygon(0 0,50% 0,50% 100%,0 100%);}
+    .gov-a11y button.contrast span:last-child{background:#222;clip-path:polygon(50% 0,100% 0,100% 100%,50% 100%);}
+
+    /* ---- HERÓI ---- */
+    .phero{position:relative;overflow:hidden;color:#fff;
+      background:
+        radial-gradient(80% 130% at 88% -20%,#23508f 0%,rgba(35,80,143,0) 55%),
+        linear-gradient(125deg,var(--navy2) 0%,var(--navy) 52%,var(--navy3) 100%);}
+    .phero .wrap{position:relative;z-index:2;padding:48px 22px 52px;}
+    .breadcrumb{font-size:13.5px;color:#9fb6d6;margin-bottom:18px;}
+    .breadcrumb a{color:#c8d7ec;border-bottom:1px solid rgba(200,215,236,.35);}
+    .breadcrumb a:hover{color:var(--gold);border-color:var(--gold);}
+    .phero-txt{max-width:760px;}
+    .eyebrow{display:inline-flex;align-items:center;gap:11px;font:800 12.5px 'DM Sans',sans-serif;letter-spacing:.16em;text-transform:uppercase;color:var(--gold);margin-bottom:16px;}
+    .eyebrow::before{content:"";width:32px;height:3px;border-radius:3px;background:var(--gold);}
+    .phero h1{font-size:clamp(30px,5vw,48px);line-height:1.05;font-weight:800;letter-spacing:-.025em;text-wrap:balance;}
+    .phero h1 b{color:var(--gold);font-weight:800;}
+    .phero p{margin-top:18px;max-width:62ch;font-size:clamp(15px,1.7vw,17.5px);color:#c8d7ec;}
+    .phero-meta{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-top:24px;}
+    .pill{display:inline-flex;align-items:center;gap:9px;background:rgba(246,185,30,.14);border:1px solid rgba(246,185,30,.42);color:#ffe3a3;border-radius:999px;padding:8px 16px;font:700 13.5px 'DM Sans',sans-serif;}
+    .pill b{color:var(--gold);font-size:16px;}
+    .pill.ghost{background:rgba(255,255,255,.07);border-color:rgba(255,255,255,.22);color:#dfe9f7;}
+    .phero-deco{position:absolute;inset:0;z-index:1;pointer-events:none;opacity:.85;}
+    .phero-deco svg{position:absolute;right:-40px;top:50%;transform:translateY(-50%);width:440px;height:340px;}
+
+    /* ---- ESTRUTURA ---- */
+    main{flex:1;padding:0 0 60px;}
+    section.bloco{padding-top:52px;}
+    .sec-h{display:flex;align-items:baseline;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:20px;padding-bottom:14px;border-bottom:2px solid var(--line);}
+    .sec-h h2{font-size:clamp(21px,2.6vw,27px);font-weight:800;letter-spacing:-.02em;}
+    .sec-h .sub{font-size:14px;color:var(--muted);}
+    .card{background:var(--surface);border:1px solid var(--line);border-radius:14px;}
+
+    /* ---- KPI ---- */
+    .kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin-top:-30px;position:relative;z-index:3;}
+    .kpi{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:18px 20px;box-shadow:0 6px 22px rgba(15,42,82,.07);}
+    .kpi .n{font-size:32px;font-weight:800;letter-spacing:-.03em;line-height:1.1;color:var(--navy);}
+    .kpi .l{font-size:13px;color:var(--muted);margin-top:4px;font-weight:600;}
+    .kpi .h{font-size:12px;color:#8296b3;margin-top:6px;}
+    .kpi.gold .n{color:var(--gold2);}
+
+    /* ---- GRÁFICOS DE BARRA ---- */
+    .grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:16px;}
+    .chart{padding:20px 22px 22px;}
+    .chart h3{font-size:15.5px;font-weight:700;margin-bottom:3px;}
+    .chart .cap{font-size:12.5px;color:var(--muted);margin-bottom:16px;}
+    .bars{display:flex;flex-direction:column;gap:11px;}
+    .bar-row{display:grid;grid-template-columns:1fr auto;gap:4px 10px;align-items:center;}
+    .bar-lab{font-size:13.5px;font-weight:600;}
+    .bar-val{font-size:13px;font-weight:700;color:var(--muted);white-space:nowrap;}
+    .bar-track{grid-column:1/-1;height:9px;border-radius:99px;background:#eaf0f8;overflow:hidden;}
+    .bar-fill{height:100%;border-radius:99px;background:var(--c-blue);transition:width .6s cubic-bezier(.2,.8,.2,1);}
+    .bar-fill.gold{background:var(--gold);}
+    .bar-fill.green{background:var(--c-green);}
+    .bar-fill.purple{background:var(--c-purple);}
+    .bar-fill.navy{background:var(--navy);}
+    .bar-fill.red{background:var(--c-red);}
+    .bar-fill.mut{background:#a9bcd6;}
+
+    /* ---- TEMAS ---- */
+    .tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px;}
+    .tab{border:1px solid var(--line);background:#fff;color:var(--muted);border-radius:999px;padding:8px 16px;font:700 13.5px 'DM Sans',sans-serif;cursor:pointer;transition:.18s;}
+    .tab:hover{border-color:#c3d3e8;color:var(--ink);}
+    .tab[aria-selected="true"]{background:var(--navy);border-color:var(--navy);color:#fff;}
+    .temas{padding:22px;}
+    .tema-row{display:grid;grid-template-columns:1fr auto;gap:5px 12px;align-items:center;padding:9px 10px;border-radius:9px;cursor:pointer;transition:background .15s;border:none;background:none;text-align:left;font:inherit;color:inherit;width:100%;}
+    .tema-row:hover{background:#f5f9ff;}
+    .tema-row .lab{font-size:14px;font-weight:600;}
+    .tema-row .val{font-size:13px;font-weight:800;color:var(--navy);white-space:nowrap;}
+    .tema-row .val small{font-weight:600;color:var(--muted);}
+    .tema-row .track{grid-column:1/-1;height:10px;border-radius:99px;background:#eaf0f8;overflow:hidden;}
+    .tema-row .fill{height:100%;border-radius:99px;background:linear-gradient(90deg,var(--navy),#2f5f9e);transition:width .5s;}
+    .tema-hint{font-size:12.5px;color:var(--muted);margin-top:14px;padding-top:14px;border-top:1px dashed var(--line);}
+
+    /* ---- ANÁLISE QUALITATIVA ---- */
+    .eixos{display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:16px;align-items:start;}
+    .eixo{padding:22px;display:flex;flex-direction:column;gap:12px;}
+    .eixo-top{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;}
+    .eixo h3{font-size:17px;font-weight:800;letter-spacing:-.015em;line-height:1.25;}
+    .eixo .badge{flex:none;background:#eef4fc;color:var(--navy);border-radius:8px;padding:5px 10px;font-size:12.5px;font-weight:800;white-space:nowrap;}
+    .eixo p{font-size:14.5px;color:#3b4a63;}
+    .eixo ul{margin:0;padding-left:19px;display:flex;flex-direction:column;gap:6px;}
+    .eixo li{font-size:14px;color:#3b4a63;}
+    .quote{border-left:3px solid var(--gold);background:#fffaf0;padding:11px 14px;border-radius:0 9px 9px 0;font-size:13.5px;color:#4a3d1e;font-style:italic;}
+    .quote cite{display:block;margin-top:6px;font-style:normal;font-size:12px;color:#8a7a52;font-weight:700;}
+    .tensao{border-left:3px solid var(--c-blue);background:#f2f7fe;padding:11px 14px;border-radius:0 9px 9px 0;font-size:13.5px;color:#2c4a6e;}
+    .tensao b{color:var(--navy);}
+    mark{background:#ffe89a;color:inherit;border-radius:3px;padding:0 2px;}
+
+    /* ---- DEVOLUTIVAS ---- */
+    .filtros{padding:18px 20px;display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px;align-items:end;}
+    .campo{display:flex;flex-direction:column;gap:5px;}
+    .campo label{font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;}
+    .campo input,.campo select{border:1px solid var(--line);border-radius:9px;padding:9px 11px;font:500 14px 'DM Sans',sans-serif;color:var(--ink);background:#fff;width:100%;}
+    .campo input:focus,.campo select:focus{outline:2px solid rgba(28,116,212,.35);outline-offset:1px;border-color:var(--c-blue);}
+    .filtro-acoes{display:flex;gap:8px;align-items:center;}
+    .btn{border:1px solid var(--line);background:#fff;border-radius:9px;padding:9px 15px;font:700 13.5px 'DM Sans',sans-serif;cursor:pointer;color:var(--ink);}
+    .btn:hover{background:#f5f9ff;border-color:#c3d3e8;}
+    .btn.primary{background:var(--navy);border-color:var(--navy);color:#fff;}
+    .btn.primary:hover{background:var(--navy2);}
+    .res-info{font-size:13.5px;color:var(--muted);margin:16px 2px 12px;font-weight:600;}
+    .devs{display:flex;flex-direction:column;gap:12px;}
+    .dev{padding:18px 20px;}
+    .dev-h{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:12px;}
+    .tagi{font-size:11.5px;font-weight:800;letter-spacing:.04em;background:#eef4fc;color:var(--navy);border-radius:6px;padding:3px 8px;}
+    .tagi.n{background:var(--navy);color:#fff;}
+    .tagi.g{background:#fff5db;color:#8a6400;}
+    .tagi.gr{background:#e9f7ee;color:#1e6b30;}
+    .dev-q{margin-top:12px;}
+    .dev-q:first-of-type{margin-top:0;}
+    .dev-q .qh{font-size:11.5px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;color:var(--c-blue);margin-bottom:5px;}
+    .dev-q.atr .qh{color:var(--c-purple);}
+    .dev-q.proj .qh{color:var(--c-green);}
+    .dev-q p{font-size:14.5px;color:#33415a;white-space:pre-wrap;}
+    .dev-temas{display:flex;gap:6px;flex-wrap:wrap;margin-top:12px;padding-top:11px;border-top:1px dashed var(--line);}
+    .dev-temas span{font-size:11.5px;font-weight:600;color:var(--muted);background:#f4f7fc;border:1px solid var(--line);border-radius:99px;padding:2px 9px;}
+    .vazio{padding:38px 20px;text-align:center;color:var(--muted);font-size:14.5px;}
+    .paginacao{display:flex;justify-content:center;align-items:center;gap:10px;margin-top:22px;}
+    .paginacao span{font-size:13.5px;color:var(--muted);font-weight:600;}
+
+    /* ---- NOTA ---- */
+    .nota{padding:22px 24px;font-size:13.5px;color:#3b4a63;}
+    .nota h3{font-size:15.5px;font-weight:800;margin-bottom:10px;}
+    .nota ul{padding-left:19px;display:flex;flex-direction:column;gap:7px;margin-top:8px;}
+    .nota strong{color:var(--navy);}
+
+    footer{background:var(--navy3);color:#93a9c9;text-align:center;padding:28px 22px;font-size:13.5px;}
+    .fmark{color:var(--gold);font-weight:800;letter-spacing:.02em;margin-bottom:6px;}
+
+    @media (max-width:640px){
+      .phero .wrap{padding:34px 22px 40px;}
+      .kpis{margin-top:-22px;}
+      .kpi .n{font-size:27px;}
+      .phero-deco{display:none;}
+    }
+
+    /* ---- ALTO CONTRASTE ---- */
+    body.contraste{background:#000;color:#fff;}
+    body.contraste .card,body.contraste .kpi,body.contraste .gov-top{background:#111;border-color:#555;}
+    body.contraste .kpi .n,body.contraste .tema-row .val,body.contraste .eixo .badge{color:#ffe066;}
+    body.contraste .phero{background:#000;border-bottom:2px solid #ffe066;}
+    body.contraste .sec-h{border-color:#555;}
+    body.contraste .eixo p,body.contraste .eixo li,body.contraste .dev-q p,body.contraste .nota{color:#eee;}
+    body.contraste .quote,body.contraste .tensao{background:#1a1a1a;color:#eee;}
+    body.contraste .campo input,body.contraste .campo select,body.contraste .btn{background:#111;color:#fff;border-color:#555;}
+    body.contraste .tab{background:#111;color:#ccc;border-color:#555;}
+    body.contraste .tab[aria-selected="true"]{background:#ffe066;color:#000;}
+    body.contraste .bar-track,body.contraste .tema-row .track{background:#333;}
+    body.contraste .tagi,body.contraste .dev-temas span{background:#222;color:#ffe066;border-color:#555;}
+  </style>
+</head>
+<body>
+
+<header class="gov-top">
+  <div class="wrap">
+    <div class="gov-brand">
+      <img class="gov-logo" src="pmrp.png" alt="Prefeitura da Cidade de Ribeirão Preto">
+    </div>
+    <div class="gov-actions">
+      <div class="gov-a11y">
+        <button type="button" onclick="ajustarFonte(-1)" aria-label="Diminuir fonte">A-</button>
+        <button type="button" onclick="ajustarFonte(1)" aria-label="Aumentar fonte">A+</button>
+        <button type="button" class="contrast" onclick="alternarContraste()" aria-label="Alto contraste"><span></span><span></span></button>
+      </div>
+    </div>
+  </div>
+</header>
+
+<section class="phero">
+  <div class="phero-deco" aria-hidden="true">
+    <svg viewBox="0 0 440 340" fill="none">
+      <g stroke="#f6b91e" stroke-opacity=".28" stroke-width="1.5">
+        <path d="M70 60 L200 120 L150 240 L300 180 L380 90"/>
+        <path d="M200 120 L260 250 L150 240"/>
+        <path d="M300 180 L340 280"/>
+      </g>
+      <g fill="#f6b91e">
+        <circle cx="70" cy="60" r="5" fill-opacity=".9"/>
+        <circle cx="200" cy="120" r="7"/>
+        <circle cx="150" cy="240" r="5" fill-opacity=".8"/>
+        <circle cx="300" cy="180" r="6" fill-opacity=".9"/>
+        <circle cx="380" cy="90" r="4" fill-opacity=".7"/>
+        <circle cx="260" cy="250" r="4.5" fill-opacity=".7"/>
+        <circle cx="340" cy="280" r="4" fill-opacity=".6"/>
+      </g>
+    </svg>
+  </div>
+  <div class="wrap">
+    <nav class="breadcrumb"><a href="index.html">Início</a> › <a href="consultas.html">Consultas Públicas</a> › Resultado</nav>
+    <div class="phero-txt">
+      <span class="eyebrow">Secretaria Municipal de Educação</span>
+      <h1>Remoção e Atribuição<br>de Aulas <b>2026/2027</b></h1>
+      <p>Resumo das contribuições enviadas pelos profissionais da rede municipal de ensino. Esta página reúne o retrato quantitativo da participação, a análise dos assuntos mais recorrentes e o texto integral de todas as devolutivas recebidas.</p>
+      <div class="phero-meta">
+        <span class="pill"><b id="pTotal">—</b>&nbsp;contribuições</span>
+        <span class="pill ghost" id="pPeriodo">—</span>
+        <span class="pill ghost">Consulta encerrada</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<main>
+  <div class="wrap">
+
+    <!-- ====== KPIs ====== -->
+    <div class="kpis" id="kpis"></div>
+
+    <!-- ====== PERFIL ====== -->
+    <section class="bloco" id="perfil">
+      <div class="sec-h">
+        <h2>Quem participou</h2>
+        <span class="sub">Perfil declarado pelos respondentes</span>
+      </div>
+      <div class="grid2">
+        <div class="card chart">
+          <h3>Cargo atual</h3>
+          <div class="cap">Distribuição das 257 contribuições por cargo</div>
+          <div class="bars" id="chCargo"></div>
+        </div>
+        <div class="card chart">
+          <h3>Tipo de unidade de sede</h3>
+          <div class="cap">Classificação a partir da unidade informada</div>
+          <div class="bars" id="chTipo"></div>
+        </div>
+        <div class="card chart">
+          <h3>Interesse em compor a Comissão</h3>
+          <div class="cap">Manifestação de interesse — não implica participação automática</div>
+          <div class="bars" id="chComissao"></div>
+        </div>
+        <div class="card chart">
+          <h3>Perguntas dirigidas a grupos específicos</h3>
+          <div class="cap">Blocos exibidos apenas a determinados cargos no formulário</div>
+          <div class="bars" id="chEspecificas"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ====== VOLUME ====== -->
+    <section class="bloco" id="volume">
+      <div class="sec-h">
+        <h2>Volume e densidade das respostas</h2>
+        <span class="sub">Quanto de cada questão trouxe proposta concreta</span>
+      </div>
+      <div class="card chart">
+        <h3>Respostas preenchidas × respostas com sugestão substantiva</h3>
+        <div class="cap">Foram classificadas como <strong>substantivas</strong> as respostas que apresentam alguma proposta, crítica ou justificativa. Ficaram de fora variações de “não tenho sugestão”, “nenhuma”, “ok”, “não participo” e campos preenchidos apenas com pontuação.</div>
+        <div class="bars" id="chVolume"></div>
+      </div>
+    </section>
+
+    <!-- ====== TEMAS ====== -->
+    <section class="bloco" id="temas">
+      <div class="sec-h">
+        <h2>Assuntos mais frequentes</h2>
+        <span class="sub">Clique em um assunto para ler as devolutivas correspondentes</span>
+      </div>
+      <div class="tabs" role="tablist" id="tabsTema">
+        <button class="tab" role="tab" data-esc="geral" aria-selected="true">Visão geral</button>
+        <button class="tab" role="tab" data-esc="remocao" aria-selected="false">Remoção</button>
+        <button class="tab" role="tab" data-esc="atribuicao" aria-selected="false">Atribuição</button>
+        <button class="tab" role="tab" data-esc="projetos" aria-selected="false">Projetos / jornada</button>
+      </div>
+      <div class="card temas">
+        <div id="listaTemas"></div>
+        <p class="tema-hint" id="temaHint"></p>
+      </div>
+    </section>
+
+    <!-- ====== QUALITATIVO ====== -->
+    <section class="bloco" id="analise">
+      <div class="sec-h">
+        <h2>Leitura qualitativa</h2>
+        <span class="sub">O que a rede está efetivamente pedindo, eixo a eixo</span>
+      </div>
+      <div class="eixos">
+
+        <article class="card eixo">
+          <div class="eixo-top">
+            <h3>1. Projetos como composição de jornada</h3>
+            <span class="badge">87 · 40%</span>
+          </div>
+          <p>É o assunto mais citado do conjunto e o único que aparece com força nas três questões abertas. Três pedidos se repetem, muitas vezes quase palavra por palavra:</p>
+          <ul>
+            <li><strong>Ofertar todos os projetos já na fase inicial</strong> (PPA, PRA, PRP, Práticas Pedagógicas, Educação Financeira), na própria unidade sede, respeitando o tempo de serviço — e não abrir vagas depois do início do ano letivo.</li>
+            <li><strong>Permitir a atribuição no mesmo período da sala regular</strong> ou nas janelas de horário, em vez do contraturno — pedido de isonomia entre as regras do PPA e as do PRA.</li>
+            <li><strong>Rever o conteúdo dos projetos:</strong> substituir Matemática Financeira nos 1ºs anos por contação de histórias e literatura infantil, criar oficinas de produção textual do 3º ao 5º ano, incluir Matemática no PRP e reestruturar o PRA.</li>
+          </ul>
+          <div class="quote">“Todas as fases de atribuição sejam realizadas na unidade sede do professor.”<cite>Devolutiva #238 — PEB II 28/32 h/a</cite></div>
+        </article>
+
+        <article class="card eixo">
+          <div class="eixo-top">
+            <h3>2. Calendário: antecipar tudo</h3>
+            <span class="badge">67 · 31%</span>
+          </div>
+          <p>Maior tema isolado da questão sobre <em>remoção</em> (34% das respostas substantivas). O pedido é convergente e datado:</p>
+          <ul>
+            <li>Remoção em <strong>setembro/outubro</strong>, logo após a expedição das certidões de tempo de serviço.</li>
+            <li>Atribuição em <strong>novembro ou início de dezembro</strong>, concluída antes do recesso.</li>
+            <li><strong>Intervalo maior entre as duas etapas</strong>, para absorver correções sem travar o processo seguinte.</li>
+          </ul>
+          <p>A justificativa mais repetida é operacional: turmas que chegam a março e abril sem professor, dezembro sobrecarregado (folha de pagamento, prestação de contas, conselhos, formaturas) e readaptados sabendo do resultado a uma semana do início do ano letivo.</p>
+          <div class="quote">“Já tem anos que chegamos em abril com salas sem professores.”<cite>Devolutiva #8 — PEB III</cite></div>
+        </article>
+
+        <article class="card eixo">
+          <div class="eixo-top">
+            <h3>3. Concentrar a jornada em uma única unidade</h3>
+            <span class="badge">66 · 30%</span>
+          </div>
+          <p>Demanda central dos PEB II de 28/32 h/a e dos PEB III. O pedido é que a carga total seja atribuída na escola sede, na primeira fase, antes do “completa jornada”.</p>
+          <ul>
+            <li>Retomar a fase <strong>“Volta à sede”</strong>.</li>
+            <li>Permitir <strong>reduzir o número de escolas ao longo do ano</strong> quando surgirem aulas na sede (por exoneração, reabertura de turma etc.).</li>
+            <li>Criar <strong>sede e subsede</strong> para PEB III, limitando a duas unidades.</li>
+          </ul>
+          <p>Os motivos alegados são consistentes: deslocamento entre duas e três escolas, almoço corrido, multiplicação de diários e planejamentos, perda de vínculo com a comunidade escolar e desgaste — vários relatos associam a fragmentação da jornada a adoecimento e afastamento.</p>
+          <div class="quote">“O professor trabalha mais feliz se trabalhar em apenas uma escola. Além disso, o professor que trabalha em várias escolas não se identifica com nenhuma delas.”<cite>Devolutiva #33 — Gestor escolar</cite></div>
+        </article>
+
+        <article class="card eixo">
+          <div class="eixo-top">
+            <h3>4. Presencial × online: a divisão mais nítida</h3>
+            <span class="badge">55 · 25%</span>
+          </div>
+          <p>É o único eixo em que a rede está claramente dividida. Entre quem tratou do formato: <strong>33 defendem o processo por sistema/online</strong>, <strong>23 defendem o presencial</strong> e <strong>11 propõem modelo misto</strong>.</p>
+          <ul>
+            <li><em>Pró-presencial:</em> saber com quem se vai trabalhar, parceria de equipe, saldo impresso à vista, orientação do gestor, menos erro de preenchimento.</li>
+            <li><em>Pró-online:</em> sem deslocamento, sem espera em fila, sem constrangimento na hora de escolher — e o relato recorrente de sessões que varam a noite depois de um dia inteiro de aula.</li>
+          </ul>
+          <div class="tensao"><b>Convergência possível:</b> os dois lados pedem exatamente a mesma garantia — saldo de aulas publicado e atualizado a cada atribuição. A proposta mais citada como meio-termo é a <b>1ª fase presencial na sede</b>, com as demais etapas (completa jornada, troca, contratados) por sistema.</div>
+        </article>
+
+        <article class="card eixo">
+          <div class="eixo-top">
+            <h3>5. Transparência e informação</h3>
+            <span class="badge">54 · 25%</span>
+          </div>
+          <p>Segundo tema da questão sobre remoção (28%). O conjunto de pedidos é bastante padronizado:</p>
+          <ul>
+            <li>Divulgação prévia de vagas, turmas, período e carga horária.</li>
+            <li>Cronograma fixo publicado com antecedência e cumprido sem alteração no meio do processo.</li>
+            <li>Saldo atualizado <strong>em tempo real</strong> após cada atribuição.</li>
+            <li>Prazo de conferência e recurso antes da homologação.</li>
+            <li>Canal oficial de dúvidas, comprovante digital da escolha e relatório final de vagas atribuídas e remanescentes.</li>
+          </ul>
+          <div class="tensao"><b>Ponto controverso:</b> vários respondentes pedem o retorno do <b>nome dos docentes nas listas</b>, hoje publicadas apenas com código funcional, invocando o princípio da publicidade. Outros veem risco à proteção de dados pessoais. A demanda aparece em ambos os lados e merece decisão explícita.</div>
+        </article>
+
+        <article class="card eixo">
+          <div class="eixo-top">
+            <h3>6. Turmas, grade horária e projeção</h3>
+            <span class="badge">52 · 24%</span>
+          </div>
+          <p>Grupo de pedidos sobre o que precisa estar pronto <em>antes</em> da escolha:</p>
+          <ul>
+            <li>Projeção das unidades com data de início e fim, para que as vagas não mudem durante o processo.</li>
+            <li>Lista — ao menos provisória — das crianças de cada turma, com data de nascimento, antes da atribuição.</li>
+            <li>Sala atribuída já com espaço, nomenclatura e grade horária definidos.</li>
+            <li>Toda atribuição feita durante o ano letivo acompanhada da grade fixa daquelas aulas.</li>
+          </ul>
+        </article>
+
+        <article class="card eixo">
+          <div class="eixo-top">
+            <h3>7. Educação Infantil e Etapa 1</h3>
+            <span class="badge">47 · 22%</span>
+          </div>
+          <p>Reivindicação de paridade entre segmentos. Aparece em 42% das respostas sobre composição de jornada por projetos:</p>
+          <ul>
+            <li>Estender Práticas Pedagógicas e demais projetos às <strong>Etapas 1 e 2</strong> e às EMEIs parciais.</li>
+            <li>Levar PPA, leitura e contação de histórias à Educação Infantil.</li>
+            <li>Equiparar o PEB III sediado em EMEI ao sediado em EMEF quanto ao direito de completar jornada com projetos na própria unidade.</li>
+            <li>Projeto de alimentação/higiene nas EMEIs parciais, espelhando o modelo das integrais.</li>
+          </ul>
+        </article>
+
+        <article class="card eixo">
+          <div class="eixo-top">
+            <h3>8. Critérios de classificação e desempate</h3>
+            <span class="badge">47 · 22%</span>
+          </div>
+          <p>A proposta mais frequente é acrescentar o <strong>tempo de permanência na unidade</strong> (“professor da casa”) como critério ou desempate, ao lado do tempo de serviço na rede.</p>
+          <ul>
+            <li>Titulação como desempate (doutorado, mestrado, especialização).</li>
+            <li>Idade, filhos menores e proximidade da residência.</li>
+            <li>Isonomia entre PEB I, II e III no valor da hora-aula e nas regras de ampliação de jornada.</li>
+            <li>Observância da reserva legal de vagas na atribuição.</li>
+          </ul>
+          <div class="tensao"><b>Tensão a resolver:</b> valorizar o tempo de sede reduz a rotatividade, mas colide com o peso hoje dado à pontuação geral — e há devolutivas defendendo cada um dos lados com o mesmo argumento de justiça.</div>
+        </article>
+
+        <article class="card eixo">
+          <div class="eixo-top">
+            <h3>9. Blocos, carga mínima e troca</h3>
+            <span class="badge">45 · 21%</span>
+          </div>
+          <ul>
+            <li>Preservar <strong>blocos indivisíveis</strong> — inclusive flexibilizando o teto da jornada no ato da 1ª etapa para não quebrá-los.</li>
+            <li>Permitir que o PEB III se remova com <strong>carga mínima</strong> (18 h/a) em vez do bloco fechado, eliminando o vaivém “reduzir → remover → ampliar”.</li>
+            <li>Corrigir falhas relatadas no <strong>sistema de troca</strong>: leitura incorreta dos blocos indicados e ausência do cruzamento reverso que já existe na remoção.</li>
+          </ul>
+        </article>
+
+        <article class="card eixo">
+          <div class="eixo-top">
+            <h3>10. Apoio, substituição e AEE</h3>
+            <span class="badge">43 · 20%</span>
+          </div>
+          <ul>
+            <li>Manter o projeto de substituição hoje restrito ao PEB I e <strong>estendê-lo a PEB II e PEB III</strong>.</li>
+            <li>Professor de apoio lotado na própria sede, à disposição da unidade.</li>
+            <li>Segundo professor nos 1ºs e 2ºs anos e nas etapas da Educação Infantil.</li>
+            <li>Reforço ao AEE, com prioridade a quem tem formação específica.</li>
+          </ul>
+          <p>Duas devolutivas propõem a criação da função de <strong>Professor Mediador de Ambientes</strong>, vinculado ao gestor, para acolhimento, ações socioemocionais e apoio às avaliações externas — justificando-a inclusive como medida de redução de riscos psicossociais.</p>
+        </article>
+
+        <article class="card eixo">
+          <div class="eixo-top">
+            <h3>11. Sistema e usabilidade</h3>
+            <span class="badge">42 · 19%</span>
+          </div>
+          <p>Críticas concretas à plataforma, com propostas de correção:</p>
+          <ul>
+            <li>Seleção em lote das escolas (hoje uma a uma), filtros por região e ordenação por arrastar e soltar.</li>
+            <li>Validação que alerte erro de preenchimento antes de confirmar.</li>
+            <li>Simulação/prévia de remoção, para o docente estimar vagas potenciais antes de definir a ordem.</li>
+            <li>Estabilidade e conectividade — inclusive garantia de internet nas escolas para quem atribui a partir da unidade.</li>
+            <li>Comprovante com certificação digital ao final.</li>
+          </ul>
+        </article>
+
+        <article class="card eixo">
+          <div class="eixo-top">
+            <h3>12. Grupos com demanda específica</h3>
+            <span class="badge">46 respondentes</span>
+          </div>
+          <ul>
+            <li><strong>Readaptados (16):</strong> direito à remoção de sede, e não apenas “realocação”/mudança de lotação; lista de classificação própria com base no tempo de readaptação; resultado divulgado antes do recesso.</li>
+            <li><strong>Contratados (18):</strong> prioridade de permanência na turma na renovação do contrato; possibilidade de atribuir acima de 18 h/a já na primeira sessão, para não fragmentar a jornada.</li>
+            <li><strong>Docentes com dois cargos (12):</strong> atribuição de PEB I, II e III em <strong>dias distintos</strong> — hoje ocorrem no mesmo dia e horário, inviabilizando a compatibilização dos períodos.</li>
+          </ul>
+        </article>
+
+      </div>
+    </section>
+
+    <!-- ====== DEVOLUTIVAS ====== -->
+    <section class="bloco" id="devolutivas">
+      <div class="sec-h">
+        <h2>Devolutivas na íntegra</h2>
+        <span class="sub">Texto original, sem edição</span>
+      </div>
+      <div class="card filtros">
+        <div class="campo" style="grid-column:span 2;">
+          <label for="fBusca">Buscar no texto</label>
+          <input type="search" id="fBusca" placeholder="ex.: projetos na sede, blocos, readaptados…" autocomplete="off">
+        </div>
+        <div class="campo">
+          <label for="fCargo">Cargo</label>
+          <select id="fCargo"><option value="">Todos</option></select>
+        </div>
+        <div class="campo">
+          <label for="fTipo">Unidade</label>
+          <select id="fTipo"><option value="">Todas</option></select>
+        </div>
+        <div class="campo">
+          <label for="fTema">Assunto</label>
+          <select id="fTema"><option value="">Todos</option></select>
+        </div>
+        <div class="campo">
+          <label for="fQuestao">Questão</label>
+          <select id="fQuestao">
+            <option value="">Todas</option>
+            <option value="rem">Remoção</option>
+            <option value="atr">Atribuição</option>
+            <option value="proj">Projetos / jornada</option>
+          </select>
+        </div>
+        <div class="filtro-acoes">
+          <button class="btn" type="button" id="btnLimpar">Limpar filtros</button>
+        </div>
+      </div>
+      <p class="res-info" id="resInfo">—</p>
+      <div class="devs" id="listaDevs"></div>
+      <div class="paginacao" id="paginacao"></div>
+    </section>
+
+    <!-- ====== NOTA ====== -->
+    <section class="bloco" id="metodologia">
+      <div class="sec-h"><h2>Nota metodológica</h2></div>
+      <div class="card nota">
+        <h3>Como estes números foram apurados</h3>
+        <ul>
+          <li><strong>Origem.</strong> Respostas do formulário “Remoção e Atribuição de Aulas 2026/2027”, coletadas entre <span id="nPeriodo">—</span>. Cada linha corresponde a um envio; um mesmo profissional pode ter enviado mais de uma contribuição — inclusive por ocupar dois cargos, já que o formulário não permitia declarar ambos em um único envio.</li>
+          <li><strong>Privacidade.</strong> Nome, e-mail e unidade escolar dos respondentes <strong>não foram publicados</strong>. Do campo de unidade preservou-se apenas o tipo (EMEF, EMEI ou CEI), usado para agregação. O texto das devolutivas é reproduzido integralmente, sem correção de grafia.</li>
+          <li><strong>Respostas substantivas.</strong> Cada resposta aberta foi marcada como substantiva ou não. Variações de “não tenho sugestão”, “nenhuma”, “ok”, “não participo”, “já respondi acima” e campos com apenas pontuação foram excluídas das bases percentuais dos assuntos.</li>
+          <li><strong>Classificação por assunto.</strong> Feita por reconhecimento de expressões-chave no texto de cada resposta. Uma mesma devolutiva pode tratar de vários assuntos — por isso os percentuais somam mais de 100%. Na visão geral, cada respondente é contado uma única vez por assunto, ainda que o mencione nas três questões.</li>
+          <li><strong>Bases de cálculo.</strong> Remoção: <span id="nBaseRem">—</span> respostas substantivas. Atribuição: <span id="nBaseAtr">—</span>. Projetos/jornada: <span id="nBaseProj">—</span>. Visão geral: <span id="nBaseGeral">—</span> respondentes com ao menos uma resposta substantiva.</li>
+          <li><strong>Limites.</strong> A consulta é de adesão voluntária e não constitui amostra estatística da rede. Algumas unidades concentram mais envios que outras, e o volume por cargo reflete quem se dispôs a responder — não o tamanho de cada categoria.</li>
+        </ul>
+      </div>
+    </section>
+
+  </div>
+</main>
+
+<footer>
+  <div class="fmark">Secretaria Municipal de Educação</div>
+  Prefeitura de Ribeirão Preto · Transparência e diálogo por uma educação de qualidade.
+</footer>
+
+<script src="dados-consulta-remocao.js"></script>
+<script>
+(function(){
+  "use strict";
+  var D = window.DADOS_CONSULTA;
+  var TEMAS = D.temas, REG = D.registros, META = D.meta;
+
+  function el(t, cls, txt){ var e = document.createElement(t); if(cls) e.className = cls; if(txt != null) e.textContent = txt; return e; }
+  function fmtData(iso){ var p = iso.split("-"); return p[2] + "/" + p[1] + "/" + p[0]; }
+  var PERIODO = fmtData(META.inicio) + " e " + fmtData(META.fim);
+
+  document.getElementById("pTotal").textContent = META.total;
+  document.getElementById("pPeriodo").textContent = fmtData(META.inicio) + " – " + fmtData(META.fim);
+  document.getElementById("nPeriodo").textContent = PERIODO;
+  document.getElementById("nBaseRem").textContent = D.stats.remocao.base;
+  document.getElementById("nBaseAtr").textContent = D.stats.atribuicao.base;
+  document.getElementById("nBaseProj").textContent = D.stats.projetos.base;
+  document.getElementById("nBaseGeral").textContent = D.stats.geral.base;
+
+  /* ---------- KPIs ---------- */
+  var KPIS = [
+    { n: META.total, l: "contribuições recebidas", h: "envios individuais do formulário" },
+    { n: META.unidades, l: "unidades escolares", h: "com ao menos uma contribuição" },
+    { n: D.stats.geral.base, l: "com proposta concreta", h: Math.round(100 * D.stats.geral.base / META.total) + "% do total de envios" },
+    { n: D.perfil.comissao["Sim"] || 0, l: "interessados na Comissão", h: Math.round(100 * (D.perfil.comissao["Sim"] || 0) / META.total) + "% dos respondentes", gold: true }
+  ];
+  var kw = document.getElementById("kpis");
+  KPIS.forEach(function(k){
+    var c = el("div", "kpi" + (k.gold ? " gold" : ""));
+    c.appendChild(el("div", "n", k.n));
+    c.appendChild(el("div", "l", k.l));
+    c.appendChild(el("div", "h", k.h));
+    kw.appendChild(c);
+  });
+
+  /* ---------- Barras genéricas ---------- */
+  function barras(alvo, itens, total, cor){
+    var box = document.getElementById(alvo);
+    box.innerHTML = "";
+    itens.forEach(function(it){
+      var row = el("div", "bar-row");
+      row.appendChild(el("div", "bar-lab", it.lab));
+      row.appendChild(el("div", "bar-val", it.val + " · " + Math.round(100 * it.val / (it.base || total)) + "%"));
+      var tr = el("div", "bar-track"), fl = el("div", "bar-fill " + (it.cor || cor || ""));
+      fl.style.width = (100 * it.val / (it.base || total)) + "%";
+      tr.appendChild(fl); row.appendChild(tr);
+      box.appendChild(row);
+    });
+  }
+  function deObj(o){ return Object.keys(o).map(function(k){ return { lab: k, val: o[k] }; }); }
+
+  barras("chCargo", deObj(D.perfil.cargo), META.total, "navy");
+  barras("chTipo", deObj(D.perfil.tipo), META.total, "purple");
+  barras("chComissao", deObj(D.perfil.comissao).map(function(i){
+    return { lab: i.lab === "Sim" ? "Sim, tenho interesse" : "Não tenho interesse", val: i.val, cor: i.lab === "Sim" ? "green" : "mut" };
+  }), META.total);
+
+  function somaObj(o){ var s = 0; for (var k in o) s += o[k]; return s; }
+  var esp = [];
+  (function(){
+    var e = D.perfil.eventuais, be = somaObj(e);
+    esp.push({ lab: "Pretende atribuir aulas eventuais em 2027 (PEB II 19 h/a)", val: e["Sim"] || 0, base: be, cor: "gold" });
+    var p = D.perfil.pra, bp = (p["Sim"] || 0) + (p["Não"] || 0);
+    esp.push({ lab: "Quer assumir o P.R.A. da própria turma (atuantes no Fundamental)", val: p["Sim"] || 0, base: bp, cor: "gold" });
+    var i = D.perfil.integral, bi = (i["Sim"] || 0) + (i["Não"] || 0);
+    esp.push({ lab: "Quer assumir Práticas de Alimentação/Relaxamento (Ed. Infantil integral)", val: i["Sim"] || 0, base: bi, cor: "gold" });
+  })();
+  barras("chEspecificas", esp, 1);
+  (function(){
+    var e = D.perfil.eventuais, p = D.perfil.pra, i = D.perfil.integral;
+    var nota = el("p", "tema-hint");
+    nota.textContent = "Bases reduzidas: aulas eventuais — " + somaObj(e) + " respondentes; P.R.A. — " +
+      ((p["Sim"] || 0) + (p["Não"] || 0)) + " que declararam atuar no Ensino Fundamental; Práticas — " +
+      ((i["Sim"] || 0) + (i["Não"] || 0)) + " que declararam atuar na Educação Infantil integral.";
+    document.getElementById("chEspecificas").parentNode.appendChild(nota);
+  })();
+
+  barras("chVolume", [
+    { lab: "Remoção — preenchidas", val: META.preenchidas.rem, base: META.total, cor: "mut" },
+    { lab: "Remoção — com sugestão substantiva", val: D.stats.remocao.base, base: META.total, cor: "navy" },
+    { lab: "Atribuição — preenchidas", val: META.preenchidas.atr, base: META.total, cor: "mut" },
+    { lab: "Atribuição — com sugestão substantiva", val: D.stats.atribuicao.base, base: META.total, cor: "purple" },
+    { lab: "Projetos / jornada — preenchidas (só PEB II 28-32 h/a)", val: META.preenchidas.proj, base: META.total, cor: "mut" },
+    { lab: "Projetos / jornada — com sugestão substantiva", val: D.stats.projetos.base, base: META.total, cor: "green" }
+  ], META.total);
+
+  /* ---------- Temas ---------- */
+  var escopoAtual = "geral";
+  var HINTS = {
+    geral: "Cada respondente é contado uma vez por assunto, mesmo que o mencione em mais de uma questão. Base: %B respondentes com ao menos uma resposta substantiva.",
+    remocao: "Base: %B respostas substantivas sobre o processo de remoção.",
+    atribuicao: "Base: %B respostas substantivas sobre o processo de atribuição de aulas.",
+    projetos: "Questão exibida apenas a professores PEB II com 28 ou 32 h/a. Base: %B respostas substantivas."
+  };
+  function renderTemas(){
+    var s = D.stats[escopoAtual], box = document.getElementById("listaTemas");
+    var max = Math.max.apply(null, Object.keys(s.temas).map(function(k){ return s.temas[k]; }));
+    box.innerHTML = "";
+    Object.keys(s.temas).forEach(function(k){
+      var v = s.temas[k];
+      var row = el("button", "tema-row");
+      row.type = "button";
+      row.title = "Ver devolutivas sobre: " + TEMAS[k];
+      row.appendChild(el("div", "lab", TEMAS[k]));
+      var val = el("div", "val", v + " ");
+      val.appendChild(el("small", null, "· " + Math.round(100 * v / s.base) + "%"));
+      row.appendChild(val);
+      var tr = el("div", "track"), fl = el("div", "fill");
+      fl.style.width = (100 * v / max) + "%";
+      tr.appendChild(fl); row.appendChild(tr);
+      row.addEventListener("click", function(){
+        document.getElementById("fTema").value = k;
+        document.getElementById("fQuestao").value = escopoAtual === "geral" ? "" :
+          (escopoAtual === "remocao" ? "rem" : escopoAtual === "atribuicao" ? "atr" : "proj");
+        aplicar();
+        document.getElementById("devolutivas").scrollIntoView({ behavior: "smooth" });
+      });
+      box.appendChild(row);
+    });
+    document.getElementById("temaHint").textContent = HINTS[escopoAtual].replace("%B", s.base);
+  }
+  Array.prototype.forEach.call(document.querySelectorAll("#tabsTema .tab"), function(t){
+    t.addEventListener("click", function(){
+      Array.prototype.forEach.call(document.querySelectorAll("#tabsTema .tab"), function(o){ o.setAttribute("aria-selected", "false"); });
+      t.setAttribute("aria-selected", "true");
+      escopoAtual = t.dataset.esc;
+      renderTemas();
+    });
+  });
+  renderTemas();
+
+  /* ---------- Devolutivas ---------- */
+  var selCargo = document.getElementById("fCargo"),
+      selTipo = document.getElementById("fTipo"),
+      selTema = document.getElementById("fTema"),
+      selQ = document.getElementById("fQuestao"),
+      busca = document.getElementById("fBusca");
+
+  Object.keys(D.perfil.cargo).forEach(function(c){
+    selCargo.appendChild(new Option(c + " (" + D.perfil.cargo[c] + ")", c));
+  });
+  Object.keys(D.perfil.tipo).forEach(function(c){
+    selTipo.appendChild(new Option(c + " (" + D.perfil.tipo[c] + ")", c));
+  });
+  Object.keys(D.stats.geral.temas).forEach(function(k){
+    selTema.appendChild(new Option(TEMAS[k], k));
+  });
+
+  function semAcento(s){
+    return s.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+  }
+  REG.forEach(function(r){ r._busca = semAcento(r.rem + " " + r.atr + " " + r.proj); });
+
+  var QLABEL = { rem: "Sugestões para o processo de Remoção", atr: "Sugestões para o processo de Atribuição de aulas", proj: "Sugestões para atribuição de projetos na composição da jornada" };
+  var QCLS = { rem: "", atr: "atr", proj: "proj" };
+  var TCAMPO = { rem: "tr", atr: "ta", proj: "tp" };
+  var POR_PAGINA = 20, pagina = 1, filtrados = REG;
+
+  function filtrar(){
+    var q = semAcento(busca.value.trim()), c = selCargo.value, tp = selTipo.value,
+        tm = selTema.value, qs = selQ.value;
+    return REG.filter(function(r){
+      if (c && r.cargo !== c) return false;
+      if (tp && r.tipo !== tp) return false;
+      if (q && r._busca.indexOf(q) < 0) return false;
+      if (qs && !r[qs]) return false;
+      if (tm){
+        if (qs) return r[TCAMPO[qs]].indexOf(tm) >= 0;
+        return r.tr.indexOf(tm) >= 0 || r.ta.indexOf(tm) >= 0 || r.tp.indexOf(tm) >= 0;
+      }
+      return true;
+    });
+  }
+
+  function marcar(texto, termo){
+    var frag = document.createDocumentFragment();
+    if (!termo){ frag.appendChild(document.createTextNode(texto)); return frag; }
+    var alvo = semAcento(texto), i = 0, p;
+    while ((p = alvo.indexOf(termo, i)) >= 0){
+      frag.appendChild(document.createTextNode(texto.slice(i, p)));
+      var m = el("mark", null, texto.slice(p, p + termo.length));
+      frag.appendChild(m);
+      i = p + termo.length;
+    }
+    frag.appendChild(document.createTextNode(texto.slice(i)));
+    return frag;
+  }
+
+  function render(){
+    var box = document.getElementById("listaDevs"), pg = document.getElementById("paginacao");
+    box.innerHTML = ""; pg.innerHTML = "";
+    var termo = semAcento(busca.value.trim());
+    var qs = selQ.value;
+    var total = filtrados.length;
+    var maxPag = Math.max(1, Math.ceil(total / POR_PAGINA));
+    if (pagina > maxPag) pagina = maxPag;
+
+    document.getElementById("resInfo").textContent = total === 0 ? "Nenhuma devolutiva encontrada com os filtros atuais." :
+      total + (total === 1 ? " devolutiva encontrada" : " devolutivas encontradas") +
+      " · exibindo " + ((pagina - 1) * POR_PAGINA + 1) + "–" + Math.min(pagina * POR_PAGINA, total);
+
+    if (total === 0){
+      box.appendChild(el("div", "card vazio", "Tente remover um filtro ou usar outro termo de busca."));
+      return;
+    }
+
+    filtrados.slice((pagina - 1) * POR_PAGINA, pagina * POR_PAGINA).forEach(function(r){
+      var c = el("article", "card dev");
+      var h = el("div", "dev-h");
+      h.appendChild(el("span", "tagi n", "#" + r.id));
+      h.appendChild(el("span", "tagi", r.cargo));
+      h.appendChild(el("span", "tagi g", r.tipo));
+      if (r.seg) h.appendChild(el("span", "tagi gr", r.seg));
+      c.appendChild(h);
+
+      ["rem", "atr", "proj"].forEach(function(k){
+        if (!r[k]) return;
+        if (qs && qs !== k) return;
+        var q = el("div", "dev-q " + QCLS[k]);
+        q.appendChild(el("div", "qh", QLABEL[k]));
+        var p = el("p");
+        p.appendChild(marcar(r[k], termo));
+        q.appendChild(p);
+        c.appendChild(q);
+      });
+
+      var ts = {};
+      ["tr", "ta", "tp"].forEach(function(k){ r[k].forEach(function(t){ ts[t] = 1; }); });
+      var chaves = Object.keys(ts);
+      if (chaves.length){
+        var dt = el("div", "dev-temas");
+        chaves.forEach(function(t){ dt.appendChild(el("span", null, TEMAS[t])); });
+        c.appendChild(dt);
+      }
+      box.appendChild(c);
+    });
+
+    if (maxPag > 1){
+      var ant = el("button", "btn", "‹ Anterior");
+      ant.type = "button"; ant.disabled = pagina === 1;
+      ant.addEventListener("click", function(){ pagina--; render(); document.getElementById("devolutivas").scrollIntoView(); });
+      var prox = el("button", "btn", "Próxima ›");
+      prox.type = "button"; prox.disabled = pagina === maxPag;
+      prox.addEventListener("click", function(){ pagina++; render(); document.getElementById("devolutivas").scrollIntoView(); });
+      pg.appendChild(ant);
+      pg.appendChild(el("span", null, "Página " + pagina + " de " + maxPag));
+      pg.appendChild(prox);
+    }
+  }
+
+  function aplicar(){ filtrados = filtrar(); pagina = 1; render(); }
+
+  var timer;
+  busca.addEventListener("input", function(){ clearTimeout(timer); timer = setTimeout(aplicar, 200); });
+  [selCargo, selTipo, selTema, selQ].forEach(function(s){ s.addEventListener("change", aplicar); });
+  document.getElementById("btnLimpar").addEventListener("click", function(){
+    busca.value = ""; selCargo.value = ""; selTipo.value = ""; selTema.value = ""; selQ.value = "";
+    aplicar();
+  });
+  aplicar();
+})();
+
+// ---- Acessibilidade: tamanho de fonte e alto contraste ----
+var PASSOS = [87.5, 100, 112.5, 125];
+var idx = parseInt(localStorage.getItem("fonte_idx") || "1", 10);
+function aplicarFonte(){ document.documentElement.style.fontSize = PASSOS[idx] + "%"; }
+function ajustarFonte(dir){
+  idx = Math.min(PASSOS.length - 1, Math.max(0, idx + dir));
+  localStorage.setItem("fonte_idx", idx);
+  aplicarFonte();
+}
+function alternarContraste(){
+  document.body.classList.toggle("contraste");
+  localStorage.setItem("contraste", document.body.classList.contains("contraste") ? "1" : "0");
+}
+aplicarFonte();
+if (localStorage.getItem("contraste") === "1") document.body.classList.add("contraste");
+</script>
+
+</body>
+</html>
