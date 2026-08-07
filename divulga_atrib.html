@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png?v=1">
+  <link rel="icon" href="favicon.ico?v=1">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png?v=1">
+  <title>Resultados da Consulta — Remoção e Atribuição de Aulas 2026/2027 | Secretaria Municipal de Educação</title>
+  <meta name="description" content="Números da consulta pública sobre os processos de Remoção e Atribuição de Aulas 2026/2027 da rede municipal de ensino de Ribeirão Preto: perfil dos participantes, volume de contribuições e assuntos mais frequentes.">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700;9..40,800&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --navy:#0f2a52; --navy2:#16305c; --navy3:#0b2246;
+      --gold:#f6b91e; --gold2:#d99b06;
+      --ink:#16233d; --muted:#5b6d8a; --line:#e2eaf4;
+      --surface:#ffffff; --page:#eef3fa;
+      --c-gold:#e8a50a; --c-blue:#1c74d4; --c-green:#2b8a3e; --c-purple:#6741d9;
+    }
+    *{box-sizing:border-box;margin:0;padding:0;}
+    html{scroll-behavior:smooth;}
+    body{font-family:'DM Sans',system-ui,-apple-system,Segoe UI,Roboto,sans-serif;background:var(--page);color:var(--ink);line-height:1.55;-webkit-font-smoothing:antialiased;display:flex;flex-direction:column;min-height:100vh;}
+    img{max-width:100%;display:block;}
+    a{color:inherit;text-decoration:none;}
+    .wrap{max-width:1080px;margin:0 auto;padding:0 22px;width:100%;}
+
+    /* ---- CABEÇALHO OFICIAL ---- */
+    .gov-top{background:#fff;border-bottom:1px solid #e6e6e6;}
+    .gov-top .wrap{max-width:1200px;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:16px;padding:11px 22px;}
+    .gov-brand{grid-column:2;justify-self:center;display:flex;align-items:center;}
+    .gov-logo{height:63px;width:auto;}
+    .gov-actions{grid-column:3;justify-self:end;display:flex;align-items:center;}
+    .gov-a11y{display:flex;align-items:center;gap:6px;}
+    .gov-a11y button{border:1px solid #cfcfcf;background:#fff;border-radius:5px;width:26px;height:26px;font:700 11px 'DM Sans',sans-serif;cursor:pointer;color:#333;line-height:1;}
+    .gov-a11y button:hover{background:#f2f2f2;}
+    .gov-a11y button.contrast{border-radius:50%;padding:0;overflow:hidden;position:relative;}
+    .gov-a11y button.contrast span{position:absolute;inset:0;}
+    .gov-a11y button.contrast span:first-child{background:#fff;clip-path:polygon(0 0,50% 0,50% 100%,0 100%);}
+    .gov-a11y button.contrast span:last-child{background:#222;clip-path:polygon(50% 0,100% 0,100% 100%,50% 100%);}
+
+    /* ---- HERÓI ---- */
+    .phero{position:relative;overflow:hidden;color:#fff;
+      background:
+        radial-gradient(80% 130% at 88% -20%,#23508f 0%,rgba(35,80,143,0) 55%),
+        linear-gradient(125deg,var(--navy2) 0%,var(--navy) 52%,var(--navy3) 100%);}
+    .phero .wrap{position:relative;z-index:2;padding:48px 22px 52px;}
+    .phero-txt{max-width:730px;}
+    .eyebrow{display:inline-flex;align-items:center;gap:11px;font:800 12.5px 'DM Sans',sans-serif;letter-spacing:.16em;text-transform:uppercase;color:var(--gold);margin-bottom:16px;}
+    .eyebrow::before{content:"";width:32px;height:3px;border-radius:3px;background:var(--gold);}
+    .phero h1{font-size:clamp(30px,5vw,48px);line-height:1.05;font-weight:800;letter-spacing:-.025em;text-wrap:balance;}
+    .phero h1 b{color:var(--gold);font-weight:800;}
+    .phero p{margin-top:18px;max-width:60ch;font-size:clamp(15px,1.7vw,17.5px);color:#c8d7ec;}
+    .phero-meta{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-top:24px;}
+    .pill{display:inline-flex;align-items:center;gap:9px;background:rgba(246,185,30,.14);border:1px solid rgba(246,185,30,.42);color:#ffe3a3;border-radius:999px;padding:8px 16px;font:700 13.5px 'DM Sans',sans-serif;}
+    .pill b{color:var(--gold);font-size:16px;}
+    .pill.ghost{background:rgba(255,255,255,.07);border-color:rgba(255,255,255,.22);color:#dfe9f7;}
+    .phero-deco{position:absolute;inset:0;z-index:1;pointer-events:none;opacity:.85;}
+    .phero-deco svg{position:absolute;right:-40px;top:50%;transform:translateY(-50%);width:440px;height:340px;}
+
+    /* ---- ESTRUTURA ---- */
+    main{flex:1;padding:0 0 60px;}
+    section.bloco{padding-top:52px;}
+    .sec-h{display:flex;align-items:baseline;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:20px;padding-bottom:14px;border-bottom:2px solid var(--line);}
+    .sec-h h2{font-size:clamp(21px,2.6vw,27px);font-weight:800;letter-spacing:-.02em;}
+    .sec-h .sub{font-size:14px;color:var(--muted);}
+    .card{background:var(--surface);border:1px solid var(--line);border-radius:14px;}
+
+    /* ---- KPI ---- */
+    .kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin-top:-30px;position:relative;z-index:3;}
+    .kpi{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:18px 20px;box-shadow:0 6px 22px rgba(15,42,82,.07);}
+    .kpi .n{font-size:32px;font-weight:800;letter-spacing:-.03em;line-height:1.1;color:var(--navy);}
+    .kpi .l{font-size:13px;color:var(--muted);margin-top:4px;font-weight:600;}
+    .kpi .h{font-size:12px;color:#8296b3;margin-top:6px;}
+    .kpi.gold .n{color:var(--gold2);}
+
+    /* ---- GRÁFICOS DE BARRA ---- */
+    .grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:16px;align-items:start;}
+    .chart{padding:20px 22px 22px;}
+    .chart h3{font-size:15.5px;font-weight:700;margin-bottom:3px;}
+    .chart .cap{font-size:12.5px;color:var(--muted);margin-bottom:16px;}
+    .bars{display:flex;flex-direction:column;gap:11px;}
+    .bar-row{display:grid;grid-template-columns:1fr auto;gap:4px 10px;align-items:center;}
+    .bar-lab{font-size:13.5px;font-weight:600;}
+    .bar-val{font-size:13px;font-weight:700;color:var(--muted);white-space:nowrap;}
+    .bar-track{grid-column:1/-1;height:9px;border-radius:99px;background:#eaf0f8;overflow:hidden;}
+    .bar-fill{height:100%;border-radius:99px;background:var(--c-blue);transition:width .6s cubic-bezier(.2,.8,.2,1);}
+    .bar-fill.gold{background:var(--gold);}
+    .bar-fill.green{background:var(--c-green);}
+    .bar-fill.purple{background:var(--c-purple);}
+    .bar-fill.navy{background:var(--navy);}
+    .bar-fill.mut{background:#a9bcd6;}
+    .nota-bar{font-size:12.5px;color:var(--muted);margin-top:14px;padding-top:13px;border-top:1px dashed var(--line);}
+
+    /* ---- TEMAS ---- */
+    .tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px;}
+    .tab{border:1px solid var(--line);background:#fff;color:var(--muted);border-radius:999px;padding:8px 16px;font:700 13.5px 'DM Sans',sans-serif;cursor:pointer;transition:.18s;}
+    .tab:hover{border-color:#c3d3e8;color:var(--ink);}
+    .tab[aria-selected="true"]{background:var(--navy);border-color:var(--navy);color:#fff;}
+    .temas{padding:22px;}
+    .tema-row{display:grid;grid-template-columns:1fr auto;gap:5px 12px;align-items:center;padding:9px 10px;border-radius:9px;}
+    .tema-row .lab{font-size:14px;font-weight:600;}
+    .tema-row .val{font-size:13px;font-weight:800;color:var(--navy);white-space:nowrap;}
+    .tema-row .val small{font-weight:600;color:var(--muted);}
+    .tema-row .track{grid-column:1/-1;height:10px;border-radius:99px;background:#eaf0f8;overflow:hidden;}
+    .tema-row .fill{height:100%;border-radius:99px;background:linear-gradient(90deg,var(--navy),#2f5f9e);transition:width .5s;}
+    .tema-hint{font-size:12.5px;color:var(--muted);margin-top:14px;padding-top:14px;border-top:1px dashed var(--line);}
+
+    /* ---- NOTA ---- */
+    .nota{padding:22px 24px;font-size:13.5px;color:#3b4a63;}
+    .nota h3{font-size:15.5px;font-weight:800;margin-bottom:10px;}
+    .nota ul{padding-left:19px;display:flex;flex-direction:column;gap:7px;margin-top:8px;}
+    .nota strong{color:var(--navy);}
+
+    .cta-band{margin-top:44px;background:linear-gradient(120deg,var(--navy2),var(--navy3));border-radius:20px;
+      padding:28px 30px;display:flex;align-items:center;justify-content:space-between;gap:20px;color:#fff;flex-wrap:wrap;}
+    .cta-band b{display:block;font-size:18px;font-weight:800;}
+    .cta-band span{color:#c8d7ec;font-size:14px;}
+    .cta-band .gold-dot{color:var(--gold);font-size:30px;line-height:1;}
+
+    footer{background:var(--navy3);color:#93a9c9;text-align:center;padding:28px 22px;font-size:13.5px;}
+    .fmark{color:var(--gold);font-weight:800;letter-spacing:.02em;margin-bottom:6px;}
+
+    @media (max-width:640px){
+      .phero .wrap{padding:34px 22px 40px;}
+      .kpis{margin-top:-22px;}
+      .kpi .n{font-size:27px;}
+      .phero-deco{display:none;}
+    }
+
+    /* ---- ALTO CONTRASTE ---- */
+    body.contraste{background:#000;color:#fff;}
+    body.contraste .card,body.contraste .kpi,body.contraste .gov-top{background:#111;border-color:#555;}
+    body.contraste .kpi .n,body.contraste .tema-row .val{color:#ffe066;}
+    body.contraste .phero{background:#000;border-bottom:2px solid #ffe066;}
+    body.contraste .sec-h{border-color:#555;}
+    body.contraste .nota,body.contraste .nota strong{color:#eee;}
+    body.contraste .tab{background:#111;color:#ccc;border-color:#555;}
+    body.contraste .tab[aria-selected="true"]{background:#ffe066;color:#000;}
+    body.contraste .bar-track,body.contraste .tema-row .track{background:#333;}
+    body.contraste .cta-band{background:#111;border:1px solid #555;}
+  </style>
+</head>
+<body>
+
+<header class="gov-top">
+  <div class="wrap">
+    <div class="gov-brand">
+      <img class="gov-logo" src="pmrp.png" alt="Prefeitura da Cidade de Ribeirão Preto">
+    </div>
+    <div class="gov-actions">
+      <div class="gov-a11y">
+        <button type="button" onclick="ajustarFonte(-1)" aria-label="Diminuir fonte">A-</button>
+        <button type="button" onclick="ajustarFonte(1)" aria-label="Aumentar fonte">A+</button>
+        <button type="button" class="contrast" onclick="alternarContraste()" aria-label="Alto contraste"><span></span><span></span></button>
+      </div>
+    </div>
+  </div>
+</header>
+
+<section class="phero">
+  <div class="phero-deco" aria-hidden="true">
+    <svg viewBox="0 0 440 340" fill="none">
+      <g stroke="#f6b91e" stroke-opacity=".28" stroke-width="1.5">
+        <path d="M70 60 L200 120 L150 240 L300 180 L380 90"/>
+        <path d="M200 120 L260 250 L150 240"/>
+        <path d="M300 180 L340 280"/>
+      </g>
+      <g fill="#f6b91e">
+        <circle cx="70" cy="60" r="5" fill-opacity=".9"/>
+        <circle cx="200" cy="120" r="7"/>
+        <circle cx="150" cy="240" r="5" fill-opacity=".8"/>
+        <circle cx="300" cy="180" r="6" fill-opacity=".9"/>
+        <circle cx="380" cy="90" r="4" fill-opacity=".7"/>
+        <circle cx="260" cy="250" r="4.5" fill-opacity=".7"/>
+        <circle cx="340" cy="280" r="4" fill-opacity=".6"/>
+      </g>
+    </svg>
+  </div>
+  <div class="wrap">
+    <div class="phero-txt">
+      <span class="eyebrow">Secretaria Municipal de Educação</span>
+      <h1>Consulta Pública<br>Remoção e Atribuição de Aulas <b>2026/2027</b></h1>
+      <p>Os números da participação da rede municipal de ensino: quem contribuiu, quanto foi produzido e quais assuntos apareceram com mais frequência nas contribuições recebidas.</p>
+      <div class="phero-meta">
+        <span class="pill"><b id="pTotal">—</b>&nbsp;contribuições</span>
+        <span class="pill ghost" id="pPeriodo">—</span>
+        <span class="pill ghost">Consulta encerrada</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<main>
+  <div class="wrap">
+
+    <!-- ====== KPIs ====== -->
+    <div class="kpis" id="kpis"></div>
+
+    <!-- ====== PERFIL ====== -->
+    <section class="bloco" id="perfil">
+      <div class="sec-h">
+        <h2>Quem participou</h2>
+        <span class="sub">Perfil declarado pelos respondentes</span>
+      </div>
+      <div class="grid2">
+        <div class="card chart">
+          <h3>Cargo atual</h3>
+          <div class="cap">Distribuição das contribuições por cargo</div>
+          <div class="bars" id="chCargo"></div>
+        </div>
+        <div class="card chart">
+          <h3>Tipo de unidade de sede</h3>
+          <div class="cap">Classificação a partir da unidade informada</div>
+          <div class="bars" id="chTipo"></div>
+        </div>
+        <div class="card chart">
+          <h3>Segmento de atuação</h3>
+          <div class="cap">Declarado pelos professores PEB II</div>
+          <div class="bars" id="chSegmento"></div>
+        </div>
+        <div class="card chart">
+          <h3>Interesse em compor a Comissão</h3>
+          <div class="cap">A manifestação de interesse não implica participação automática — a composição será definida pela Secretaria</div>
+          <div class="bars" id="chComissao"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ====== PERGUNTAS DIRIGIDAS ====== -->
+    <section class="bloco" id="especificas">
+      <div class="sec-h">
+        <h2>Perguntas dirigidas a grupos específicos</h2>
+        <span class="sub">Blocos exibidos apenas a determinados cargos ou segmentos</span>
+      </div>
+      <div class="card chart">
+        <h3>Manifestações de interesse</h3>
+        <div class="cap">Percentuais calculados sobre a base de cada pergunta, e não sobre o total de respondentes</div>
+        <div class="bars" id="chEspecificas"></div>
+        <p class="nota-bar" id="notaEspecificas"></p>
+      </div>
+    </section>
+
+    <!-- ====== VOLUME ====== -->
+    <section class="bloco" id="volume">
+      <div class="sec-h">
+        <h2>Volume das contribuições</h2>
+        <span class="sub">Quanto de cada questão trouxe proposta</span>
+      </div>
+      <div class="card chart">
+        <h3>Respostas preenchidas × respostas com proposta concreta</h3>
+        <div class="cap">Foram contadas como <strong>respostas com proposta</strong> as que trazem alguma sugestão, crítica ou justificativa. Ficaram de fora variações de “não tenho sugestão”, “nenhuma”, “ok”, “não participo” e campos preenchidos apenas com pontuação.</div>
+        <div class="bars" id="chVolume"></div>
+      </div>
+    </section>
+
+    <!-- ====== TEMAS ====== -->
+    <section class="bloco" id="temas">
+      <div class="sec-h">
+        <h2>Assuntos mais frequentes</h2>
+        <span class="sub">Selecione a questão para ver o ranking correspondente</span>
+      </div>
+      <div class="tabs" role="tablist" id="tabsTema">
+        <button class="tab" role="tab" data-esc="geral" aria-selected="true">Visão geral</button>
+        <button class="tab" role="tab" data-esc="remocao" aria-selected="false">Remoção</button>
+        <button class="tab" role="tab" data-esc="atribuicao" aria-selected="false">Atribuição</button>
+        <button class="tab" role="tab" data-esc="projetos" aria-selected="false">Projetos / jornada</button>
+      </div>
+      <div class="card temas">
+        <div id="listaTemas"></div>
+        <p class="tema-hint" id="temaHint"></p>
+      </div>
+    </section>
+
+    <!-- ====== NOTA ====== -->
+    <section class="bloco" id="metodologia">
+      <div class="sec-h"><h2>Nota metodológica</h2></div>
+      <div class="card nota">
+        <h3>Como estes números foram apurados</h3>
+        <ul>
+          <li><strong>Origem.</strong> Respostas do formulário “Remoção e Atribuição de Aulas 2026/2027”, coletadas entre <span id="nPeriodo">—</span>. Cada linha corresponde a um envio; um mesmo profissional pode ter enviado mais de uma contribuição — inclusive por ocupar dois cargos, já que o formulário não permitia declarar ambos em um único envio.</li>
+          <li><strong>Privacidade.</strong> Esta página apresenta apenas dados agregados. Nome, e-mail e unidade escolar dos respondentes não são publicados; da unidade preservou-se somente o tipo (EMEF, EMEI ou CEI), usado para agregação.</li>
+          <li><strong>Respostas com proposta.</strong> Cada resposta aberta foi marcada como propositiva ou não. Variações de “não tenho sugestão”, “nenhuma”, “ok”, “não participo”, “já respondi acima” e campos com apenas pontuação foram excluídas das bases percentuais dos assuntos.</li>
+          <li><strong>Classificação por assunto.</strong> Feita por reconhecimento de expressões-chave no texto de cada resposta. Uma mesma contribuição pode tratar de vários assuntos — por isso os percentuais somam mais de 100%. Na visão geral, cada respondente é contado uma única vez por assunto, ainda que o mencione nas três questões.</li>
+          <li><strong>Bases de cálculo.</strong> Remoção: <span id="nBaseRem">—</span> respostas com proposta. Atribuição: <span id="nBaseAtr">—</span>. Projetos/jornada: <span id="nBaseProj">—</span>. Visão geral: <span id="nBaseGeral">—</span> respondentes com ao menos uma resposta com proposta.</li>
+          <li><strong>Limites.</strong> A consulta é de adesão voluntária e não constitui amostra estatística da rede. Algumas unidades concentram mais envios que outras, e o volume por cargo reflete quem se dispôs a responder — não o tamanho de cada categoria.</li>
+        </ul>
+      </div>
+
+      <div class="cta-band">
+        <div><b>Obrigado a quem contribuiu.</b><span>As sugestões recebidas subsidiarão a construção dos processos de 2026/2027.</span></div>
+        <span class="gold-dot">•••</span>
+      </div>
+    </section>
+
+  </div>
+</main>
+
+<footer>
+  <div class="fmark">Secretaria Municipal de Educação</div>
+  Prefeitura de Ribeirão Preto · Transparência e diálogo por uma educação de qualidade.
+</footer>
+
+<script src="dados-divulga.js"></script>
+<script>
+(function(){
+  "use strict";
+  var D = window.DADOS_DIVULGA;
+  var TEMAS = D.temas, META = D.meta;
+
+  function el(t, cls, txt){ var e = document.createElement(t); if(cls) e.className = cls; if(txt != null) e.textContent = txt; return e; }
+  function fmtData(iso){ var p = iso.split("-"); return p[2] + "/" + p[1] + "/" + p[0]; }
+  function somaObj(o){ var s = 0; for (var k in o) s += o[k]; return s; }
+
+  document.getElementById("pTotal").textContent = META.total;
+  document.getElementById("pPeriodo").textContent = fmtData(META.inicio) + " – " + fmtData(META.fim);
+  document.getElementById("nPeriodo").textContent = fmtData(META.inicio) + " e " + fmtData(META.fim);
+  document.getElementById("nBaseRem").textContent = D.stats.remocao.base;
+  document.getElementById("nBaseAtr").textContent = D.stats.atribuicao.base;
+  document.getElementById("nBaseProj").textContent = D.stats.projetos.base;
+  document.getElementById("nBaseGeral").textContent = D.stats.geral.base;
+
+  /* ---------- KPIs ---------- */
+  [
+    { n: META.total, l: "contribuições recebidas", h: "envios individuais do formulário" },
+    { n: META.unidades, l: "unidades escolares", h: "com ao menos uma contribuição" },
+    { n: D.stats.geral.base, l: "com proposta concreta", h: Math.round(100 * D.stats.geral.base / META.total) + "% do total de envios" },
+    { n: D.perfil.comissao["Sim"] || 0, l: "interessados na Comissão", h: Math.round(100 * (D.perfil.comissao["Sim"] || 0) / META.total) + "% dos respondentes", gold: true }
+  ].forEach(function(k){
+    var c = el("div", "kpi" + (k.gold ? " gold" : ""));
+    c.appendChild(el("div", "n", k.n));
+    c.appendChild(el("div", "l", k.l));
+    c.appendChild(el("div", "h", k.h));
+    document.getElementById("kpis").appendChild(c);
+  });
+
+  /* ---------- Barras ---------- */
+  function barras(alvo, itens, total, cor){
+    var box = document.getElementById(alvo);
+    box.innerHTML = "";
+    itens.forEach(function(it){
+      var pct = 100 * it.val / (it.base || total);
+      var row = el("div", "bar-row");
+      row.appendChild(el("div", "bar-lab", it.lab));
+      row.appendChild(el("div", "bar-val", it.val + " · " + Math.round(pct) + "%"));
+      var tr = el("div", "bar-track"), fl = el("div", "bar-fill " + (it.cor || cor || ""));
+      fl.style.width = pct + "%";
+      tr.appendChild(fl); row.appendChild(tr);
+      box.appendChild(row);
+    });
+  }
+  function deObj(o){ return Object.keys(o).map(function(k){ return { lab: k, val: o[k] }; }); }
+
+  barras("chCargo", deObj(D.perfil.cargo), META.total, "navy");
+  barras("chTipo", deObj(D.perfil.tipo), META.total, "purple");
+  barras("chSegmento", deObj(D.perfil.segmento), somaObj(D.perfil.segmento), "blue");
+  barras("chComissao", [
+    { lab: "Sim, tenho interesse", val: D.perfil.comissao["Sim"] || 0, cor: "green" },
+    { lab: "Não tenho interesse", val: D.perfil.comissao["Não"] || 0, cor: "mut" }
+  ], META.total);
+
+  var ev = D.perfil.eventuais, pr = D.perfil.pra, ig = D.perfil.integral;
+  var bEv = somaObj(ev), bPr = (pr["Sim"] || 0) + (pr["Não"] || 0), bIg = (ig["Sim"] || 0) + (ig["Não"] || 0);
+  barras("chEspecificas", [
+    { lab: "Pretende atribuir aulas eventuais em 2027 (PEB II 19 h/a)", val: ev["Sim"] || 0, base: bEv, cor: "gold" },
+    { lab: "Quer assumir o P.R.A. da própria turma (Ensino Fundamental)", val: pr["Sim"] || 0, base: bPr, cor: "gold" },
+    { lab: "Quer assumir Práticas de Alimentação/Relaxamento (Ed. Infantil integral)", val: ig["Sim"] || 0, base: bIg, cor: "gold" }
+  ], 1);
+  document.getElementById("notaEspecificas").textContent =
+    "Bases reduzidas: aulas eventuais — " + bEv + " respondentes; P.R.A. — " + bPr +
+    " que declararam atuar no Ensino Fundamental; Práticas — " + bIg +
+    " que declararam atuar na Educação Infantil integral.";
+
+  barras("chVolume", [
+    { lab: "Remoção — preenchidas", val: META.preenchidas.rem, base: META.total, cor: "mut" },
+    { lab: "Remoção — com proposta concreta", val: D.stats.remocao.base, base: META.total, cor: "navy" },
+    { lab: "Atribuição — preenchidas", val: META.preenchidas.atr, base: META.total, cor: "mut" },
+    { lab: "Atribuição — com proposta concreta", val: D.stats.atribuicao.base, base: META.total, cor: "purple" },
+    { lab: "Projetos / jornada — preenchidas (só PEB II 28-32 h/a)", val: META.preenchidas.proj, base: META.total, cor: "mut" },
+    { lab: "Projetos / jornada — com proposta concreta", val: D.stats.projetos.base, base: META.total, cor: "green" }
+  ], META.total);
+
+  /* ---------- Temas ---------- */
+  var escopoAtual = "geral";
+  var HINTS = {
+    geral: "Cada respondente é contado uma vez por assunto, mesmo que o mencione em mais de uma questão. Base: %B respondentes com ao menos uma resposta com proposta.",
+    remocao: "Base: %B respostas com proposta sobre o processo de remoção.",
+    atribuicao: "Base: %B respostas com proposta sobre o processo de atribuição de aulas.",
+    projetos: "Questão exibida apenas a professores PEB II com 28 ou 32 h/a. Base: %B respostas com proposta."
+  };
+  function renderTemas(){
+    var s = D.stats[escopoAtual], box = document.getElementById("listaTemas");
+    var max = Math.max.apply(null, Object.keys(s.temas).map(function(k){ return s.temas[k]; }));
+    box.innerHTML = "";
+    Object.keys(s.temas).forEach(function(k){
+      var v = s.temas[k];
+      var row = el("div", "tema-row");
+      row.appendChild(el("div", "lab", TEMAS[k]));
+      var val = el("div", "val", v + " ");
+      val.appendChild(el("small", null, "· " + Math.round(100 * v / s.base) + "%"));
+      row.appendChild(val);
+      var tr = el("div", "track"), fl = el("div", "fill");
+      fl.style.width = (100 * v / max) + "%";
+      tr.appendChild(fl); row.appendChild(tr);
+      box.appendChild(row);
+    });
+    document.getElementById("temaHint").textContent = HINTS[escopoAtual].replace("%B", s.base);
+  }
+  Array.prototype.forEach.call(document.querySelectorAll("#tabsTema .tab"), function(t){
+    t.addEventListener("click", function(){
+      Array.prototype.forEach.call(document.querySelectorAll("#tabsTema .tab"), function(o){ o.setAttribute("aria-selected", "false"); });
+      t.setAttribute("aria-selected", "true");
+      escopoAtual = t.dataset.esc;
+      renderTemas();
+    });
+  });
+  renderTemas();
+})();
+
+// ---- Acessibilidade: tamanho de fonte e alto contraste ----
+var PASSOS = [87.5, 100, 112.5, 125];
+var idx = parseInt(localStorage.getItem("fonte_idx") || "1", 10);
+function aplicarFonte(){ document.documentElement.style.fontSize = PASSOS[idx] + "%"; }
+function ajustarFonte(dir){
+  idx = Math.min(PASSOS.length - 1, Math.max(0, idx + dir));
+  localStorage.setItem("fonte_idx", idx);
+  aplicarFonte();
+}
+function alternarContraste(){
+  document.body.classList.toggle("contraste");
+  localStorage.setItem("contraste", document.body.classList.contains("contraste") ? "1" : "0");
+}
+aplicarFonte();
+if (localStorage.getItem("contraste") === "1") document.body.classList.add("contraste");
+</script>
+
+</body>
+</html>

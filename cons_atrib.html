@@ -282,8 +282,8 @@
         <span class="sub">Quanto de cada questão trouxe proposta concreta</span>
       </div>
       <div class="card chart">
-        <h3>Respostas preenchidas × respostas com sugestão substantiva</h3>
-        <div class="cap">Foram classificadas como <strong>substantivas</strong> as respostas que apresentam alguma proposta, crítica ou justificativa. Ficaram de fora variações de “não tenho sugestão”, “nenhuma”, “ok”, “não participo” e campos preenchidos apenas com pontuação.</div>
+        <h3>Respostas preenchidas × respostas com proposta concreta</h3>
+        <div class="cap">Foram contadas como <strong>respostas com proposta</strong> as que trazem alguma sugestão, crítica ou justificativa. Ficaram de fora variações de “não tenho sugestão”, “nenhuma”, “ok”, “não participo” e campos preenchidos apenas com pontuação.</div>
         <div class="bars" id="chVolume"></div>
       </div>
     </section>
@@ -333,7 +333,7 @@
             <h3>2. Calendário: antecipar tudo</h3>
             <span class="badge">67 · 31%</span>
           </div>
-          <p>Maior tema isolado da questão sobre <em>remoção</em> (34% das respostas substantivas). O pedido é convergente e datado:</p>
+          <p>Maior tema isolado da questão sobre <em>remoção</em> (34% das respostas com proposta). O pedido é convergente e datado:</p>
           <ul>
             <li>Remoção em <strong>setembro/outubro</strong>, logo após a expedição das certidões de tempo de serviço.</li>
             <li>Atribuição em <strong>novembro ou início de dezembro</strong>, concluída antes do recesso.</li>
@@ -535,9 +535,9 @@
         <ul>
           <li><strong>Origem.</strong> Respostas do formulário “Remoção e Atribuição de Aulas 2026/2027”, coletadas entre <span id="nPeriodo">—</span>. Cada linha corresponde a um envio; um mesmo profissional pode ter enviado mais de uma contribuição — inclusive por ocupar dois cargos, já que o formulário não permitia declarar ambos em um único envio.</li>
           <li><strong>Privacidade.</strong> Nome, e-mail e unidade escolar dos respondentes <strong>não foram publicados</strong>. Do campo de unidade preservou-se apenas o tipo (EMEF, EMEI ou CEI), usado para agregação. O texto das devolutivas é reproduzido integralmente, sem correção de grafia.</li>
-          <li><strong>Respostas substantivas.</strong> Cada resposta aberta foi marcada como substantiva ou não. Variações de “não tenho sugestão”, “nenhuma”, “ok”, “não participo”, “já respondi acima” e campos com apenas pontuação foram excluídas das bases percentuais dos assuntos.</li>
+          <li><strong>Respostas com proposta.</strong> Cada resposta aberta foi marcada como propositiva ou não. Variações de “não tenho sugestão”, “nenhuma”, “ok”, “não participo”, “já respondi acima” e campos com apenas pontuação foram excluídas das bases percentuais dos assuntos.</li>
           <li><strong>Classificação por assunto.</strong> Feita por reconhecimento de expressões-chave no texto de cada resposta. Uma mesma devolutiva pode tratar de vários assuntos — por isso os percentuais somam mais de 100%. Na visão geral, cada respondente é contado uma única vez por assunto, ainda que o mencione nas três questões.</li>
-          <li><strong>Bases de cálculo.</strong> Remoção: <span id="nBaseRem">—</span> respostas substantivas. Atribuição: <span id="nBaseAtr">—</span>. Projetos/jornada: <span id="nBaseProj">—</span>. Visão geral: <span id="nBaseGeral">—</span> respondentes com ao menos uma resposta substantiva.</li>
+          <li><strong>Bases de cálculo.</strong> Remoção: <span id="nBaseRem">—</span> respostas com proposta. Atribuição: <span id="nBaseAtr">—</span>. Projetos/jornada: <span id="nBaseProj">—</span>. Visão geral: <span id="nBaseGeral">—</span> respondentes com ao menos uma resposta com proposta.</li>
           <li><strong>Limites.</strong> A consulta é de adesão voluntária e não constitui amostra estatística da rede. Algumas unidades concentram mais envios que outras, e o volume por cargo reflete quem se dispôs a responder — não o tamanho de cada categoria.</li>
         </ul>
       </div>
@@ -604,9 +604,10 @@
 
   barras("chCargo", deObj(D.perfil.cargo), META.total, "navy");
   barras("chTipo", deObj(D.perfil.tipo), META.total, "purple");
-  barras("chComissao", deObj(D.perfil.comissao).map(function(i){
-    return { lab: i.lab === "Sim" ? "Sim, tenho interesse" : "Não tenho interesse", val: i.val, cor: i.lab === "Sim" ? "green" : "mut" };
-  }), META.total);
+  barras("chComissao", [
+    { lab: "Sim, tenho interesse", val: D.perfil.comissao["Sim"] || 0, cor: "green" },
+    { lab: "Não tenho interesse", val: D.perfil.comissao["Não"] || 0, cor: "mut" }
+  ], META.total);
 
   function somaObj(o){ var s = 0; for (var k in o) s += o[k]; return s; }
   var esp = [];
@@ -630,20 +631,20 @@
 
   barras("chVolume", [
     { lab: "Remoção — preenchidas", val: META.preenchidas.rem, base: META.total, cor: "mut" },
-    { lab: "Remoção — com sugestão substantiva", val: D.stats.remocao.base, base: META.total, cor: "navy" },
+    { lab: "Remoção — com proposta concreta", val: D.stats.remocao.base, base: META.total, cor: "navy" },
     { lab: "Atribuição — preenchidas", val: META.preenchidas.atr, base: META.total, cor: "mut" },
-    { lab: "Atribuição — com sugestão substantiva", val: D.stats.atribuicao.base, base: META.total, cor: "purple" },
+    { lab: "Atribuição — com proposta concreta", val: D.stats.atribuicao.base, base: META.total, cor: "purple" },
     { lab: "Projetos / jornada — preenchidas (só PEB II 28-32 h/a)", val: META.preenchidas.proj, base: META.total, cor: "mut" },
-    { lab: "Projetos / jornada — com sugestão substantiva", val: D.stats.projetos.base, base: META.total, cor: "green" }
+    { lab: "Projetos / jornada — com proposta concreta", val: D.stats.projetos.base, base: META.total, cor: "green" }
   ], META.total);
 
   /* ---------- Temas ---------- */
   var escopoAtual = "geral";
   var HINTS = {
-    geral: "Cada respondente é contado uma vez por assunto, mesmo que o mencione em mais de uma questão. Base: %B respondentes com ao menos uma resposta substantiva.",
-    remocao: "Base: %B respostas substantivas sobre o processo de remoção.",
-    atribuicao: "Base: %B respostas substantivas sobre o processo de atribuição de aulas.",
-    projetos: "Questão exibida apenas a professores PEB II com 28 ou 32 h/a. Base: %B respostas substantivas."
+    geral: "Cada respondente é contado uma vez por assunto, mesmo que o mencione em mais de uma questão. Base: %B respondentes com ao menos uma resposta com proposta.",
+    remocao: "Base: %B respostas com proposta sobre o processo de remoção.",
+    atribuicao: "Base: %B respostas com proposta sobre o processo de atribuição de aulas.",
+    projetos: "Questão exibida apenas a professores PEB II com 28 ou 32 h/a. Base: %B respostas com proposta."
   };
   function renderTemas(){
     var s = D.stats[escopoAtual], box = document.getElementById("listaTemas");
