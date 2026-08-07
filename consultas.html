@@ -92,6 +92,20 @@
     .consulta.green{--cc:var(--c-green);--ccs:rgba(43,138,62,.5);}
     .consulta.purple{--cc:var(--c-purple);--ccs:rgba(103,65,217,.5);}
 
+    /* ---- ABAS ---- */
+    .tabs{display:flex;gap:6px;margin-bottom:24px;border-bottom:2px solid var(--line);flex-wrap:wrap;}
+    .tab{position:relative;display:inline-flex;align-items:center;gap:9px;background:none;border:none;cursor:pointer;
+      font:800 15px 'DM Sans',sans-serif;color:var(--muted);padding:12px 8px 15px;margin-bottom:-2px;
+      border-bottom:3px solid transparent;transition:color .15s,border-color .15s;}
+    .tab:hover{color:var(--navy);}
+    .tab.active{color:var(--navy);border-bottom-color:var(--gold);}
+    .tab:focus-visible{outline:3px solid var(--gold);outline-offset:3px;border-radius:6px;}
+    .tab-badge{display:inline-flex;align-items:center;justify-content:center;min-width:22px;height:22px;padding:0 7px;
+      border-radius:999px;background:#e6edf6;color:var(--muted);font:700 12px 'DM Sans',sans-serif;}
+    .tab.active .tab-badge{background:var(--gold);color:#3a2a00;}
+    .painel[hidden]{display:none;}
+    .painel .sec-h{margin-bottom:16px;}
+
     /* ---- FAIXA FINAL ---- */
     .cta-band{margin-top:34px;background:linear-gradient(120deg,var(--navy2),var(--navy3));border-radius:20px;
       padding:28px 30px;display:flex;align-items:center;justify-content:space-between;gap:20px;color:#fff;flex-wrap:wrap;}
@@ -183,12 +197,15 @@
 
 <main>
   <div class="wrap">
-    <div class="sec-h">
-      <h2>Participe</h2>
-      <span class="sub">Cada formulário abre em uma nova aba.</span>
+    <div class="tabs" role="tablist" aria-label="Consultas">
+      <button class="tab active" id="tab-abertas" role="tab" aria-selected="true" aria-controls="p-abertas" onclick="mostrarAba('abertas')">Consultas em aberto <span class="tab-badge" id="cAbertas">0</span></button>
+      <button class="tab" id="tab-result" role="tab" aria-selected="false" aria-controls="p-result" onclick="mostrarAba('result')">Resultados <span class="tab-badge" id="cResult">0</span></button>
     </div>
 
-    <div class="consultas">
+    <section class="painel" id="p-abertas" role="tabpanel" aria-labelledby="tab-abertas">
+      <div class="sec-h"><span class="sub">Cada formulário abre em uma nova aba.</span></div>
+
+      <div class="consultas">
 
       <a class="consulta gold" href="https://docs.google.com/forms/d/e/1FAIpQLSd8vIU-dP5UV89hYxD-BSXj8CUeyXwKuZjLMQ7nDBSeLNkHrA/viewform" target="_blank" rel="noopener">
         <span class="c-ico"><svg viewBox="0 0 24 24"><path d="M12 2l2.9 6.6 7.1.6-5.4 4.7 1.6 7-6.2-3.8-6.2 3.8 1.6-7-5.4-4.7 7.1-.6z"/></svg></span>
@@ -229,15 +246,14 @@
         <span class="c-cta">Responder <svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
       </a>
 
-    </div>
+      </div>
+    </section>
 
-    <div class="sec-h" style="margin-top:46px;">
-      <h2>Resultados das consultas</h2>
-      <span class="sub">Devolutivas das consultas já encerradas.</span>
-    </div>
+    <section class="painel" id="p-result" role="tabpanel" aria-labelledby="tab-result" hidden>
+      <div class="sec-h"><span class="sub">Devolutivas das consultas já encerradas.</span></div>
 
-    <div class="consultas">
-      <a class="consulta purple" href="cons_atrib.html">
+      <div class="consultas">
+      <a class="consulta purple" href="divulga_atrib.html">
         <span class="c-ico"><svg viewBox="0 0 24 24"><path d="M4 20V10M10 20V4M16 20v-7M21 20H3"/></svg></span>
         <div class="c-body">
           <span class="c-tag">Vida funcional</span>
@@ -249,7 +265,8 @@
         </div>
         <span class="c-cta">Ver resultados <svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
       </a>
-    </div>
+      </div>
+    </section>
 
     <div class="cta-band">
       <div><b>Sua participação faz a diferença.</b><span>Transparência e diálogo por uma educação de qualidade.</span></div>
@@ -280,11 +297,26 @@
   aplicarFonte();
   if (localStorage.getItem("alto_contraste") === "1") document.body.classList.add("alto-contraste");
 
-  // Conta automaticamente quantas consultas estão na página (evita número desatualizado).
+  // Conta automaticamente quantas consultas estão abertas (evita número desatualizado).
   (function(){
     var n = document.querySelectorAll(".chip.open").length;
     var el = document.getElementById("abertasN");
     if (el) el.textContent = n;
+  })();
+
+  // ---- Abas: Consultas em aberto / Resultados ----
+  function mostrarAba(k){
+    var abertas = (k === "abertas");
+    document.getElementById("p-abertas").hidden = !abertas;
+    document.getElementById("p-result").hidden  = abertas;
+    var ta = document.getElementById("tab-abertas"), tr = document.getElementById("tab-result");
+    ta.classList.toggle("active", abertas); ta.setAttribute("aria-selected", abertas);
+    tr.classList.toggle("active", !abertas); tr.setAttribute("aria-selected", !abertas);
+  }
+  (function(){
+    document.getElementById("cAbertas").textContent = document.querySelectorAll("#p-abertas .consulta").length;
+    document.getElementById("cResult").textContent  = document.querySelectorAll("#p-result .consulta").length;
+    if (location.hash === "#resultados") mostrarAba("result");
   })();
 </script>
 </body>

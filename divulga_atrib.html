@@ -128,8 +128,13 @@
     }
 
     /* ---- ALTO CONTRASTE ---- */
+    .voltar-wrap{margin-top:34px;text-align:center;}
+    .voltar-btn{display:inline-flex;align-items:center;gap:9px;background:#0f2a52;color:#fff;border-radius:11px;padding:13px 24px;font:700 14px 'DM Sans',sans-serif;transition:background .15s,color .15s;}
+    .voltar-btn svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round;}
+    .voltar-btn:hover{background:#f6b91e;color:#0f2a52;}
     body.contraste{background:#000;color:#fff;}
     body.contraste .card,body.contraste .kpi,body.contraste .gov-top{background:#111;border-color:#555;}
+    body.contraste .voltar-btn{background:#ffe066;color:#000;}
     body.contraste .kpi .n,body.contraste .tema-row .val{color:#ffe066;}
     body.contraste .phero{background:#000;border-bottom:2px solid #ffe066;}
     body.contraste .sec-h{border-color:#555;}
@@ -291,6 +296,10 @@
         <span class="gold-dot">•••</span>
       </div>
     </section>
+
+    <div class="voltar-wrap">
+      <a class="voltar-btn" href="index.html"><svg viewBox="0 0 24 24"><path d="M19 12H5M11 18l-6-6 6-6"/></svg>Voltar para Consultas Públicas</a>
+    </div>
 
   </div>
 </main>
