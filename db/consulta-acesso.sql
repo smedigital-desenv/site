@@ -65,10 +65,15 @@ revoke all   on resultados_consultas.acesso from anon;
 -- 4) AUTORIZAR --------------------------------------------------------------
 -- Cadastre EM MINÚSCULAS, exatamente como o e-mail aparece na conta Google.
 
+-- O campo `nome` é só um rótulo para consulta administrativa; ajuste à vontade.
+-- Todos precisam ser contas Google (Workspace ou Gmail) — o login é OAuth Google.
+
 insert into resultados_consultas.acesso (email, nome) values
-  ('desenv.sme@gmail.com', 'Desenvolvimento SME')
-  -- ,('fulano@exemplo.com',  'Nome da Pessoa')
-  -- ,('ciclano@exemplo.com', 'Nome da Pessoa')
+  ('desenv.sme@gmail.com',                       'Desenvolvimento SME'),
+  ('matheusprospero@educacao.pmrp.sp.gov.br',    'Matheus Prospero'),
+  ('christianoliveira@educacao.pmrp.sp.gov.br',  'Christian Oliveira'),
+  ('g.atribucao@educacao.pmrp.sp.gov.br',        'Atribuição (conta setorial)')
+  -- ,('fulano@exemplo.com', 'Nome da Pessoa')
 on conflict (email) do update
   set nome = coalesce(excluded.nome, resultados_consultas.acesso.nome);
 
