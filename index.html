@@ -92,6 +92,8 @@
     .c-cta svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round;transition:transform .15s;}
     .consulta:hover .c-cta{background:var(--gold);color:var(--navy);}
     .consulta:hover .c-cta svg{transform:translateX(3px);}
+    .c-cta.destaque{background:var(--gold);color:#3a2a00;box-shadow:0 10px 22px -8px rgba(246,185,30,.55);}
+    .consulta:hover .c-cta.destaque{background:var(--gold2);color:#3a2a00;}
 
     .consulta.gold{--cc:var(--c-gold);--ccs:rgba(216,155,6,.5);}
     .consulta.blue{--cc:var(--c-blue);--ccs:rgba(28,116,212,.5);}
@@ -213,19 +215,6 @@
 
       <div class="consultas">
 
-      <div class="consulta gold static">
-        <span class="c-ico"><svg viewBox="0 0 24 24"><path d="M12 2l2.9 6.6 7.1.6-5.4 4.7 1.6 7-6.2-3.8-6.2 3.8 1.6-7-5.4-4.7 7.1-.6z"/></svg></span>
-        <div class="c-body">
-          <span class="c-tag">Avaliação do evento</span>
-          <h3>Avaliação do Congresso Municipal de Educação — 2026</h3>
-          <div class="c-chips">
-            <span class="chip">Participantes do Congresso</span>
-            <span class="chip closed"><span class="d"></span>Prazo encerrado</span>
-          </div>
-        </div>
-        <span class="c-status"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>Em análise</span>
-      </div>
-
       <a class="consulta blue" href="https://docs.google.com/forms/d/1rtWBo7JcizSzW2JpeTZj6Drqdtu-NsNLV1cdCkoNuJw/viewform" target="_blank" rel="noopener">
         <span class="c-ico"><svg viewBox="0 0 24 24"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h5"/></svg></span>
         <div class="c-body">
@@ -262,8 +251,21 @@
             <span class="chip done"><span class="d"></span>Resultado publicado</span>
           </div>
         </div>
-        <span class="c-cta">Ver resultados <svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+        <span class="c-cta destaque">Ver resultados <svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
       </a>
+
+      <div class="consulta gold static">
+        <span class="c-ico"><svg viewBox="0 0 24 24"><path d="M12 2l2.9 6.6 7.1.6-5.4 4.7 1.6 7-6.2-3.8-6.2 3.8 1.6-7-5.4-4.7 7.1-.6z"/></svg></span>
+        <div class="c-body">
+          <span class="c-tag">Avaliação do evento</span>
+          <h3>Avaliação do Congresso Municipal de Educação — 2026</h3>
+          <div class="c-chips">
+            <span class="chip">Participantes do Congresso</span>
+            <span class="chip closed"><span class="d"></span>Prazo encerrado</span>
+          </div>
+        </div>
+        <span class="c-status"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>Em análise</span>
+      </div>
 
       </div>
     </section>
@@ -282,7 +284,7 @@
             <span class="chip done"><span class="d"></span>Resultado publicado</span>
           </div>
         </div>
-        <span class="c-cta">Ver resultados <svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+        <span class="c-cta destaque">Ver resultados <svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
       </a>
       </div>
     </section>
