@@ -83,6 +83,9 @@
     .chip.done .d{width:7px;height:7px;border-radius:50%;background:#6741d9;}
     .chip.closed{color:#6b7688;background:#eef1f5;border-color:#dde4ee;}
     .chip.closed .d{width:7px;height:7px;border-radius:50%;background:#9aa7b8;}
+    .chip.prazo{color:#9a6a00;background:#fff7e6;border-color:#f0d79a;}
+    .chip.prazo svg{width:13px;height:13px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+    .chip.prazo b{font-weight:800;}
     .c-status{flex:none;display:inline-flex;align-items:center;gap:8px;background:#fff4e0;color:#9a6a00;border:1px solid #f3cf7a;border-radius:11px;padding:11px 18px;font:700 13.5px 'DM Sans',sans-serif;}
     .c-status svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;}
     .consulta.static{cursor:default;}
@@ -215,7 +218,7 @@
 
       <div class="consultas">
 
-      <a class="consulta blue" href="https://docs.google.com/forms/d/1rtWBo7JcizSzW2JpeTZj6Drqdtu-NsNLV1cdCkoNuJw/viewform" target="_blank" rel="noopener">
+      <a class="consulta blue" href="https://docs.google.com/forms/d/1rtWBo7JcizSzW2JpeTZj6Drqdtu-NsNLV1cdCkoNuJw/viewform" target="_blank" rel="noopener" data-prazo="2026-08-31">
         <span class="c-ico"><svg viewBox="0 0 24 24"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h5"/></svg></span>
         <div class="c-body">
           <span class="c-tag">Materiais pedagógicos</span>
@@ -223,12 +226,13 @@
           <div class="c-chips">
             <span class="chip">Profissionais da educação</span>
             <span class="chip open"><span class="d"></span>Aberta</span>
+            <span class="chip prazo"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18M8 2v4M16 2v4"/></svg>Até <b class="pz"></b></span>
           </div>
         </div>
         <span class="c-cta">Responder <svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
       </a>
 
-      <a class="consulta green" href="https://docs.google.com/forms/d/1zX1UFU25Zs2oOXxdkpDnpfNOW33jp26hEbxwTooxxgk/viewform" target="_blank" rel="noopener">
+      <a class="consulta green" href="https://docs.google.com/forms/d/1zX1UFU25Zs2oOXxdkpDnpfNOW33jp26hEbxwTooxxgk/viewform" target="_blank" rel="noopener" data-prazo="2026-08-31">
         <span class="c-ico"><svg viewBox="0 0 24 24"><path d="M12 22s8-4.5 8-11V5l-8-3-8 3v6c0 6.5 8 11 8 11z"/></svg></span>
         <div class="c-body">
           <span class="c-tag">Segurança escolar</span>
@@ -236,6 +240,7 @@
           <div class="c-chips">
             <span class="chip">Comunidade escolar</span>
             <span class="chip open"><span class="d"></span>Aberta</span>
+            <span class="chip prazo"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18M8 2v4M16 2v4"/></svg>Até <b class="pz"></b></span>
           </div>
         </div>
         <span class="c-cta">Responder <svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
@@ -317,6 +322,38 @@
   }
   aplicarFonte();
   if (localStorage.getItem("alto_contraste") === "1") document.body.classList.add("alto-contraste");
+
+  // ---- Prazo das consultas: encerra sozinho após a data (data-prazo="AAAA-MM-DD") ----
+  function _fmtBR(ds){ var p = ds.split("-"); return p[2] + "/" + p[1] + "/" + p[0]; }
+  (function(){
+    var hoje = new Date(); hoje.setHours(0, 0, 0, 0);
+    var cards = document.querySelectorAll(".consulta[data-prazo]");
+    for (var i = 0; i < cards.length; i++) {
+      var card = cards[i];
+      var ds = card.getAttribute("data-prazo"), p = ds.split("-");
+      var prazo = new Date(+p[0], +p[1] - 1, +p[2]); prazo.setHours(23, 59, 59, 999);
+      var encerrada = hoje.getTime() > prazo.getTime();
+      var pz = card.querySelector(".pz");
+      if (!encerrada) {
+        if (pz) pz.textContent = _fmtBR(ds);        // mostra "Até 31/08/2026"
+        continue;
+      }
+      // Após o prazo: vira "Prazo encerrado" + "Em análise" e deixa de linkar.
+      card.classList.add("static");
+      card.removeAttribute("href"); card.removeAttribute("target"); card.removeAttribute("rel");
+      var co = card.querySelector(".chip.open");
+      if (co) { co.className = "chip closed"; co.innerHTML = '<span class="d"></span>Prazo encerrado'; }
+      var pr = card.querySelector(".chip.prazo");
+      if (pr) pr.remove();
+      var cta = card.querySelector(".c-cta");
+      if (cta) {
+        var st = document.createElement("span");
+        st.className = "c-status";
+        st.innerHTML = '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>Em análise';
+        cta.replaceWith(st);
+      }
+    }
+  })();
 
   // Conta automaticamente quantas consultas estão abertas (evita número desatualizado).
   (function(){
