@@ -18,7 +18,7 @@
     }
     *{box-sizing:border-box;margin:0;padding:0;}
     html{scroll-behavior:smooth;}
-    body{font-family:'DM Sans',system-ui,sans-serif;background:var(--blue);color:var(--ink);line-height:1.55;-webkit-font-smoothing:antialiased;display:flex;flex-direction:column;min-height:100vh;}
+    body{font-family:'DM Sans',system-ui,sans-serif;background:linear-gradient(180deg,#eaf2fb 0%,#f4f8fd 46%,#eaf2fb 100%);background-attachment:fixed;color:var(--ink);line-height:1.55;-webkit-font-smoothing:antialiased;display:flex;flex-direction:column;min-height:100vh;}
     img{max-width:100%;display:block;}
     a{color:inherit;text-decoration:none;}
     .wrap{max-width:960px;margin:0 auto;padding:0 20px;width:100%;}
@@ -79,10 +79,49 @@
     footer{background:var(--navy);color:#c3d2e6;text-align:center;padding:24px 20px;font-size:12.5px;}
     footer .fmark{font-weight:800;color:#fff;font-size:14px;margin-bottom:5px;}
 
+    /* ---- Banner (imagem 1600x320) ---- */
+    .banner-hero{margin:24px auto 4px;max-width:1180px;padding:0 20px;width:100%;}
+    .banner-hero img{width:100%;height:auto;border-radius:20px;box-shadow:0 22px 48px -22px rgba(15,42,82,.55);display:block;}
+
+    /* ---- Rótulo de seção ---- */
+    .sec-label{max-width:960px;margin:30px auto 0;padding:0 20px;width:100%;}
+    .sec-label .eyebrow{display:inline-flex;align-items:center;gap:9px;font:800 12px 'DM Sans',sans-serif;letter-spacing:.12em;text-transform:uppercase;color:var(--gold2);}
+    .sec-label .eyebrow::before{content:"";width:22px;height:3px;border-radius:3px;background:var(--gold);}
+    .sec-label h2{margin:9px 0 0;font-size:clamp(20px,3vw,26px);font-weight:800;color:var(--navy);letter-spacing:-.01em;}
+    .sec-label p{margin:7px 0 0;color:var(--muted);font-size:14.5px;max-width:58ch;}
+
+    /* ---- Cards modernizados (ícones coloridos, no padrão do banner) ---- */
+    .card{border-radius:18px;padding:20px 20px 18px;border-color:#e4edf8;}
+    .card::before{display:none;}
+    .card .icon{width:46px;height:46px;border-radius:13px;box-shadow:0 10px 20px -8px rgba(15,42,82,.4);}
+    .card .icon svg{width:22px;height:22px;}
+    .card.gold .icon{background:linear-gradient(135deg,#f6b91e,#d99b06);}
+    .card.blue .icon{background:linear-gradient(135deg,#3b8ae6,#1c74d4);}
+    .card.green .icon{background:linear-gradient(135deg,#37b24d,#2b8a3e);}
+    .card .tag{color:var(--muted);}
+    .card.gold:hover{border-color:#f2cf7a;box-shadow:0 16px 32px -14px rgba(246,185,30,.5);}
+    .card.blue:hover{border-color:#bcd6f5;box-shadow:0 16px 32px -14px rgba(28,116,212,.45);}
+    .card.green:hover{border-color:#bfe3c8;box-shadow:0 16px 32px -14px rgba(47,158,68,.45);}
+
+    /* ---- Herói do mobile (substitui o banner 5:1, que fica pequeno demais) ---- */
+    .hero-m{display:none;}
+    @media (max-width:640px){
+      .banner-hero{display:none;}
+      .hero-m{display:block;margin:20px 16px 4px;border-radius:18px;padding:22px 20px;
+        background:linear-gradient(120deg,#16305c 0%,#0f2a52 55%,#0b2246 100%);
+        box-shadow:0 18px 40px -20px rgba(15,42,82,.55);}
+      .hero-m .eyebrow{display:flex;align-items:center;gap:9px;font:800 11px 'DM Sans',sans-serif;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);margin-bottom:10px;}
+      .hero-m .eyebrow::before{content:"";width:24px;height:3px;border-radius:3px;background:var(--gold);}
+      .hero-m h1{margin:0;color:#fff;font-size:26px;line-height:1.1;font-weight:800;letter-spacing:-.02em;}
+      .hero-m h1 b{color:var(--gold);}
+      .hero-m p{margin:12px 0 0;color:#c8d7ec;font-size:14px;line-height:1.45;}
+    }
+
     /* ---- Alto contraste ---- */
     body.alto-contraste{background:#000!important;color:#ffe066!important;}
     body.alto-contraste .gov-top,body.alto-contraste footer,body.alto-contraste .card{background:#000!important;color:#ffe066!important;}
     body.alto-contraste .hero h1,body.alto-contraste .card h3{color:#ffe066!important;}
+    body.alto-contraste .sec-label h2{color:#ffe066!important;}
     body.alto-contraste .hero p,body.alto-contraste .card p,body.alto-contraste footer{color:#ffe066!important;opacity:.9;}
     body.alto-contraste .card{border-color:#ffe066!important;}
     body.alto-contraste .card .go,body.alto-contraste .badge{background:#ffe066!important;color:#000!important;}
@@ -107,20 +146,30 @@
 </header>
 <div class="gov-sec"><div class="wrap"><span>Secretaria de Educação</span></div></div>
 
-<section class="hero">
-  <span class="badge">
-    <span class="ic"><svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg></span>
-    Consultas <span class="em">em andamento</span>
-  </span>
-  <h1>Participe e dê sua opinião</h1>
+<div class="banner-hero">
+  <img src="banner.png?v=1"
+       srcset="banner.png?v=1 1600w, banner@2x.png?v=1 3200w"
+       sizes="(max-width:1180px) 100vw, 1140px"
+       alt="Secretaria Municipal de Educação — Acompanhe a Educação em movimento: ações, consultas públicas, notícias e novidades.">
+</div>
+
+<div class="hero-m">
+  <div class="eyebrow">Secretaria Municipal de Educação</div>
+  <h1>Acompanhe a Educação <b>em movimento</b></h1>
+  <p>Ações, consultas públicas, notícias e novidades da rede — em um só lugar.</p>
+</div>
+
+<div class="sec-label">
+  <span class="eyebrow">Consultas em andamento</span>
+  <h2>Participe e dê sua opinião</h2>
   <p>Contribua com as consultas públicas da Educação e ajude a construir uma rede cada vez melhor.</p>
-</section>
+</div>
 
 <main>
   <div class="wrap">
     <div class="grid">
 
-      <a class="card" href="https://docs.google.com/forms/d/e/1FAIpQLSd8vIU-dP5UV89hYxD-BSXj8CUeyXwKuZjLMQ7nDBSeLNkHrA/viewform" target="_blank" rel="noopener">
+      <a class="card gold" href="https://docs.google.com/forms/d/e/1FAIpQLSd8vIU-dP5UV89hYxD-BSXj8CUeyXwKuZjLMQ7nDBSeLNkHrA/viewform" target="_blank" rel="noopener">
         <div class="card-head">
           <span class="icon"><svg viewBox="0 0 24 24"><path d="M12 2l2.9 6.6 7.1.6-5.4 4.7 1.6 7-6.2-3.8-6.2 3.8 1.6-7-5.4-4.7 7.1-.6z"/></svg></span>
           <span class="tag">Avaliação do evento</span>
@@ -129,7 +178,7 @@
         <span class="go">Responder <svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
       </a>
 
-      <a class="card" href="https://docs.google.com/forms/d/1rtWBo7JcizSzW2JpeTZj6Drqdtu-NsNLV1cdCkoNuJw/viewform" target="_blank" rel="noopener">
+      <a class="card blue" href="https://docs.google.com/forms/d/1rtWBo7JcizSzW2JpeTZj6Drqdtu-NsNLV1cdCkoNuJw/viewform" target="_blank" rel="noopener">
         <div class="card-head">
           <span class="icon"><svg viewBox="0 0 24 24"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h5"/></svg></span>
           <span class="tag">Materiais pedagógicos</span>
@@ -138,7 +187,7 @@
         <span class="go">Responder <svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
       </a>
 
-      <a class="card" href="https://docs.google.com/forms/d/1zX1UFU25Zs2oOXxdkpDnpfNOW33jp26hEbxwTooxxgk/viewform" target="_blank" rel="noopener">
+      <a class="card green" href="https://docs.google.com/forms/d/1zX1UFU25Zs2oOXxdkpDnpfNOW33jp26hEbxwTooxxgk/viewform" target="_blank" rel="noopener">
         <div class="card-head">
           <span class="icon"><svg viewBox="0 0 24 24"><path d="M12 22s8-4.5 8-11V5l-8-3-8 3v6c0 6.5 8 11 8 11z"/></svg></span>
           <span class="tag">Segurança escolar</span>
