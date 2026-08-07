@@ -15,10 +15,9 @@
 -- schema pelo cabeçalho HTTP `Accept-Profile`, e espaços exigiriam aspas em
 -- toda referência SQL.
 --
--- ⚠️ PASSO OBRIGATÓRIO NO PAINEL, DEPOIS DE RODAR ESTE SCRIPT:
---    Supabase → Settings → API → "Exposed schemas": acrescentar
---    `resultados_consultas` à lista (que hoje tem `public` e `presenca`).
---    Sem isso a API devolve 404/406 e a página não libera o acesso.
+-- NÃO é preciso expor `resultados_consultas` em Settings → API. A página fala
+-- com a função `public.tem_acesso_consulta()` (item 5), e `public` já é
+-- exposto por padrão. Se você chegou a marcar o schema lá, pode desmarcar.
 --
 -- Rode no Supabase → SQL Editor.
 -- ============================================================================
@@ -78,7 +77,42 @@ on conflict (email) do update
   set nome = coalesce(excluded.nome, resultados_consultas.acesso.nome);
 
 
--- 5) CONFERIR ---------------------------------------------------------------
+-- 5) FUNÇÃO DE CHECAGEM (é ela que a página usa) ----------------------------
+-- A página NÃO consulta a tabela direto. Ela chama esta função, que vive no
+-- schema `public` (sempre exposto) e responde apenas true/false.
+--
+-- Duas vantagens sobre ler a tabela pela API:
+--   • não depende de `resultados_consultas` estar em "Exposed schemas" —
+--     você pode inclusive DESMARCAR o schema lá, que continua funcionando;
+--   • a tabela `acesso` nunca fica alcançável pela API, em hipótese alguma.
+--
+-- SECURITY DEFINER: roda com os privilégios do dono da função, por isso ela
+-- enxerga a tabela mesmo sem grant para `authenticated`. O search_path fixo
+-- evita sequestro de resolução de nomes.
+
+create or replace function public.tem_acesso_consulta()
+returns boolean
+language sql
+stable
+security definer
+set search_path = resultados_consultas, pg_temp
+as $$
+  select exists (
+    select 1
+      from resultados_consultas.acesso
+     where lower(email) = lower(auth.jwt() ->> 'email')
+  );
+$$;
+
+comment on function public.tem_acesso_consulta() is
+  'True se o e-mail autenticado esta na allowlist de resultados_consultas.acesso.';
+
+-- Só quem está autenticado pode perguntar. Anônimo nem chama.
+revoke execute on function public.tem_acesso_consulta() from public, anon;
+grant  execute on function public.tem_acesso_consulta() to authenticated;
+
+
+-- 6) CONFERIR ---------------------------------------------------------------
 -- (rode pelo SQL Editor, que usa service_role; a policy acima não permite que
 --  um usuário comum liste a tabela inteira)
 select email, nome, criado_em
@@ -86,11 +120,11 @@ select email, nome, criado_em
  order by email;
 
 
--- 6) REVOGAR ----------------------------------------------------------------
+-- 7) REVOGAR ----------------------------------------------------------------
 -- delete from resultados_consultas.acesso where email = 'fulano@exemplo.com';
 
 
--- 7) LIMPEZA ----------------------------------------------------------------
+-- 8) LIMPEZA ----------------------------------------------------------------
 -- Só se você chegou a rodar a versão anterior deste script, que criava a
 -- tabela dentro do schema `presenca`:
 -- drop table if exists presenca.consulta_acesso;
