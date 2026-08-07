@@ -1035,8 +1035,8 @@ function iniciarPagina(){
 }
 
 /* ================= PORTÃO DE ACESSO =================
-   Só e-mails cadastrados em presenca.consulta_acesso entram — allowlist
-   PRÓPRIA desta página, independente de presenca.validadores.
+   Só e-mails cadastrados em resultados_consultas.acesso entram — allowlist
+   PRÓPRIA desta página, em schema separado do sistema de presença.
    A sessão usa storageKey "consulta-auth", isolada da do sistema de presença.
    Os dados da consulta só são baixados depois da liberação. */
 (function(){
@@ -1131,7 +1131,11 @@ function iniciarPagina(){
     return cliente.auth.signOut().catch(function(){}).then(function(){ window.location.reload(); });
   };
 
-  // Confere o e-mail logado na allowlist própria (presenca.consulta_acesso).
+  // Schema próprio dos resultados de consultas (precisa estar em
+  // Supabase → Settings → API → Exposed schemas).
+  var SCHEMA_CONSULTA = "resultados_consultas";
+
+  // Confere o e-mail logado na allowlist (resultados_consultas.acesso).
   // A RLS só devolve a linha da própria pessoa — ninguém consegue listar a tabela.
   function verificarAcesso(){
     return cliente.auth.getSession().then(function(res){
@@ -1139,11 +1143,11 @@ function iniciarPagina(){
       if (!sessao || !sessao.user || !sessao.user.email) return { semSessao: true };
       var email = sessao.user.email.toLowerCase();
       return fetch(
-        SUPA_URL + "/consulta_acesso?email=eq." + encodeURIComponent(email) + "&select=email,nome&limit=1",
+        SUPA_URL + "/acesso?email=eq." + encodeURIComponent(email) + "&select=email,nome&limit=1",
         { headers: {
             "apikey": SUPA_KEY,
             "Authorization": "Bearer " + sessao.access_token,
-            "Accept-Profile": SUPA_SCHEMA
+            "Accept-Profile": SCHEMA_CONSULTA
           } }
       )
       .then(function(r){ if (!r.ok) throw new Error("http " + r.status); return r.json(); })
@@ -1166,7 +1170,8 @@ function iniciarPagina(){
     liberar();
   }).catch(function(){
     mostrarCaixa('<div class="portao-erro"><b>Não foi possível verificar o acesso.</b>' +
-      "Recarregue a página. Se persistir, confirme se a tabela de acesso foi criada no banco.</div>", true);
+      "Recarregue a página. Se persistir, confirme se o schema <b>" + SCHEMA_CONSULTA +
+      "</b> foi criado e exposto na API do Supabase.</div>", true);
   });
 })();
 
