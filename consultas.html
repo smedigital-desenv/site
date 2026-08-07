@@ -69,16 +69,6 @@
     .card:hover .go{background:var(--gold);color:var(--navy);}
     .card .go svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round;transition:transform .15s;}
     .card:hover .go svg{transform:translateX(2px);}
-    /* Card em destaque (prazo prorrogado) */
-    .card.destaque{border-color:var(--gold);box-shadow:0 10px 26px rgba(246,185,30,.22);}
-    .card.destaque::before{width:5px;background:linear-gradient(180deg,var(--gold),var(--gold2));}
-    .prazo{display:inline-flex;align-items:center;gap:7px;align-self:flex-start;background:#fff4e0;color:#9a6a00;border:1px solid #f3cf7a;border-radius:999px;padding:5px 12px 5px 10px;font:800 11.5px 'DM Sans',sans-serif;letter-spacing:.01em;margin-bottom:12px;}
-    .prazo svg{width:14px;height:14px;stroke:#c58a00;fill:none;stroke-width:2.3;stroke-linecap:round;stroke-linejoin:round;flex:none;}
-    .prazo b{color:#7a2e00;}
-    body.alto-contraste .card.destaque{border-color:#ffe066!important;}
-    body.alto-contraste .prazo{background:#000!important;color:#ffe066!important;border-color:#ffe066!important;}
-    body.alto-contraste .prazo svg{stroke:#ffe066!important;}
-    body.alto-contraste .prazo b{color:#ffe066!important;}
 
     @media (max-width:600px){
       .grid{grid-template-columns:1fr;}
