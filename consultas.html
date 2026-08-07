@@ -229,6 +229,28 @@
 
     </div>
 
+    <div class="sec-h" style="margin-top:38px;">
+      <h2>Resultados</h2>
+      <span class="sub">Devolutivas das consultas já encerradas.</span>
+    </div>
+
+    <div class="consultas">
+
+      <a class="consulta purple" href="consulta-remocao-atribuicao.html">
+        <span class="c-ico"><svg viewBox="0 0 24 24"><path d="M3 3v18h18"/><path d="M7 15l4-5 3 3 5-7"/></svg></span>
+        <div class="c-body">
+          <span class="c-tag">Resumo das contribuições</span>
+          <h3>Remoção e Atribuição de Aulas 2026/2027</h3>
+          <div class="c-chips">
+            <span class="chip">257 contribuições</span>
+            <span class="chip">Análise e devolutivas na íntegra</span>
+          </div>
+        </div>
+        <span class="c-cta">Ver resultado <svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+      </a>
+
+    </div>
+
     <div class="cta-band">
       <div><b>Sua participação faz a diferença.</b><span>Transparência e diálogo por uma educação de qualidade.</span></div>
       <span class="gold-dot" style="font-size:30px;line-height:1;">•••</span>
@@ -260,7 +282,7 @@
 
   // Conta automaticamente quantas consultas estão na página (evita número desatualizado).
   (function(){
-    var n = document.querySelectorAll(".consulta").length;
+    var n = document.querySelectorAll(".consulta .chip.open").length;
     var el = document.getElementById("abertasN");
     if (el) el.textContent = n;
   })();
