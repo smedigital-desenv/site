@@ -228,6 +228,12 @@
           <div class="cap">A manifestação de interesse não implica participação automática — a composição será definida pela Secretaria</div>
           <div class="bars" id="chComissao"></div>
         </div>
+        <div class="card chart">
+          <h3>Interessados na Comissão, por cargo</h3>
+          <div class="cap">A barra mostra a proporção de cada cargo que manifestou interesse — não a fatia que o cargo representa no total de interessados</div>
+          <div class="bars" id="chComissaoCargo"></div>
+          <p class="nota-bar" id="notaComissaoCargo"></p>
+        </div>
       </div>
     </section>
 
@@ -350,7 +356,7 @@
       var pct = 100 * it.val / (it.base || total);
       var row = el("div", "bar-row");
       row.appendChild(el("div", "bar-lab", it.lab));
-      row.appendChild(el("div", "bar-val", it.val + " · " + Math.round(pct) + "%"));
+      row.appendChild(el("div", "bar-val", it.txt || (it.val + " · " + Math.round(pct) + "%")));
       var tr = el("div", "bar-track"), fl = el("div", "bar-fill " + (it.cor || cor || ""));
       fl.style.width = pct + "%";
       tr.appendChild(fl); row.appendChild(tr);
@@ -366,6 +372,22 @@
     { lab: "Sim, tenho interesse", val: D.perfil.comissao["Sim"] || 0, cor: "green" },
     { lab: "Não tenho interesse", val: D.perfil.comissao["Não"] || 0, cor: "mut" }
   ], META.total);
+
+  /* ---------- Interesse na Comissão detalhado por cargo ---------- */
+  (function(){
+    var cc = D.perfil.comissao_cargo, totalSim = 0;
+    var itens = Object.keys(cc).map(function(k){
+      totalSim += cc[k].sim;
+      return { lab: k, val: cc[k].sim, base: cc[k].total, cor: "green",
+               txt: cc[k].sim + " de " + cc[k].total + " · " + Math.round(100 * cc[k].sim / cc[k].total) + "%" };
+    }).sort(function(a, b){ return (b.val / b.base) - (a.val / a.base); });
+    barras("chComissaoCargo", itens, 1);
+    var comp = itens.slice().sort(function(a, b){ return b.val - a.val; }).map(function(i){
+      return i.lab + " " + i.val + " (" + Math.round(100 * i.val / totalSim) + "%)";
+    }).join(" · ");
+    document.getElementById("notaComissaoCargo").textContent =
+      "Composição dos " + totalSim + " interessados: " + comp + ".";
+  })();
 
   var ev = D.perfil.eventuais, pr = D.perfil.pra, ig = D.perfil.integral;
   var bEv = somaObj(ev), bPr = (pr["Sim"] || 0) + (pr["Não"] || 0), bIg = (ig["Sim"] || 0) + (ig["Não"] || 0);
