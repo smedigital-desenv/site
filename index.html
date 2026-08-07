@@ -342,7 +342,7 @@
       card.classList.add("static");
       card.removeAttribute("href"); card.removeAttribute("target"); card.removeAttribute("rel");
       var co = card.querySelector(".chip.open");
-      if (co) { co.className = "chip closed"; co.innerHTML = '<span class="d"></span>Prazo encerrado'; }
+      if (co) { co.className = "chip closed"; co.innerHTML = '<span class="d"></span>Encerrou em ' + _fmtBR(ds); }
       var pr = card.querySelector(".chip.prazo");
       if (pr) pr.remove();
       var cta = card.querySelector(".c-cta");
