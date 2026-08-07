@@ -1,0 +1,6 @@
+# Scripts com dados pessoais dos respondentes das consultas.
+# São gerados sob demanda e executados direto no Supabase — NUNCA versionar,
+# porque este repositório é público e o histórico do Git é permanente.
+db/consulta-respondentes.sql
+db/*-respondentes.sql
+db/*-nominal.sql
