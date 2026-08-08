@@ -24,7 +24,7 @@ create table if not exists resultados_consultas.cards (
   categoria      text,                                 -- eyebrow acima do título
   titulo         text    not null,
   publico        text,                                 -- chip de público-alvo
-  estado         text    not null default 'aberta',    -- aberta | resultado | encerrada | nenhum
+  estado         text    not null default 'aberta',    -- aberta | resultado | encerrada | breve | nenhum
   destaque       boolean not null default false,      -- CTA em destaque (dourado)
   href           text,                                 -- vazio => card não clicável
   nova_aba       boolean not null default true,
@@ -126,7 +126,7 @@ begin
   if coalesce(p->>'cor', '') not in ('gold', 'blue', 'green', 'purple') then
     raise exception 'cor invalida';
   end if;
-  if coalesce(p->>'estado', '') not in ('aberta', 'resultado', 'encerrada', 'nenhum') then
+  if coalesce(p->>'estado', '') not in ('aberta', 'resultado', 'encerrada', 'breve', 'nenhum') then
     raise exception 'estado invalido';
   end if;
   -- Só http(s) ou caminho relativo: bloqueia javascript: e afins.
@@ -257,7 +257,11 @@ select * from (values
    'Remoção e Atribuição de Aulas 2026/2027 — devolutivas',
    'Profissionais da educação', 'resultado', true,
    'divulga_atrib.html', false, null::date, 'Ver resultados'),
-  (true, false, 3, 'gold', 'estrela', 'Avaliação do evento',
+  (true, false, 3, 'blue', 'lapis', 'Vida funcional',
+   'Resolução de acompanhamento de sala de aula',
+   'Profissionais da educação', 'breve', false,
+   null, false, null::date, 'Aguarde a abertura'),
+  (true, false, 4, 'gold', 'estrela', 'Avaliação do evento',
    'Avaliação do Congresso Municipal de Educação — 2026',
    'Participantes do Congresso', 'encerrada', false,
    null, false, null::date, null)
