@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png?v=1">
   <link rel="icon" href="favicon.ico?v=1">
-  <title>Gerenciar cards da página inicial | Secretaria Municipal de Educação</title>
+  <title>Painel de gerenciamento | Secretaria Municipal de Educação</title>
   <meta name="robots" content="noindex, nofollow">
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700;9..40,800&display=swap" rel="stylesheet">
   <style>
@@ -38,7 +38,36 @@
     .topo a.voltar:hover{color:var(--gold);border-color:var(--gold);}
 
     main{flex:1;padding:26px 0 60px;}
+    .abas{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px;border-bottom:2px solid var(--line);padding-bottom:0;}
+    .aba{border:none;background:none;color:var(--muted);padding:10px 4px 12px;margin-right:18px;
+      font:700 14.5px 'DM Sans',sans-serif;cursor:pointer;border-bottom:3px solid transparent;margin-bottom:-2px;}
+    .aba:hover{color:var(--ink);}
+    .aba[aria-selected="true"]{color:var(--navy);border-bottom-color:var(--gold);}
+    .aba .n{display:inline-block;background:#eef4fc;color:var(--navy);border-radius:999px;
+      padding:1px 8px;font-size:11.5px;margin-left:6px;}
+
+    .res-item{display:grid;grid-template-columns:auto 1fr auto;gap:16px;align-items:center;
+      border:1px solid var(--line);border-radius:13px;padding:16px 18px;margin-bottom:12px;background:#fff;}
+    .res-item .pin{width:44px;height:44px;border-radius:11px;display:flex;align-items:center;justify-content:center;
+      color:#fff;background:var(--c-purple);}
+    .res-item .pin svg{width:21px;height:21px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+    .res-item h3{font-size:15.5px;font-weight:700;line-height:1.3;}
+    .res-item .met{font-size:12.5px;color:var(--muted);margin-top:4px;}
+    .res-links{display:flex;gap:8px;flex-wrap:wrap;}
+    .lk{display:inline-flex;align-items:center;gap:7px;border:1px solid var(--line);background:#fff;border-radius:10px;
+      padding:9px 15px;font:700 13px 'DM Sans',sans-serif;color:var(--ink);white-space:nowrap;}
+    .lk:hover{background:#f2f7fe;border-color:#c3d3e8;}
+    .lk.forte{background:var(--navy);border-color:var(--navy);color:#fff;}
+    .lk.forte:hover{background:var(--navy2);}
+    .lk svg{width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;}
+    .selo{display:inline-flex;align-items:center;gap:5px;font:700 11px 'DM Sans',sans-serif;letter-spacing:.04em;
+      text-transform:uppercase;border-radius:999px;padding:3px 9px;margin-left:8px;}
+    .selo.restrito{background:#fff5db;color:#8a6400;}
+    .selo.publico{background:#e7f4ea;color:#1e7a34;}
+    @media (max-width:760px){ .res-item{grid-template-columns:auto 1fr;} .res-links{grid-column:1/-1;} }
     .cols{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,420px);gap:20px;align-items:start;}
+    /* `display:grid` acima venceria o atributo hidden; isto garante a troca de abas. */
+    [hidden]{display:none!important;}
     @media (max-width:960px){ .cols{grid-template-columns:1fr;} }
 
     .card{background:var(--surface);border:1px solid var(--line);border-radius:14px;}
@@ -182,15 +211,75 @@
   <div class="wrap">
     <a class="voltar" href="index.html">← Ver a página inicial</a>
     <div class="eyebrow" style="margin-top:14px;">Secretaria Municipal de Educação</div>
-    <h1>Gerenciar cards da página inicial</h1>
-    <p>Cadastre, edite, reordene e oculte os cards exibidos na home. As alterações entram no ar assim que você salva — não é preciso publicar nada.</p>
+    <h1>Painel de gerenciamento</h1>
+    <p>Cards da página inicial e resultados das consultas. As alterações entram no ar assim que você salva — não é preciso publicar nada.</p>
   </div>
 </section>
 
 <main>
   <div class="wrap">
+    <div class="abas" role="tablist">
+      <button class="aba" role="tab" id="aba-cards" aria-selected="true" onclick="mostrarAba('cards')">Cards da página inicial</button>
+      <button class="aba" role="tab" id="aba-res" aria-selected="false" onclick="mostrarAba('res')">Resultados completos<span class="n" id="nRes">1</span></button>
+    </div>
+
     <div id="avisos"></div>
-    <div class="cols">
+
+    <div id="painel-res" hidden>
+      <div class="cols">
+
+        <div class="card bloco">
+          <h2>Resultados cadastrados</h2>
+          <div class="sub">Cada consulta encerrada com seus dois endereços. Use ▲ ▼ para reordenar e clique para editar.</div>
+          <div id="listaRes"></div>
+          <button type="button" class="btn primary" id="btnNovoRes" style="margin-top:6px;">+ Novo resultado</button>
+        </div>
+
+        <div class="card bloco">
+          <h2 id="tituloFormRes">Novo resultado</h2>
+          <div class="sub">O endereço restrito não deve ser divulgado: ele expõe as devolutivas na íntegra com a identificação de quem respondeu.</div>
+
+          <div class="campo">
+            <label for="rTitulo">Consulta *</label>
+            <input type="text" id="rTitulo" maxlength="160" placeholder="Ex.: Remoção e Atribuição de Aulas 2026/2027">
+          </div>
+
+          <div class="campo">
+            <label for="rDescricao">Descrição</label>
+            <input type="text" id="rDescricao" maxlength="200" placeholder="Ex.: 257 contribuições · 90 unidades · jul–ago/2026">
+            <div class="dica">Linha de apoio exibida abaixo do título.</div>
+          </div>
+
+          <div class="campo">
+            <label for="rPublico">Resumo público <span class="selo publico">aberto</span></label>
+            <input type="text" id="rPublico" placeholder="divulga_atrib.html">
+            <div class="dica">Números agregados. É o endereço que pode ser divulgado e linkado na home.</div>
+          </div>
+
+          <div class="campo">
+            <label for="rCompleto">Resultados completos <span class="selo restrito">restrito</span></label>
+            <input type="text" id="rCompleto" placeholder="cons_atrib.html">
+            <div class="dica">Devolutivas na íntegra com nome e unidade. Só abre para os e-mails autorizados.</div>
+          </div>
+
+          <div class="campo">
+            <label>Opções</label>
+            <div class="checks">
+              <label class="check"><input type="checkbox" id="rVisivel" checked> Exibir nesta lista</label>
+            </div>
+          </div>
+
+          <div class="acoes-form">
+            <button type="button" class="btn primary" id="btnSalvarRes">Salvar</button>
+            <button type="button" class="btn" id="btnCancelarRes">Cancelar</button>
+            <button type="button" class="btn perigo" id="btnExcluirRes" hidden>Excluir</button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="cols" id="painel-cards">
 
       <div class="card bloco">
         <h2>Cards cadastrados</h2>
@@ -282,6 +371,17 @@
 
 <footer>Secretaria Municipal de Educação · Prefeitura de Ribeirão Preto</footer>
 
+<script>
+  function mostrarAba(k){
+    var cards = (k === "cards");
+    document.getElementById("painel-cards").hidden = !cards;
+    document.getElementById("painel-res").hidden   = cards;
+    var a = document.getElementById("aba-cards"), b = document.getElementById("aba-res");
+    a.setAttribute("aria-selected", cards);
+    b.setAttribute("aria-selected", !cards);
+    location.hash = cards ? "" : "resultados";
+  }
+</script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="config.js"></script>
 <script src="cards.js"></script>
@@ -395,6 +495,8 @@
     document.getElementById("btnExcluir").addEventListener("click", excluir);
     limpar();
     recarregar();
+    iniciarResultados();
+    if (location.hash === "#resultados") mostrarAba("res");
   }
 
   function recarregar(){
@@ -608,6 +710,145 @@
       avisar("<b>Não foi possível salvar.</b> " + e.message, "erro");
     }).then(function(){
       b.disabled = false; b.textContent = "Salvar";
+    });
+  }
+
+  /* ================= RESULTADOS ================= */
+  var resultados = [], editandoRes = null;
+
+  function iniciarResultados(){
+    document.getElementById("btnNovoRes").addEventListener("click", limparRes);
+    document.getElementById("btnCancelarRes").addEventListener("click", limparRes);
+    document.getElementById("btnSalvarRes").addEventListener("click", salvarRes);
+    document.getElementById("btnExcluirRes").addEventListener("click", excluirRes);
+    limparRes();
+    recarregarRes();
+  }
+
+  function recarregarRes(){
+    return rpc("resultados_listar", {}).then(function(d){
+      resultados = Array.isArray(d) ? d : [];
+      listaRes();
+    }).catch(function(e){
+      avisar("<b>Não foi possível carregar os resultados.</b> " + e.message +
+             " — confirme se o <b>db/resultados.sql</b> já foi executado no Supabase.", "erro");
+    });
+  }
+
+  function listaRes(){
+    var cx = document.getElementById("listaRes");
+    cx.innerHTML = "";
+    document.getElementById("nRes").textContent = resultados.length;
+    if (!resultados.length){
+      cx.innerHTML = '<div class="aviso info">Nenhum resultado cadastrado ainda.</div>';
+      return;
+    }
+    resultados.forEach(function(r, i){
+      var el = document.createElement("div");
+      el.className = "item" + (r.visivel ? "" : " oculto") + (r.id === editandoRes ? " sel" : "");
+
+      var pin = document.createElement("div");
+      pin.className = "pin purple";
+      pin.innerHTML = C.svgIcone("grafico");
+
+      var meio = document.createElement("div");
+      var met = [];
+      met.push(r.url_publico  ? "<b>público</b>" : "sem resumo público");
+      met.push(r.url_completo ? "<b>completo</b>" : "sem versão completa");
+      if (!r.visivel) met.push("<b>oculto</b>");
+      meio.innerHTML = '<div class="tit"></div><div class="met">' +
+                       met.map(function(m){ return "<span>" + m + "</span>"; }).join("") + "</div>";
+      meio.querySelector(".tit").textContent = r.titulo;
+      meio.style.cursor = "pointer";
+      meio.addEventListener("click", function(){ editarRes(r.id); });
+
+      var acoes = document.createElement("div");
+      acoes.className = "acoes";
+      acoes.appendChild(botao("▲", "Subir", i === 0, function(){ moverRes(i, -1); }));
+      acoes.appendChild(botao("▼", "Descer", i === resultados.length - 1, function(){ moverRes(i, 1); }));
+      if (r.url_publico)  acoes.appendChild(abrir(r.url_publico, "Abrir o resumo público"));
+      if (r.url_completo) acoes.appendChild(abrir(r.url_completo, "Abrir os resultados completos"));
+
+      el.appendChild(pin); el.appendChild(meio); el.appendChild(acoes);
+      cx.appendChild(el);
+    });
+  }
+
+  function abrir(url, titulo){
+    var a = document.createElement("a");
+    a.className = "mini"; a.href = url; a.target = "_blank"; a.rel = "noopener";
+    a.title = titulo; a.textContent = "↗";
+    a.style.display = "inline-flex"; a.style.alignItems = "center"; a.style.justifyContent = "center";
+    return a;
+  }
+
+  function moverRes(i, d){
+    var j = i + d;
+    if (j < 0 || j >= resultados.length) return;
+    var tmp = resultados[i]; resultados[i] = resultados[j]; resultados[j] = tmp;
+    listaRes();
+    rpc("resultados_reordenar", { p_ids: resultados.map(function(r){ return String(r.id); }) })
+      .then(function(){ avisar("Ordem atualizada.", "ok"); })
+      .catch(function(e){ avisar("<b>Falha ao reordenar.</b> " + e.message, "erro"); recarregarRes(); });
+  }
+
+  function limparRes(){
+    editandoRes = null;
+    document.getElementById("tituloFormRes").textContent = "Novo resultado";
+    ["rTitulo","rDescricao","rPublico","rCompleto"].forEach(function(id){
+      document.getElementById(id).value = "";
+    });
+    document.getElementById("rVisivel").checked = true;
+    document.getElementById("btnExcluirRes").hidden = true;
+    listaRes();
+  }
+
+  function editarRes(id){
+    var r = resultados.filter(function(x){ return x.id === id; })[0];
+    if (!r) return;
+    editandoRes = id;
+    document.getElementById("tituloFormRes").textContent = "Editando resultado";
+    document.getElementById("rTitulo").value    = r.titulo || "";
+    document.getElementById("rDescricao").value = r.descricao || "";
+    document.getElementById("rPublico").value   = r.url_publico || "";
+    document.getElementById("rCompleto").value  = r.url_completo || "";
+    document.getElementById("rVisivel").checked = !!r.visivel;
+    document.getElementById("btnExcluirRes").hidden = false;
+    listaRes();
+  }
+
+  function salvarRes(){
+    var dados = {
+      id: editandoRes,
+      titulo:       document.getElementById("rTitulo").value.trim(),
+      descricao:    document.getElementById("rDescricao").value.trim(),
+      url_publico:  document.getElementById("rPublico").value.trim(),
+      url_completo: document.getElementById("rCompleto").value.trim(),
+      visivel:      document.getElementById("rVisivel").checked
+    };
+    if (!dados.titulo){ avisar("<b>Informe o nome da consulta.</b>", "erro"); return; }
+    var b = document.getElementById("btnSalvarRes");
+    b.disabled = true; b.textContent = "Salvando…";
+    rpc("resultado_salvar", { p: dados }).then(function(){
+      avisar("Resultado salvo.", "ok");
+      limparRes();
+      return recarregarRes();
+    }).catch(function(e){
+      avisar("<b>Não foi possível salvar.</b> " + e.message, "erro");
+    }).then(function(){
+      b.disabled = false; b.textContent = "Salvar";
+    });
+  }
+
+  function excluirRes(){
+    if (!editandoRes) return;
+    if (!confirm("Excluir este resultado da lista? A ação não pode ser desfeita.\n\nAs páginas em si não são apagadas — só o registro aqui.")) return;
+    rpc("resultado_excluir", { p_id: editandoRes }).then(function(){
+      avisar("Resultado excluído.", "ok");
+      limparRes();
+      return recarregarRes();
+    }).catch(function(e){
+      avisar("<b>Não foi possível excluir.</b> " + e.message, "erro");
     });
   }
 
