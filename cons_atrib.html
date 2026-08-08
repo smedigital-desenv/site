@@ -95,6 +95,8 @@
     .bar-fill.navy{background:var(--navy);}
     .bar-fill.red{background:var(--c-red);}
     .bar-fill.mut{background:#a9bcd6;}
+    .grupo-h{font-size:13.5px;font-weight:800;color:var(--ink);letter-spacing:-.01em;}
+    .grupo-sub{font-size:11.5px;color:var(--muted);margin:2px 0 10px;}
     .nota-bar{font-size:12.5px;color:var(--muted);margin-top:14px;padding-top:13px;border-top:1px dashed var(--line);}
     .bar-row.clic{cursor:pointer;border:none;background:none;font:inherit;color:inherit;text-align:left;width:100%;padding:5px 7px;margin:-5px -7px;border-radius:8px;transition:background .15s;}
     .bar-row.clic:hover{background:#f2f7fe;}
@@ -349,7 +351,7 @@
         </div>
         <div class="card chart">
           <h3>Perguntas dirigidas a grupos específicos</h3>
-          <div class="cap">Blocos exibidos apenas a determinados cargos no formulário</div>
+          <div class="cap">Blocos exibidos apenas a determinados cargos no formulário. Todas as alternativas são clicáveis.</div>
           <div class="bars" id="chEspecificas"></div>
         </div>
       </div>
@@ -811,29 +813,63 @@ function iniciarPagina(){
   })();
 
   function somaObj(o){ var s = 0; for (var k in o) s += o[k]; return s; }
-  var esp = [];
+  /* Cada pergunta vira um grupo com TODAS as alternativas clicáveis — inclusive
+     quem respondeu "Não" e quem declarou não atuar no segmento. */
   (function(){
-    var e = D.perfil.eventuais, be = somaObj(e);
-    esp.push({ lab: "Pretende atribuir aulas eventuais em 2027 (PEB II 19 h/a)", val: e["Sim"] || 0, base: be, cor: "gold",
-      modalTitulo: "Pretendem atribuir aulas eventuais em 2027", modalSub: "PEB II 19 h/a que responderam “Sim”",
-      filtro: function(r){ return r.ev === "Sim"; } });
-    var p = D.perfil.pra, bp = (p["Sim"] || 0) + (p["Não"] || 0);
-    esp.push({ lab: "Quer assumir o P.R.A. da própria turma (atuantes no Fundamental)", val: p["Sim"] || 0, base: bp, cor: "gold",
-      modalTitulo: "Querem assumir o P.R.A. da própria turma", modalSub: "Atuantes no Ensino Fundamental que responderam “Sim”",
-      filtro: function(r){ return r.pra === "Sim"; } });
-    var i = D.perfil.integral, bi = (i["Sim"] || 0) + (i["Não"] || 0);
-    esp.push({ lab: "Quer assumir Práticas de Alimentação/Relaxamento (Ed. Infantil integral)", val: i["Sim"] || 0, base: bi, cor: "gold",
-      modalTitulo: "Querem assumir Práticas de Alimentação/Relaxamento", modalSub: "Atuantes na Ed. Infantil integral que responderam “Sim”",
-      filtro: function(r){ return r.int === "Sim"; } });
-  })();
-  barras("chEspecificas", esp, 1);
-  (function(){
-    var e = D.perfil.eventuais, p = D.perfil.pra, i = D.perfil.integral;
+    var box = document.getElementById("chEspecificas");
+    box.innerHTML = "";
+
+    var PERGUNTAS = [
+      { campo: "ev",  dados: D.perfil.eventuais,
+        titulo: "Pretende atribuir aulas eventuais em 2027",
+        quem:   "PEB II 19 h/a" },
+      { campo: "pra", dados: D.perfil.pra,
+        titulo: "Quer assumir o P.R.A. da própria turma",
+        quem:   "quem atua no Ensino Fundamental" },
+      { campo: "int", dados: D.perfil.integral,
+        titulo: "Quer assumir Práticas de Alimentação/Relaxamento",
+        quem:   "quem atua na Educação Infantil integral" }
+    ];
+    var NAO_ATUA = "Não atuo nesse segmento";
+
+    PERGUNTAS.forEach(function(q, idx){
+      var sim = q.dados["Sim"] || 0,
+          nao = q.dados["Não"] || 0,
+          fora = q.dados[NAO_ATUA] || 0,
+          baseSN = sim + nao,
+          total = baseSN + fora;
+
+      var h = el("div", "grupo-h", q.titulo);
+      if (idx) h.style.marginTop = "22px";
+      box.appendChild(h);
+      box.appendChild(el("div", "grupo-sub",
+        total + (total === 1 ? " resposta" : " respostas") + " · " + q.quem));
+
+      var alvo = el("div", "bars");
+      alvo.id = "chEsp" + q.campo;
+      box.appendChild(alvo);
+
+      var itens = [
+        { lab: "Sim", val: sim, base: baseSN, cor: "green",
+          modalTitulo: q.titulo + " — Sim", modalSub: "Responderam “Sim”",
+          filtro: function(r){ return r[q.campo] === "Sim"; } },
+        { lab: "Não", val: nao, base: baseSN, cor: "red",
+          modalTitulo: q.titulo + " — Não", modalSub: "Responderam “Não”",
+          filtro: function(r){ return r[q.campo] === "Não"; } }
+      ];
+      if (fora){
+        itens.push({ lab: NAO_ATUA, val: fora, base: total, cor: "mut",
+          txt: fora + (fora === 1 ? " pessoa" : " pessoas"),
+          modalTitulo: q.titulo + " — não atuam no segmento", modalSub: "Declararam não atuar",
+          filtro: function(r){ return r[q.campo] === NAO_ATUA; } });
+      }
+      barras(alvo.id, itens, 1);
+    });
+
     var nota = el("p", "tema-hint");
-    nota.textContent = "Bases reduzidas: aulas eventuais — " + somaObj(e) + " respondentes; P.R.A. — " +
-      ((p["Sim"] || 0) + (p["Não"] || 0)) + " que declararam atuar no Ensino Fundamental; Práticas — " +
-      ((i["Sim"] || 0) + (i["Não"] || 0)) + " que declararam atuar na Educação Infantil integral.";
-    document.getElementById("chEspecificas").parentNode.appendChild(nota);
+    nota.textContent = "Os percentuais de “Sim” e “Não” são calculados sobre quem atua no segmento; " +
+      "quem declarou não atuar aparece à parte, com a contagem. Clique em qualquer linha para ver quem respondeu.";
+    box.parentNode.appendChild(nota);
   })();
 
   barras("chVolume", [
