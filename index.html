@@ -220,7 +220,7 @@
     <section class="painel" id="p-abertas" role="tabpanel" aria-labelledby="tab-abertas">
       <div class="sec-h"><span class="sub">Consultas mais recentes da rede — abertas e encerradas.</span></div>
 
-      <div class="consultas">
+      <div class="consultas" id="cardsRecentes" data-fallback>
 
       <a class="consulta blue" href="https://docs.google.com/forms/d/1rtWBo7JcizSzW2JpeTZj6Drqdtu-NsNLV1cdCkoNuJw/viewform" target="_blank" rel="noopener" data-prazo="2026-08-31">
         <span class="c-ico"><svg viewBox="0 0 24 24"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h5"/></svg></span>
@@ -295,7 +295,7 @@
     <section class="painel" id="p-result" role="tabpanel" aria-labelledby="tab-result" hidden>
       <div class="sec-h"><span class="sub">Devolutivas das consultas já encerradas.</span></div>
 
-      <div class="consultas">
+      <div class="consultas" id="cardsResultados" data-fallback>
       <a class="consulta purple" href="divulga_atrib.html">
         <span class="c-ico"><svg viewBox="0 0 24 24"><path d="M4 20V10M10 20V4M16 20v-7M21 20H3"/></svg></span>
         <div class="c-body">
@@ -323,6 +323,8 @@
   Prefeitura de Ribeirão Preto · Transparência e diálogo por uma educação de qualidade.
 </footer>
 
+<script src="config.js"></script>
+<script src="cards.js"></script>
 <script>
   // ---- Acessibilidade: tamanho de fonte e alto contraste ----
   var PASSOS = [87.5, 100, 112.5, 125];
@@ -340,22 +342,17 @@
   aplicarFonte();
   if (localStorage.getItem("alto_contraste") === "1") document.body.classList.add("alto-contraste");
 
-  // ---- Prazo das consultas: encerra sozinho após a data (data-prazo="AAAA-MM-DD") ----
+  // ---- Prazo dos cards fixos (fallback): encerra sozinho após a data ----
   function _fmtBR(ds){ var p = ds.split("-"); return p[2] + "/" + p[1] + "/" + p[0]; }
-  (function(){
+  function aplicarPrazos(){
     var hoje = new Date(); hoje.setHours(0, 0, 0, 0);
     var cards = document.querySelectorAll(".consulta[data-prazo]");
     for (var i = 0; i < cards.length; i++) {
       var card = cards[i];
       var ds = card.getAttribute("data-prazo"), p = ds.split("-");
       var prazo = new Date(+p[0], +p[1] - 1, +p[2]); prazo.setHours(23, 59, 59, 999);
-      var encerrada = hoje.getTime() > prazo.getTime();
       var pz = card.querySelector(".pz");
-      if (!encerrada) {
-        if (pz) pz.textContent = _fmtBR(ds);        // mostra "Até 31/08/2026"
-        continue;
-      }
-      // Após o prazo: vira "Prazo encerrado" + "Em análise" e deixa de linkar.
+      if (hoje.getTime() <= prazo.getTime()) { if (pz) pz.textContent = _fmtBR(ds); continue; }
       card.classList.add("static");
       card.removeAttribute("href"); card.removeAttribute("target"); card.removeAttribute("rel");
       var co = card.querySelector(".chip.open");
@@ -370,14 +367,17 @@
         cta.replaceWith(st);
       }
     }
-  })();
+  }
+  aplicarPrazos();
 
   // Conta automaticamente quantas consultas estão abertas (evita número desatualizado).
-  (function(){
-    var n = document.querySelectorAll(".chip.open").length;
+  function contar(){
     var el = document.getElementById("abertasN");
-    if (el) el.textContent = n;
-  })();
+    if (el) el.textContent = document.querySelectorAll(".chip.open").length;
+    document.getElementById("cAbertas").textContent = document.querySelectorAll("#p-abertas .consulta").length;
+    document.getElementById("cResult").textContent  = document.querySelectorAll("#p-result .consulta").length;
+  }
+  contar();
 
   // ---- Abas: Consultas em aberto / Resultados ----
   function mostrarAba(k){
@@ -388,10 +388,26 @@
     ta.classList.toggle("active", abertas); ta.setAttribute("aria-selected", abertas);
     tr.classList.toggle("active", !abertas); tr.setAttribute("aria-selected", !abertas);
   }
+  if (location.hash === "#resultados") mostrarAba("result");
+
+  // ---- Cards vindos do banco ----
+  // Os cards acima ficam no HTML como fallback: se a API não responder, a home
+  // continua mostrando algo em vez de esvaziar. Ao carregar, eles são
+  // substituídos pelos cadastrados no painel (gerenciar.html).
   (function(){
-    document.getElementById("cAbertas").textContent = document.querySelectorAll("#p-abertas .consulta").length;
-    document.getElementById("cResult").textContent  = document.querySelectorAll("#p-result .consulta").length;
-    if (location.hash === "#resultados") mostrarAba("result");
+    if (!window.CARDS) return;
+    window.CARDS.carregar().then(function(lista){
+      if (!lista.length) return;                       // banco vazio: mantém o fallback
+      var rec = document.getElementById("cardsRecentes"),
+          res = document.getElementById("cardsResultados");
+      rec.innerHTML = lista.filter(function(c){ return c.em_recentes; })
+                           .map(window.CARDS.html).join("");
+      res.innerHTML = lista.filter(function(c){ return c.em_resultados; })
+                           .map(window.CARDS.html).join("");
+      rec.removeAttribute("data-fallback");
+      res.removeAttribute("data-fallback");
+      contar();
+    }).catch(function(){ /* mantém o fallback do HTML */ });
   })();
 </script>
 </body>

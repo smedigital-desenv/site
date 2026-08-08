@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png?v=1">
+  <link rel="icon" href="favicon.ico?v=1">
+  <title>Gerenciar cards da página inicial | Secretaria Municipal de Educação</title>
+  <meta name="robots" content="noindex, nofollow">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700;9..40,800&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --navy:#0f2a52; --navy2:#16305c; --navy3:#0b2246;
+      --gold:#f6b91e; --gold2:#d99b06;
+      --ink:#16233d; --muted:#5b6d8a; --line:#e2eaf4;
+      --surface:#ffffff; --page:#eef3fa;
+      --c-gold:#e8a50a; --c-blue:#1c74d4; --c-green:#2b8a3e; --c-purple:#6741d9; --c-red:#c92a2a;
+    }
+    *{box-sizing:border-box;margin:0;padding:0;}
+    body{font-family:'DM Sans',system-ui,-apple-system,Segoe UI,Roboto,sans-serif;background:var(--page);color:var(--ink);line-height:1.55;-webkit-font-smoothing:antialiased;min-height:100vh;display:flex;flex-direction:column;}
+    img{max-width:100%;display:block;}
+    a{color:inherit;text-decoration:none;}
+    .wrap{max-width:1180px;margin:0 auto;padding:0 22px;width:100%;}
+
+    .gov-top{background:#fff;border-bottom:1px solid #e6e6e6;}
+    .gov-top .wrap{max-width:1240px;display:flex;align-items:center;justify-content:space-between;gap:16px;padding:11px 22px;}
+    .gov-logo{height:52px;width:auto;}
+    .sessao-info{display:flex;align-items:center;gap:9px;font-size:12.5px;color:var(--muted);}
+    .sessao-info button{border:1px solid #cfcfcf;background:#fff;border-radius:6px;padding:4px 11px;font:700 12px 'DM Sans',sans-serif;cursor:pointer;color:#333;}
+    .sessao-info button:hover{background:#f2f2f2;}
+    @media (max-width:640px){ .sessao-info span{display:none;} }
+
+    .topo{background:linear-gradient(125deg,var(--navy2) 0%,var(--navy) 52%,var(--navy3) 100%);color:#fff;padding:30px 0 34px;}
+    .topo .eyebrow{font:800 12px 'DM Sans',sans-serif;letter-spacing:.16em;text-transform:uppercase;color:var(--gold);}
+    .topo h1{font-size:clamp(24px,4vw,34px);font-weight:800;letter-spacing:-.02em;margin-top:8px;}
+    .topo p{color:#c8d7ec;font-size:15px;margin-top:8px;max-width:62ch;}
+    .topo a.voltar{color:#c8d7ec;font-size:13.5px;border-bottom:1px solid rgba(200,215,236,.35);}
+    .topo a.voltar:hover{color:var(--gold);border-color:var(--gold);}
+
+    main{flex:1;padding:26px 0 60px;}
+    .cols{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,420px);gap:20px;align-items:start;}
+    @media (max-width:960px){ .cols{grid-template-columns:1fr;} }
+
+    .card{background:var(--surface);border:1px solid var(--line);border-radius:14px;}
+    .bloco{padding:20px 22px;}
+    .bloco h2{font-size:16.5px;font-weight:800;letter-spacing:-.01em;margin-bottom:3px;}
+    .bloco .sub{font-size:12.5px;color:var(--muted);margin-bottom:16px;}
+
+    /* ---- lista ---- */
+    .item{display:grid;grid-template-columns:auto 1fr auto;gap:12px;align-items:center;
+      border:1px solid var(--line);border-radius:11px;padding:11px 13px;margin-bottom:9px;background:#fff;}
+    .item.oculto{opacity:.5;background:#fafbfd;}
+    .item.sel{border-color:var(--c-blue);box-shadow:0 0 0 3px rgba(28,116,212,.12);}
+    .item .pin{width:36px;height:36px;border-radius:9px;display:flex;align-items:center;justify-content:center;color:#fff;}
+    .item .pin svg{width:19px;height:19px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+    .pin.gold{background:var(--c-gold);} .pin.blue{background:var(--c-blue);}
+    .pin.green{background:var(--c-green);} .pin.purple{background:var(--c-purple);}
+    .item .tit{font-size:14px;font-weight:700;line-height:1.3;}
+    .item .met{font-size:11.5px;color:var(--muted);margin-top:3px;display:flex;gap:6px;flex-wrap:wrap;}
+    .item .met b{font-weight:700;color:#42536e;}
+    .item .acoes{display:flex;gap:5px;}
+    .mini{border:1px solid var(--line);background:#fff;border-radius:7px;width:29px;height:29px;cursor:pointer;
+      font:700 13px 'DM Sans',sans-serif;color:var(--muted);line-height:1;}
+    .mini:hover{background:#f2f7fe;color:var(--ink);border-color:#c3d3e8;}
+    .mini:disabled{opacity:.35;cursor:default;}
+    .mini.perigo:hover{background:#fff5f5;color:var(--c-red);border-color:#ffc9c9;}
+
+    /* ---- formulário ---- */
+    .campo{margin-bottom:14px;}
+    .campo label{display:block;font-size:11.5px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:5px;}
+    .campo input[type=text],.campo input[type=url],.campo input[type=date],.campo select{
+      width:100%;border:1px solid var(--line);border-radius:9px;padding:9px 11px;font:500 14px 'DM Sans',sans-serif;color:var(--ink);background:#fff;}
+    .campo input:focus,.campo select:focus{outline:2px solid rgba(28,116,212,.3);outline-offset:1px;border-color:var(--c-blue);}
+    .campo .dica{font-size:11.5px;color:var(--muted);margin-top:5px;}
+    .dupla{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+    .checks{display:flex;flex-direction:column;gap:8px;}
+    .check{display:flex;align-items:flex-start;gap:8px;font-size:13.5px;cursor:pointer;}
+    .check input{margin-top:3px;flex:none;}
+
+    .cores{display:flex;gap:9px;}
+    .cor{width:38px;height:38px;border-radius:10px;border:2px solid transparent;cursor:pointer;position:relative;}
+    .cor[aria-pressed="true"]{border-color:var(--ink);box-shadow:0 0 0 3px rgba(22,35,61,.12);}
+    .cor.gold{background:var(--c-gold);} .cor.blue{background:var(--c-blue);}
+    .cor.green{background:var(--c-green);} .cor.purple{background:var(--c-purple);}
+
+    .icones{display:grid;grid-template-columns:repeat(auto-fill,minmax(52px,1fr));gap:8px;max-height:190px;overflow-y:auto;
+      border:1px solid var(--line);border-radius:10px;padding:9px;}
+    .ic{aspect-ratio:1;border:1px solid var(--line);border-radius:9px;background:#fff;cursor:pointer;
+      display:flex;align-items:center;justify-content:center;color:var(--muted);}
+    .ic svg{width:21px;height:21px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+    .ic:hover{background:#f2f7fe;color:var(--ink);}
+    .ic[aria-pressed="true"]{background:var(--navy);border-color:var(--navy);color:#fff;}
+
+    .btn{border:1px solid var(--line);background:#fff;border-radius:10px;padding:10px 17px;font:700 14px 'DM Sans',sans-serif;cursor:pointer;color:var(--ink);}
+    .btn:hover{background:#f5f9ff;border-color:#c3d3e8;}
+    .btn.primary{background:var(--navy);border-color:var(--navy);color:#fff;}
+    .btn.primary:hover{background:var(--navy2);}
+    .btn.primary:disabled{opacity:.55;cursor:default;}
+    .btn.perigo{color:var(--c-red);border-color:#ffc9c9;}
+    .btn.perigo:hover{background:#fff5f5;}
+    .acoes-form{display:flex;gap:9px;flex-wrap:wrap;margin-top:6px;}
+
+    .aviso{border-radius:10px;padding:11px 14px;font-size:13.5px;margin-bottom:14px;}
+    .aviso.ok{background:#e9f7ee;border:1px solid #c6e6ce;color:#1e6b30;}
+    .aviso.erro{background:#fff5f5;border:1px solid #ffc9c9;color:#a51111;}
+    .aviso.info{background:#f2f7fe;border:1px solid #cfe0f7;color:#2c4a6e;}
+
+    /* ---- prévia (mesmo CSS dos cards da home) ---- */
+    .previa{background:var(--page);border-radius:12px;padding:16px;border:1px dashed var(--line);}
+    .consulta{position:relative;display:flex;align-items:center;gap:16px;background:#fff;border:1px solid var(--line);
+      border-radius:18px;padding:18px 20px 18px 22px;overflow:hidden;}
+    .consulta::before{content:"";position:absolute;left:0;top:0;bottom:0;width:5px;background:var(--cc,#ccc);}
+    .c-ico{width:48px;height:48px;border-radius:13px;flex:none;display:flex;align-items:center;justify-content:center;color:#fff;background:var(--cc);}
+    .c-ico svg{width:23px;height:23px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+    .c-body{flex:1;min-width:0;}
+    .c-tag{font:800 10.5px 'DM Sans',sans-serif;letter-spacing:.09em;text-transform:uppercase;color:var(--cc);}
+    .c-body h3{margin:5px 0 0;font-size:15.5px;font-weight:700;color:var(--navy);line-height:1.32;}
+    .c-chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px;}
+    .chip{display:inline-flex;align-items:center;gap:6px;font:600 11.5px 'DM Sans',sans-serif;color:var(--muted);
+      background:#f1f5fa;border:1px solid #e3ebf5;border-radius:999px;padding:3px 10px;}
+    .chip svg{width:12px;height:12px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+    .chip.open{color:#1e7a34;background:#e7f4ea;border-color:#c6e6ce;}
+    .chip.open .d{width:7px;height:7px;border-radius:50%;background:#2fb455;}
+    .chip.done{color:#5a48b5;background:#efeaff;border-color:#ddd4f6;}
+    .chip.done .d{width:7px;height:7px;border-radius:50%;background:#6741d9;}
+    .chip.closed{color:#8a6400;background:#fff5db;border-color:#ffe3a3;}
+    .chip.closed .d{width:7px;height:7px;border-radius:50%;background:#e8a50a;}
+    .c-cta{flex:none;display:inline-flex;align-items:center;gap:8px;background:var(--navy);color:#fff;border-radius:11px;
+      padding:11px 17px;font:700 13.5px 'DM Sans',sans-serif;}
+    .c-cta.destaque{background:var(--gold);color:var(--navy);}
+    .c-cta svg{width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round;}
+    .c-status{flex:none;display:inline-flex;align-items:center;gap:7px;color:var(--muted);font:700 13px 'DM Sans',sans-serif;}
+    .c-status svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+    .consulta.gold{--cc:var(--c-gold);} .consulta.blue{--cc:var(--c-blue);}
+    .consulta.green{--cc:var(--c-green);} .consulta.purple{--cc:var(--c-purple);}
+    @media (max-width:560px){ .consulta{flex-wrap:wrap;} }
+
+    /* ---- portão ---- */
+    #portao{position:fixed;inset:0;z-index:300;background:linear-gradient(125deg,var(--navy2) 0%,var(--navy) 52%,var(--navy3) 100%);
+      display:flex;align-items:center;justify-content:center;padding:22px;color:#fff;}
+    #portao[hidden]{display:none;}
+    .portao-cx{background:var(--surface);color:var(--ink);border-radius:16px;max-width:430px;width:100%;padding:32px 30px;text-align:center;
+      box-shadow:0 26px 60px -20px rgba(11,34,70,.5);}
+    .portao-cx img{height:56px;width:auto;margin:0 auto 18px;}
+    .portao-cx h2{font-size:19px;font-weight:800;margin-bottom:8px;}
+    .portao-cx p{font-size:14px;color:var(--muted);margin-bottom:20px;}
+    .portao-cx .btn-google{width:100%;background:var(--navy);color:#fff;border:none;border-radius:11px;padding:13px 20px;
+      font:700 14.5px 'DM Sans',sans-serif;cursor:pointer;}
+    .portao-cx .btn-google:hover{background:var(--navy2);}
+    .portao-cx .btn-sec{margin-top:11px;background:none;border:1px solid var(--line);color:var(--muted);border-radius:11px;
+      padding:10px 20px;width:100%;font:600 13.5px 'DM Sans',sans-serif;cursor:pointer;}
+    .portao-erro{background:#fff5f5;border:1px solid #ffc9c9;color:#a51111;border-radius:10px;padding:12px 14px;
+      font-size:13.5px;margin-bottom:18px;text-align:left;}
+    .portao-erro b{display:block;margin-bottom:3px;}
+    .portao-carregando{color:#c8d7ec;font:600 14px 'DM Sans',sans-serif;}
+
+    footer{background:var(--navy3);color:#93a9c9;text-align:center;padding:22px;font-size:13px;}
+  </style>
+</head>
+<body>
+
+<div id="portao">
+  <div class="portao-carregando" id="portaoCarregando">Verificando acesso…</div>
+  <div class="portao-cx" id="portaoCx" hidden>
+    <img src="pmrp.png" alt="Prefeitura da Cidade de Ribeirão Preto">
+    <div id="portaoMsg"></div>
+    <h2>Acesso restrito</h2>
+    <p>Painel de gerenciamento dos cards da página inicial. Liberado apenas para e-mails autorizados.</p>
+    <button type="button" class="btn-google" id="portaoLogin">Entrar com conta Google</button>
+    <button type="button" class="btn-sec" id="portaoSair" hidden>Sair e usar outra conta</button>
+  </div>
+</div>
+
+<header class="gov-top">
+  <div class="wrap">
+    <img class="gov-logo" src="pmrp.png" alt="Prefeitura da Cidade de Ribeirão Preto">
+    <div class="sessao-info" id="sessaoInfo"></div>
+  </div>
+</header>
+
+<section class="topo">
+  <div class="wrap">
+    <a class="voltar" href="index.html">← Ver a página inicial</a>
+    <div class="eyebrow" style="margin-top:14px;">Secretaria Municipal de Educação</div>
+    <h1>Gerenciar cards da página inicial</h1>
+    <p>Cadastre, edite, reordene e oculte os cards exibidos na home. As alterações entram no ar assim que você salva — não é preciso publicar nada.</p>
+  </div>
+</section>
+
+<main>
+  <div class="wrap">
+    <div id="avisos"></div>
+    <div class="cols">
+
+      <div class="card bloco">
+        <h2>Cards cadastrados</h2>
+        <div class="sub">A ordem aqui é a ordem na home. Use ▲ ▼ para reordenar e clique no card para editar.</div>
+        <div id="lista"></div>
+        <button type="button" class="btn primary" id="btnNovo" style="margin-top:6px;">+ Novo card</button>
+      </div>
+
+      <div class="card bloco">
+        <h2 id="tituloForm">Novo card</h2>
+        <div class="sub">A prévia abaixo mostra exatamente como ele aparecerá.</div>
+
+        <div class="previa" id="previa"></div>
+
+        <div style="margin-top:18px;">
+          <div class="campo">
+            <label for="fTitulo">Título *</label>
+            <input type="text" id="fTitulo" maxlength="160" placeholder="Ex.: Consulta sobre o calendário escolar 2027">
+          </div>
+
+          <div class="dupla">
+            <div class="campo">
+              <label for="fCategoria">Categoria</label>
+              <input type="text" id="fCategoria" maxlength="60" placeholder="Ex.: Vida funcional">
+            </div>
+            <div class="campo">
+              <label for="fPublico">Público-alvo</label>
+              <input type="text" id="fPublico" maxlength="60" placeholder="Ex.: Profissionais da educação">
+            </div>
+          </div>
+
+          <div class="campo">
+            <label>Cor</label>
+            <div class="cores" id="fCores"></div>
+          </div>
+
+          <div class="campo">
+            <label>Ícone</label>
+            <div class="icones" id="fIcones"></div>
+          </div>
+
+          <div class="campo">
+            <label for="fHref">Link</label>
+            <input type="text" id="fHref" placeholder="https://… ou divulga_atrib.html">
+            <div class="dica">Deixe vazio para um card informativo, sem botão e sem link.</div>
+          </div>
+
+          <div class="dupla">
+            <div class="campo">
+              <label for="fCta">Texto do botão</label>
+              <input type="text" id="fCta" maxlength="30" placeholder="Responder">
+            </div>
+            <div class="campo">
+              <label for="fPrazo">Prazo</label>
+              <input type="date" id="fPrazo">
+            </div>
+          </div>
+          <div class="campo" style="margin-top:-6px;">
+            <div class="dica">Passado o prazo, o card se encerra sozinho: vira “Encerrou em…”, perde o link e mostra “Em análise”.</div>
+          </div>
+
+          <div class="campo">
+            <label for="fEstado">Selo de situação</label>
+            <select id="fEstado"></select>
+          </div>
+
+          <div class="campo">
+            <label>Opções</label>
+            <div class="checks">
+              <label class="check"><input type="checkbox" id="fRecentes" checked> Exibir na aba <b>&nbsp;Recentes</b></label>
+              <label class="check"><input type="checkbox" id="fResultados"> Exibir na aba <b>&nbsp;Resultados</b></label>
+              <label class="check"><input type="checkbox" id="fNovaAba" checked> Abrir o link em nova aba</label>
+              <label class="check"><input type="checkbox" id="fDestaque"> Botão em destaque (dourado)</label>
+              <label class="check"><input type="checkbox" id="fVisivel" checked> Visível na home</label>
+            </div>
+          </div>
+
+          <div class="acoes-form">
+            <button type="button" class="btn primary" id="btnSalvar">Salvar</button>
+            <button type="button" class="btn" id="btnCancelar">Cancelar</button>
+            <button type="button" class="btn perigo" id="btnExcluir" hidden>Excluir</button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</main>
+
+<footer>Secretaria Municipal de Educação · Prefeitura de Ribeirão Preto</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="config.js"></script>
+<script src="cards.js"></script>
+<script>
+(function(){
+  "use strict";
+
+  var portao = document.getElementById("portao"),
+      carreg = document.getElementById("portaoCarregando"),
+      caixa  = document.getElementById("portaoCx"),
+      msg    = document.getElementById("portaoMsg"),
+      btnLogin = document.getElementById("portaoLogin"),
+      btnSair  = document.getElementById("portaoSair");
+  var cliente = null, token = null, emailAtual = "";
+
+  function mostrarCaixa(html, comSair){
+    carreg.hidden = true; caixa.hidden = false;
+    msg.innerHTML = html || "";
+    btnSair.hidden = !comSair;
+  }
+
+  /* ================= ACESSO ================= */
+  if (!window.supabase || !window.supabase.createClient){
+    mostrarCaixa('<div class="portao-erro"><b>Autenticação indisponível.</b>Não foi possível carregar o serviço de login.</div>', false);
+    btnLogin.hidden = true;
+  } else {
+    // Mesma storageKey da cons_atrib: quem entrou lá já entra aqui.
+    cliente = window.supabase.createClient(SUPA_PROJECT_URL, SUPA_KEY, {
+      auth: { persistSession:true, autoRefreshToken:true, detectSessionInUrl:true,
+              flowType:"pkce", storage:window.localStorage, storageKey:"consulta-auth" }
+    });
+
+    btnLogin.addEventListener("click", function(){
+      btnLogin.disabled = true; btnLogin.textContent = "Redirecionando…";
+      cliente.auth.signInWithOAuth({ provider:"google", options:{
+        redirectTo: location.origin + location.pathname,
+        queryParams:{ prompt:"select_account" } } });
+    });
+    btnSair.addEventListener("click", sair);
+
+    cliente.auth.getSession().then(function(res){
+      var s = res && res.data ? res.data.session : null;
+      if (!s || !s.user || !s.user.email){ mostrarCaixa("", false); return; }
+      token = s.access_token; emailAtual = s.user.email.toLowerCase();
+      return rpc("tem_acesso_consulta", {}).then(function(ok){
+        if (ok !== true){
+          mostrarCaixa('<div class="portao-erro"><b>Conta sem autorização.</b>O e-mail <b>' +
+            emailAtual + "</b> não está na lista de acesso.</div>", true);
+          btnLogin.textContent = "Entrar com outra conta";
+          return;
+        }
+        identificar();
+        portao.hidden = true;
+        iniciar();
+      });
+    }).catch(function(){
+      mostrarCaixa('<div class="portao-erro"><b>Não foi possível verificar o acesso.</b>' +
+        "Recarregue a página e tente novamente.</div>", true);
+    });
+  }
+
+  function sair(){
+    cliente.auth.signOut().catch(function(){}).then(function(){ location.reload(); });
+  }
+  function identificar(){
+    var cx = document.getElementById("sessaoInfo");
+    cx.innerHTML = "";
+    var q = document.createElement("span"); q.textContent = emailAtual;
+    var b = document.createElement("button"); b.type = "button"; b.textContent = "Sair";
+    b.addEventListener("click", sair);
+    cx.appendChild(q); cx.appendChild(b);
+  }
+
+  /** Chama uma função RPC. Rejeita com a mensagem do banco, se houver. */
+  function rpc(nome, corpo){
+    return fetch(SUPA_URL + "/rpc/" + nome, {
+      method: "POST",
+      headers: { "apikey": SUPA_KEY, "Authorization": "Bearer " + (token || SUPA_KEY),
+                 "Content-Type": "application/json" },
+      body: JSON.stringify(corpo || {})
+    }).then(function(r){
+      return r.text().then(function(t){
+        var d = null;
+        try { d = t ? JSON.parse(t) : null; } catch(e){ d = t; }
+        if (!r.ok) throw new Error((d && d.message) ? d.message : "http " + r.status);
+        return d;
+      });
+    });
+  }
+
+  /* ================= PAINEL ================= */
+  var C = window.CARDS, cards = [], editandoId = null;
+
+  function avisar(texto, tipo){
+    var cx = document.getElementById("avisos");
+    cx.innerHTML = '<div class="aviso ' + (tipo || "info") + '">' + texto + "</div>";
+    if (tipo === "ok") setTimeout(function(){ if (cx.firstChild) cx.innerHTML = ""; }, 4000);
+  }
+
+  function iniciar(){
+    montarCores(); montarIcones(); montarEstados();
+    ["fTitulo","fCategoria","fPublico","fHref","fCta","fPrazo"].forEach(function(id){
+      document.getElementById(id).addEventListener("input", previa);
+    });
+    ["fEstado","fRecentes","fResultados","fNovaAba","fDestaque","fVisivel"].forEach(function(id){
+      document.getElementById(id).addEventListener("change", previa);
+    });
+    document.getElementById("btnNovo").addEventListener("click", function(){ limpar(); });
+    document.getElementById("btnCancelar").addEventListener("click", function(){ limpar(); });
+    document.getElementById("btnSalvar").addEventListener("click", salvar);
+    document.getElementById("btnExcluir").addEventListener("click", excluir);
+    limpar();
+    recarregar();
+  }
+
+  function recarregar(){
+    return rpc("cards_listar", {}).then(function(d){
+      cards = Array.isArray(d) ? d : [];
+      lista();
+    }).catch(function(e){
+      avisar("<b>Não foi possível carregar os cards.</b> " + e.message +
+             " — confirme se o <b>db/cards.sql</b> já foi executado no Supabase.", "erro");
+    });
+  }
+
+  function lista(){
+    var cx = document.getElementById("lista");
+    cx.innerHTML = "";
+    if (!cards.length){
+      cx.innerHTML = '<div class="aviso info">Nenhum card cadastrado ainda.</div>';
+      return;
+    }
+    cards.forEach(function(c, i){
+      var el = document.createElement("div");
+      el.className = "item" + (c.visivel ? "" : " oculto") + (c.id === editandoId ? " sel" : "");
+
+      var pin = document.createElement("div");
+      pin.className = "pin " + c.cor;
+      pin.innerHTML = C.svgIcone(c.icone);
+
+      var meio = document.createElement("div");
+      var abas = [];
+      if (c.em_recentes) abas.push("Recentes");
+      if (c.em_resultados) abas.push("Resultados");
+      var met = [];
+      met.push("<b>" + (abas.join(" + ") || "nenhuma aba") + "</b>");
+      if (c.prazo) met.push((C.prazoVencido(c.prazo) ? "encerrou " : "até ") + C.fmtBR(c.prazo));
+      if (!c.visivel) met.push("<b>oculto</b>");
+      if (!c.href) met.push("sem link");
+      meio.innerHTML = '<div class="tit"></div><div class="met">' +
+                       met.map(function(m){ return "<span>" + m + "</span>"; }).join("") + "</div>";
+      meio.querySelector(".tit").textContent = c.titulo;
+      meio.style.cursor = "pointer";
+      meio.addEventListener("click", function(){ editar(c.id); });
+
+      var acoes = document.createElement("div");
+      acoes.className = "acoes";
+      acoes.appendChild(botao("▲", "Subir", i === 0, function(){ mover(i, -1); }));
+      acoes.appendChild(botao("▼", "Descer", i === cards.length - 1, function(){ mover(i, 1); }));
+      acoes.appendChild(botao(c.visivel ? "◉" : "○", c.visivel ? "Ocultar" : "Mostrar", false, function(){
+        c.visivel = !c.visivel;
+        gravar(paraJson(c)).then(recarregar);
+      }));
+
+      el.appendChild(pin); el.appendChild(meio); el.appendChild(acoes);
+      cx.appendChild(el);
+    });
+  }
+
+  function botao(txt, titulo, desab, fn){
+    var b = document.createElement("button");
+    b.type = "button"; b.className = "mini"; b.textContent = txt;
+    b.title = titulo; b.disabled = !!desab;
+    b.addEventListener("click", fn);
+    return b;
+  }
+
+  function mover(i, d){
+    var j = i + d;
+    if (j < 0 || j >= cards.length) return;
+    var tmp = cards[i]; cards[i] = cards[j]; cards[j] = tmp;
+    lista();
+    rpc("cards_reordenar", { p_ids: cards.map(function(c){ return String(c.id); }) })
+      .then(function(){ avisar("Ordem atualizada.", "ok"); })
+      .catch(function(e){ avisar("<b>Falha ao reordenar.</b> " + e.message, "erro"); recarregar(); });
+  }
+
+  /* ---- formulário ---- */
+  var corSel = "blue", iconeSel = "documento";
+
+  function montarCores(){
+    var cx = document.getElementById("fCores");
+    cx.innerHTML = "";
+    C.CORES.forEach(function(c){
+      var b = document.createElement("button");
+      b.type = "button"; b.className = "cor " + c.chave; b.title = c.rotulo;
+      b.setAttribute("aria-pressed", c.chave === corSel);
+      b.addEventListener("click", function(){
+        corSel = c.chave;
+        Array.prototype.forEach.call(cx.children, function(o){ o.setAttribute("aria-pressed", "false"); });
+        b.setAttribute("aria-pressed", "true");
+        previa();
+      });
+      cx.appendChild(b);
+    });
+  }
+
+  function montarIcones(){
+    var cx = document.getElementById("fIcones");
+    cx.innerHTML = "";
+    Object.keys(C.ICONES).forEach(function(k){
+      var b = document.createElement("button");
+      b.type = "button"; b.className = "ic"; b.title = C.ICONES[k].rotulo;
+      b.innerHTML = C.svgIcone(k);
+      b.setAttribute("aria-pressed", k === iconeSel);
+      b.addEventListener("click", function(){
+        iconeSel = k;
+        Array.prototype.forEach.call(cx.children, function(o){ o.setAttribute("aria-pressed", "false"); });
+        b.setAttribute("aria-pressed", "true");
+        previa();
+      });
+      cx.appendChild(b);
+    });
+  }
+
+  function montarEstados(){
+    var s = document.getElementById("fEstado");
+    s.innerHTML = "";
+    C.ESTADOS_LISTA.forEach(function(e){ s.appendChild(new Option(e.rotulo, e.chave)); });
+  }
+
+  function doForm(){
+    return {
+      id: editandoId,
+      titulo:        document.getElementById("fTitulo").value.trim(),
+      categoria:     document.getElementById("fCategoria").value.trim(),
+      publico:       document.getElementById("fPublico").value.trim(),
+      cor:           corSel,
+      icone:         iconeSel,
+      href:          document.getElementById("fHref").value.trim(),
+      cta:           document.getElementById("fCta").value.trim(),
+      prazo:         document.getElementById("fPrazo").value,
+      estado:        document.getElementById("fEstado").value,
+      em_recentes:   document.getElementById("fRecentes").checked,
+      em_resultados: document.getElementById("fResultados").checked,
+      nova_aba:      document.getElementById("fNovaAba").checked,
+      destaque:      document.getElementById("fDestaque").checked,
+      visivel:       document.getElementById("fVisivel").checked
+    };
+  }
+
+  function paraJson(c){
+    return {
+      id: c.id, titulo: c.titulo, categoria: c.categoria || "", publico: c.publico || "",
+      cor: c.cor, icone: c.icone, href: c.href || "", cta: c.cta || "",
+      prazo: c.prazo ? String(c.prazo).slice(0, 10) : "", estado: c.estado,
+      em_recentes: !!c.em_recentes, em_resultados: !!c.em_resultados,
+      nova_aba: !!c.nova_aba, destaque: !!c.destaque, visivel: !!c.visivel
+    };
+  }
+
+  function previa(){
+    var c = doForm();
+    if (!c.titulo) c.titulo = "Título do card";
+    document.getElementById("previa").innerHTML = C.html(c);
+  }
+
+  function limpar(){
+    editandoId = null;
+    document.getElementById("tituloForm").textContent = "Novo card";
+    ["fTitulo","fCategoria","fPublico","fHref","fCta","fPrazo"].forEach(function(id){
+      document.getElementById(id).value = "";
+    });
+    document.getElementById("fEstado").value = "aberta";
+    document.getElementById("fRecentes").checked = true;
+    document.getElementById("fResultados").checked = false;
+    document.getElementById("fNovaAba").checked = true;
+    document.getElementById("fDestaque").checked = false;
+    document.getElementById("fVisivel").checked = true;
+    corSel = "blue"; iconeSel = "documento";
+    montarCores(); montarIcones();
+    document.getElementById("btnExcluir").hidden = true;
+    previa(); lista();
+  }
+
+  function editar(id){
+    var c = cards.filter(function(x){ return x.id === id; })[0];
+    if (!c) return;
+    editandoId = id;
+    document.getElementById("tituloForm").textContent = "Editando card";
+    document.getElementById("fTitulo").value    = c.titulo || "";
+    document.getElementById("fCategoria").value = c.categoria || "";
+    document.getElementById("fPublico").value   = c.publico || "";
+    document.getElementById("fHref").value      = c.href || "";
+    document.getElementById("fCta").value       = c.cta || "";
+    document.getElementById("fPrazo").value     = c.prazo ? String(c.prazo).slice(0, 10) : "";
+    document.getElementById("fEstado").value    = c.estado || "aberta";
+    document.getElementById("fRecentes").checked   = !!c.em_recentes;
+    document.getElementById("fResultados").checked = !!c.em_resultados;
+    document.getElementById("fNovaAba").checked    = !!c.nova_aba;
+    document.getElementById("fDestaque").checked   = !!c.destaque;
+    document.getElementById("fVisivel").checked    = !!c.visivel;
+    corSel = c.cor || "blue"; iconeSel = c.icone || "documento";
+    montarCores(); montarIcones();
+    document.getElementById("btnExcluir").hidden = false;
+    previa(); lista();
+    document.getElementById("tituloForm").scrollIntoView({ behavior: "smooth", block: "nearest" });
+  }
+
+  function gravar(dados){
+    return rpc("card_salvar", { p: dados });
+  }
+
+  function salvar(){
+    var c = doForm();
+    if (!c.titulo){ avisar("<b>Informe o título.</b> É o único campo obrigatório.", "erro"); return; }
+    var b = document.getElementById("btnSalvar");
+    b.disabled = true; b.textContent = "Salvando…";
+    gravar(c).then(function(){
+      avisar("Card salvo. A home já está atualizada.", "ok");
+      limpar();
+      return recarregar();
+    }).catch(function(e){
+      avisar("<b>Não foi possível salvar.</b> " + e.message, "erro");
+    }).then(function(){
+      b.disabled = false; b.textContent = "Salvar";
+    });
+  }
+
+  function excluir(){
+    if (!editandoId) return;
+    if (!confirm("Excluir este card? A ação não pode ser desfeita.\n\nSe a ideia for apenas tirá-lo do ar, desmarque “Visível na home” e salve.")) return;
+    rpc("card_excluir", { p_id: editandoId }).then(function(){
+      avisar("Card excluído.", "ok");
+      limpar();
+      return recarregar();
+    }).catch(function(e){
+      avisar("<b>Não foi possível excluir.</b> " + e.message, "erro");
+    });
+  }
+})();
+</script>
+
+</body>
+</html>
