@@ -393,13 +393,14 @@
   var bEv = somaObj(ev), bPr = (pr["Sim"] || 0) + (pr["Não"] || 0), bIg = (ig["Sim"] || 0) + (ig["Não"] || 0);
   barras("chEspecificas", [
     { lab: "Pretende atribuir aulas eventuais em 2027 (PEB II 19 h/a)", val: ev["Sim"] || 0, base: bEv, cor: "gold" },
-    { lab: "Quer assumir o P.R.A. da própria turma (Ensino Fundamental)", val: pr["Sim"] || 0, base: bPr, cor: "gold" },
-    { lab: "Quer assumir Práticas de Alimentação/Relaxamento (Ed. Infantil integral)", val: ig["Sim"] || 0, base: bIg, cor: "gold" }
+    { lab: "Quer assumir o P.R.A. da própria turma (PEB II 19 h/a no Fundamental)", val: pr["Sim"] || 0, base: bPr, cor: "gold" },
+    { lab: "Quer assumir Práticas de Alimentação/Relaxamento (PEB II 19 h/a na EI integral)", val: ig["Sim"] || 0, base: bIg, cor: "gold" }
   ], 1);
   document.getElementById("notaEspecificas").textContent =
     "Bases reduzidas: aulas eventuais — " + bEv + " respondentes; P.R.A. — " + bPr +
     " que declararam atuar no Ensino Fundamental; Práticas — " + bIg +
-    " que declararam atuar na Educação Infantil integral.";
+    " que declararam atuar na Educação Infantil integral. As três perguntas foram " +
+    "exibidas apenas aos professores PEB II com 19 h/a.";
 
   barras("chVolume", [
     { lab: "Remoção — preenchidas", val: META.preenchidas.rem, base: META.total, cor: "mut" },
