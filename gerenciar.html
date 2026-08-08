@@ -88,6 +88,18 @@
     .item .met{font-size:11.5px;color:var(--muted);margin-top:3px;display:flex;gap:6px;flex-wrap:wrap;}
     .item .met b{font-weight:700;color:#42536e;}
     .item .acoes{display:flex;gap:5px;}
+    .item.res{grid-template-columns:auto 1fr auto;}
+    .item .abrir{grid-column:1/-1;display:flex;gap:8px;flex-wrap:wrap;margin-top:11px;padding-top:11px;
+      border-top:1px dashed var(--line);}
+    .abrir a,.abrir button{display:inline-flex;align-items:center;gap:7px;border:1px solid var(--line);background:#fff;
+      border-radius:9px;padding:8px 13px;font:700 12.5px 'DM Sans',sans-serif;color:var(--ink);cursor:pointer;}
+    .abrir a:hover,.abrir button:hover{background:#f2f7fe;border-color:#c3d3e8;}
+    .abrir .restrito{background:var(--navy);border-color:var(--navy);color:#fff;}
+    .abrir .restrito:hover{background:var(--navy2);}
+    .abrir .criar{border-style:dashed;color:var(--muted);}
+    .abrir .criar:hover{color:var(--navy);border-color:var(--navy);}
+    .abrir svg{width:13px;height:13px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;}
+    .abrir .vazio{color:#9aa7b8;font:600 12.5px 'DM Sans',sans-serif;padding:8px 0;}
     .mini{border:1px solid var(--line);background:#fff;border-radius:7px;width:29px;height:29px;cursor:pointer;
       font:700 13px 'DM Sans',sans-serif;color:var(--muted);line-height:1;}
     .mini:hover{background:#f2f7fe;color:var(--ink);border-color:#c3d3e8;}
@@ -766,20 +778,67 @@
       acoes.className = "acoes";
       acoes.appendChild(botao("▲", "Subir", i === 0, function(){ moverRes(i, -1); }));
       acoes.appendChild(botao("▼", "Descer", i === resultados.length - 1, function(){ moverRes(i, 1); }));
-      if (r.url_publico)  acoes.appendChild(abrir(r.url_publico, "Abrir o resumo público"));
-      if (r.url_completo) acoes.appendChild(abrir(r.url_completo, "Abrir os resultados completos"));
 
-      el.appendChild(pin); el.appendChild(meio); el.appendChild(acoes);
+      // Linha de acesso: é por aqui que se abre a página de resultados.
+      var abrirCx = document.createElement("div");
+      abrirCx.className = "abrir";
+      if (r.url_publico)  abrirCx.appendChild(linkPara(r.url_publico, "Ver resumo público", ""));
+      if (r.url_completo) abrirCx.appendChild(linkPara(r.url_completo, "Ver resultados completos", "restrito"));
+      if (!r.url_publico && !r.url_completo){
+        var v = document.createElement("span");
+        v.className = "vazio";
+        v.textContent = "Nenhum endereço cadastrado ainda.";
+        abrirCx.appendChild(v);
+      }
+      var criar = document.createElement("button");
+      criar.type = "button"; criar.className = "criar";
+      criar.title = "Abre a aba de cards com os campos já preenchidos";
+      criar.innerHTML = SETA_MAIS + "Criar card na home";
+      criar.addEventListener("click", function(){ cardDoResultado(r); });
+      abrirCx.appendChild(criar);
+
+      el.className += " res";
+      el.appendChild(pin); el.appendChild(meio); el.appendChild(acoes); el.appendChild(abrirCx);
       cx.appendChild(el);
     });
   }
 
-  function abrir(url, titulo){
+  var SETA_EXT = '<svg viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><path d="M15 3h6v6M10 14L21 3"/></svg>';
+  var SETA_MAIS = '<svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>';
+
+  function linkPara(url, texto, classe){
     var a = document.createElement("a");
-    a.className = "mini"; a.href = url; a.target = "_blank"; a.rel = "noopener";
-    a.title = titulo; a.textContent = "↗";
-    a.style.display = "inline-flex"; a.style.alignItems = "center"; a.style.justifyContent = "center";
+    a.href = url; a.target = "_blank"; a.rel = "noopener";
+    if (classe) a.className = classe;
+    a.innerHTML = SETA_EXT + "<span></span>";
+    a.querySelector("span").textContent = texto;
     return a;
+  }
+
+  /** Leva o resultado para a aba de cards com o formulário já preenchido. */
+  function cardDoResultado(r){
+    mostrarAba("cards");
+    limpar();
+    document.getElementById("fTitulo").value    = r.titulo + " — devolutivas";
+    document.getElementById("fCategoria").value = "Resultados";
+    document.getElementById("fPublico").value   = "Profissionais da educação";
+    document.getElementById("fHref").value      = r.url_publico || "";
+    document.getElementById("fCta").value       = "Ver resultados";
+    document.getElementById("fEstado").value    = "resultado";
+    document.getElementById("fResultados").checked = true;
+    document.getElementById("fRecentes").checked   = true;
+    document.getElementById("fDestaque").checked   = true;
+    document.getElementById("fNovaAba").checked    = false;
+    corSel = "purple"; iconeSel = "grafico";
+    montarCores(); montarIcones();
+    previa();
+    if (!r.url_publico){
+      avisar("Card preenchido, mas <b>sem link</b>: este resultado ainda não tem resumo público. " +
+             "Cadastre o endereço antes de salvar — nunca use o link restrito na home.", "erro");
+    } else {
+      avisar("Card preenchido a partir do resultado. Revise e clique em <b>Salvar</b>.", "ok");
+    }
+    document.getElementById("tituloForm").scrollIntoView({ behavior: "smooth", block: "center" });
   }
 
   function moverRes(i, d){
