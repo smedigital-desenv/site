@@ -45,6 +45,7 @@
     aberta:    { rotulo: "Aberta",              classe: "open" },
     resultado: { rotulo: "Resultado publicado", classe: "done" },
     encerrada: { rotulo: "Prazo encerrado",     classe: "" },
+    breve:     { rotulo: "Em breve",            classe: "soon" },
     nenhum:    { rotulo: "",                    classe: "" }
   };
 
@@ -52,6 +53,7 @@
     { chave: "aberta",    rotulo: "Aberta" },
     { chave: "resultado", rotulo: "Resultado publicado" },
     { chave: "encerrada", rotulo: "Prazo encerrado" },
+    { chave: "breve",     rotulo: "Em breve" },
     { chave: "nenhum",    rotulo: "Sem selo" }
   ];
 
@@ -88,12 +90,14 @@
   function html(card) {
     var vencido  = prazoVencido(card.prazo);
     var encerrado = vencido || card.estado === "encerrada";
-    var clicavel = !!card.href && !encerrado;
+    var clicavel = !!card.href && !encerrado && card.estado !== "breve";
 
     var chips = "";
     if (card.publico) chips += '<span class="chip">' + esc(card.publico) + "</span>";
 
-    if (card.estado === "resultado") {
+    if (card.estado === "breve") {
+      chips += '<span class="chip soon"><span class="d"></span>Em breve</span>';
+    } else if (card.estado === "resultado") {
       chips += '<span class="chip done"><span class="d"></span>Resultado publicado</span>';
     } else if (encerrado) {
       chips += '<span class="chip closed"><span class="d"></span>' +
@@ -109,7 +113,10 @@
     }
 
     var rodape = "";
-    if (encerrado && card.estado !== "resultado") {
+    if (card.estado === "breve") {
+      rodape = '<span class="c-status soon">' + svgIcone("relogio") +
+               esc(card.cta || "Aguarde a abertura") + "</span>";
+    } else if (encerrado && card.estado !== "resultado") {
       rodape = '<span class="c-status">' + svgIcone("relogio") + "Em análise</span>";
     } else if (clicavel) {
       rodape = '<span class="c-cta' + (card.destaque ? " destaque" : "") + '">' +
