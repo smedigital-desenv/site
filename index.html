@@ -86,8 +86,11 @@
     .chip.prazo{color:#9a6a00;background:#fff7e6;border-color:#f0d79a;}
     .chip.prazo svg{width:13px;height:13px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
     .chip.prazo b{font-weight:800;}
+    .chip.soon{color:#1c5bb0;background:#e7effb;border-color:#c3d7f2;}
+    .chip.soon .d{width:7px;height:7px;border-radius:50%;background:#1c74d4;}
     .c-status{flex:none;display:inline-flex;align-items:center;gap:8px;background:#fff4e0;color:#9a6a00;border:1px solid #f3cf7a;border-radius:11px;padding:11px 18px;font:700 13.5px 'DM Sans',sans-serif;}
     .c-status svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;}
+    .c-status.soon{background:#e7effb;color:#1c5bb0;border-color:#c3d7f2;}
     .consulta.static{cursor:default;}
     .consulta.static:hover{transform:none;box-shadow:none;border-color:var(--line);}
     .c-cta{flex:none;display:inline-flex;align-items:center;gap:8px;background:var(--navy);color:#fff;
@@ -102,6 +105,7 @@
     .consulta.blue{--cc:var(--c-blue);--ccs:rgba(28,116,212,.5);}
     .consulta.green{--cc:var(--c-green);--ccs:rgba(43,138,62,.5);}
     .consulta.purple{--cc:var(--c-purple);--ccs:rgba(103,65,217,.5);}
+    .consulta.indigo{--cc:#4263eb;--ccs:rgba(66,99,235,.5);}
 
     /* ---- ABAS ---- */
     .tabs{display:flex;gap:6px;margin-bottom:24px;border-bottom:2px solid var(--line);flex-wrap:wrap;}
@@ -245,6 +249,19 @@
         </div>
         <span class="c-cta">Responder <svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
       </a>
+
+      <div class="consulta indigo static">
+        <span class="c-ico"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6M9 13h6M9 17h6"/></svg></span>
+        <div class="c-body">
+          <span class="c-tag">Acompanhamento pedagógico</span>
+          <h3>Resolução de acompanhamento de sala de aula</h3>
+          <div class="c-chips">
+            <span class="chip">Profissionais da educação</span>
+            <span class="chip soon"><span class="d"></span>Em breve</span>
+          </div>
+        </div>
+        <span class="c-status soon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>Aguarde a abertura</span>
+      </div>
 
       <a class="consulta purple" href="divulga_atrib.html">
         <span class="c-ico"><svg viewBox="0 0 24 24"><path d="M4 20V10M10 20V4M16 20v-7M21 20H3"/></svg></span>
