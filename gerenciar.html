@@ -118,6 +118,10 @@
     .check{display:flex;align-items:flex-start;gap:8px;font-size:13.5px;cursor:pointer;}
     .check input{margin-top:3px;flex:none;}
 
+    .bloco-res{border:1px solid #ddd4f6;background:#faf8ff;border-radius:12px;padding:15px 16px;margin-bottom:16px;}
+    .bloco-res-h{font-size:13px;font-weight:800;color:var(--c-purple);letter-spacing:.02em;text-transform:uppercase;}
+    .bloco-res-p{font-size:12px;color:var(--muted);margin:3px 0 13px;}
+
     .cores{display:flex;gap:9px;}
     .cor{width:38px;height:38px;border-radius:10px;border:2px solid transparent;cursor:pointer;position:relative;}
     .cor[aria-pressed="true"]{border-color:var(--ink);box-shadow:0 0 0 3px rgba(22,35,61,.12);}
@@ -358,6 +362,28 @@
             <select id="fEstado"></select>
           </div>
 
+          <!-- Aparece só com o selo "Resultado publicado": cadastra o card e o
+               resultado de uma vez, sem passar pela outra aba. -->
+          <div class="bloco-res" id="blocoResultado" hidden>
+            <div class="bloco-res-h">Resultado desta consulta</div>
+            <p class="bloco-res-p">Preenchido junto com o card. Aparece também na aba <b>Resultados completos</b>.</p>
+
+            <div class="campo">
+              <label for="rcDescricao">Descrição</label>
+              <input type="text" id="rcDescricao" maxlength="200" placeholder="Ex.: 257 contribuições · 90 unidades · jul–ago/2026">
+            </div>
+            <div class="campo">
+              <label for="rcPublico">Resumo público <span class="selo publico">aberto</span></label>
+              <input type="text" id="rcPublico" placeholder="divulga_atrib.html">
+              <div class="dica">Vira o link do card automaticamente, se ele ainda estiver vazio.</div>
+            </div>
+            <div class="campo" style="margin-bottom:0;">
+              <label for="rcCompleto">Resultados completos <span class="selo restrito">restrito</span></label>
+              <input type="text" id="rcCompleto" placeholder="cons_atrib.html">
+              <div class="dica">Nunca é usado como link do card — só fica registrado aqui.</div>
+            </div>
+          </div>
+
           <div class="campo">
             <label>Opções</label>
             <div class="checks">
@@ -501,13 +527,24 @@
     ["fEstado","fRecentes","fResultados","fNovaAba","fDestaque","fVisivel"].forEach(function(id){
       document.getElementById(id).addEventListener("change", previa);
     });
+    document.getElementById("fEstado").addEventListener("change", alternarBlocoRes);
+    // Digitou o resumo público e o card ainda não tem link? Usa ele.
+    document.getElementById("rcPublico").addEventListener("input", function(){
+      var href = document.getElementById("fHref");
+      if (!href.value.trim() || href.dataset.auto === "1"){
+        href.value = this.value.trim();
+        href.dataset.auto = "1";
+        previa();
+      }
+    });
+    document.getElementById("fHref").addEventListener("input", function(){ this.dataset.auto = ""; });
     document.getElementById("btnNovo").addEventListener("click", function(){ limpar(); });
     document.getElementById("btnCancelar").addEventListener("click", function(){ limpar(); });
     document.getElementById("btnSalvar").addEventListener("click", salvar);
     document.getElementById("btnExcluir").addEventListener("click", excluir);
     limpar();
-    recarregar();
     iniciarResultados();
+    recarregar();
     if (location.hash === "#resultados") mostrarAba("res");
   }
 
@@ -584,7 +621,12 @@
   }
 
   /* ---- formulário ---- */
-  var corSel = "blue", iconeSel = "documento";
+  var corSel = "blue", iconeSel = "documento", resultadoDoCard = null;
+
+  function alternarBlocoRes(){
+    document.getElementById("blocoResultado").hidden =
+      document.getElementById("fEstado").value !== "resultado";
+  }
 
   function montarCores(){
     var cx = document.getElementById("fCores");
@@ -643,7 +685,8 @@
       em_resultados: document.getElementById("fResultados").checked,
       nova_aba:      document.getElementById("fNovaAba").checked,
       destaque:      document.getElementById("fDestaque").checked,
-      visivel:       document.getElementById("fVisivel").checked
+      visivel:       document.getElementById("fVisivel").checked,
+      resultado_id:  resultadoDoCard
     };
   }
 
@@ -676,7 +719,13 @@
     document.getElementById("fDestaque").checked = false;
     document.getElementById("fVisivel").checked = true;
     corSel = "blue"; iconeSel = "documento";
+    resultadoDoCard = null;
+    ["rcDescricao","rcPublico","rcCompleto"].forEach(function(id){
+      document.getElementById(id).value = "";
+    });
+    document.getElementById("fHref").dataset.auto = "";
     montarCores(); montarIcones();
+    alternarBlocoRes();
     document.getElementById("btnExcluir").hidden = true;
     previa(); lista();
   }
@@ -699,7 +748,16 @@
     document.getElementById("fDestaque").checked   = !!c.destaque;
     document.getElementById("fVisivel").checked    = !!c.visivel;
     corSel = c.cor || "blue"; iconeSel = c.icone || "documento";
+    resultadoDoCard = c.resultado_id || null;
+    var r = resultadoDoCard
+      ? resultados.filter(function(x){ return x.id === resultadoDoCard; })[0]
+      : null;
+    document.getElementById("rcDescricao").value = r ? (r.descricao || "") : "";
+    document.getElementById("rcPublico").value   = r ? (r.url_publico || "") : "";
+    document.getElementById("rcCompleto").value  = r ? (r.url_completo || "") : "";
+    document.getElementById("fHref").dataset.auto = "";
     montarCores(); montarIcones();
+    alternarBlocoRes();
     document.getElementById("btnExcluir").hidden = false;
     previa(); lista();
     document.getElementById("tituloForm").scrollIntoView({ behavior: "smooth", block: "nearest" });
@@ -714,10 +772,37 @@
     if (!c.titulo){ avisar("<b>Informe o título.</b> É o único campo obrigatório.", "erro"); return; }
     var b = document.getElementById("btnSalvar");
     b.disabled = true; b.textContent = "Salvando…";
-    gravar(c).then(function(){
-      avisar("Card salvo. A home já está atualizada.", "ok");
+
+    // Com o selo de resultado e algum campo preenchido, grava o resultado
+    // primeiro e usa o id devolvido para vincular ao card.
+    var res = {
+      descricao:    document.getElementById("rcDescricao").value.trim(),
+      url_publico:  document.getElementById("rcPublico").value.trim(),
+      url_completo: document.getElementById("rcCompleto").value.trim()
+    };
+    var temRes = c.estado === "resultado" &&
+                 (res.descricao || res.url_publico || res.url_completo || resultadoDoCard);
+
+    var antes = temRes
+      ? rpc("resultado_salvar", { p: {
+          id: resultadoDoCard,
+          titulo: c.titulo.replace(/\s+—\s+devolutivas\s*$/i, ""),
+          descricao: res.descricao,
+          url_publico: res.url_publico,
+          url_completo: res.url_completo,
+          visivel: true
+        } }).then(function(id){ c.resultado_id = id; })
+      : Promise.resolve();
+
+    antes.then(function(){
+      return gravar(c);
+    }).then(function(){
+      avisar(temRes ? "Card e resultado salvos. A home já está atualizada."
+                    : "Card salvo. A home já está atualizada.", "ok");
       limpar();
       return recarregar();
+    }).then(function(){
+      if (temRes) return recarregarRes();
     }).catch(function(e){
       avisar("<b>Não foi possível salvar.</b> " + e.message, "erro");
     }).then(function(){
