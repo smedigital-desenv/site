@@ -4,3 +4,13 @@
 db/consulta-respondentes.sql
 db/*-respondentes.sql
 db/*-nominal.sql
+
+# ── Dados: NUNCA versionar (repositorio publico) ──────────────────────────
+*.sql
+*.csv
+*.dump
+*.xlsx
+*.xls
+.env
+.env.*
+!.env.example
