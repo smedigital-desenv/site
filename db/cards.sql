@@ -131,7 +131,150 @@ begin
   end if;
   -- Só http(s) ou caminho relativo: bloqueia javascript: e afins.
   if coalesce(p->>'href', '') <> ''
-     and p->>'href' !~ '^(https?://|[A-Za-z0-9._~/-]+\.html|[A-Za-z0-9._~/-]+/?)($|[?#])' then
+     and p->>'href' !~ '^(https?://\S+|[\w.~/#?=&%+-]+)$' then
+    raise exception 'link invalido';
+  end if;
+
+  if v_id is null then
+    insert into resultados_consultas.cards
+      (em_recentes, em_resultados, ordem, cor, icone, categoria, titulo, publico,
+       estado, destaque, href, nova_aba, prazo, cta, visivel)
+    values (
+      coalesce((p->>'em_recentes')::boolean, true),
+      coalesce((p->>'em_resultados')::boolean, false),
+      coalesce((p->>'ordem')::integer, 0),
+      p->>'cor',
+      coalesce(nullif(p->>'icone', ''), 'documento'),
+      nullif(p->>'categoria', ''),
+      trim(p->>'titulo'),
+      nullif(p->>'publico', ''),
+      p->>'estado',
+      coalesce((p->>'destaque')::boolean, false),
+      nullif(p->>'href', ''),
+      coalesce((p->>'nova_aba')::boolean, true),
+      nullif(p->>'prazo', '')::date,
+      nullif(p->>'cta', ''),
+      coalesce((p->>'visivel')::boolean, true)
+    )
+    returning id into v_id;
+  else
+    update resultados_consultas.cards set
+      em_recentes   = coalesce((p->>'em_recentes')::boolean, true),
+      em_resultados = coalesce((p->>'em_resultados')::boolean, false),
+      ordem         = coalesce((p->>'ordem')::integer, ordem),
+      cor           = p->>'cor',
+      icone         = coalesce(nullif(p->>'icone', ''), 'documento'),
+      categoria     = nullif(p->>'categoria', ''),
+      titulo        = trim(p->>'titulo'),
+      publico       = nullif(p->>'publico', ''),
+      estado        = p->>'estado',
+      destaque      = coalesce((p->>'destaque')::boolean, false),
+      href          = nullif(p->>'href', ''),
+      nova_aba      = coalesce((p->>'nova_aba')::boolean, true),
+      prazo         = nullif(p->>'prazo', '')::date,
+      cta           = nullif(p->>'cta', ''),
+      visivel       = coalesce((p->>'visivel')::boolean, true),
+      atualizado_em = now()
+    where id = v_id;
+    if not found then
+      raise exception 'card % nao encontrado', v_id;
+    end if;
+  end if;
+
+  return v_id;
+end;
+$$;
+
+revoke execute on function public.card_salvar(jsonb) from public, anon;
+grant  execute on function public.card_salvar(jsonb) to authenticated;
+
+
+-- 6) EXCLUIR ----------------------------------------------------------------
+create or replace function public.card_excluir(p_id bigint)
+returns void
+language plpgsql
+security definer
+set search_path = resultados_consultas, pg_temp
+as $$
+begin
+  if not resultados_consultas.pode_editar() then
+    raise exception 'sem permissao para editar os cards';
+  end if;
+  delete from resultados_consultas.cards where id = p_id;
+end;
+$$;
+
+revoke execute on function public.card_excluir(bigint) from public, anon;
+grant  execute on function public.card_excluir(bigint) to authenticated;
+
+
+-- 7) REORDENAR --------------------------------------------------------------
+-- Recebe um array de ids na ordem desejada: '[12, 7, 3]'::jsonb
+
+create or replace function public.cards_reordenar(p_ids jsonb)
+returns void
+language plpgsql
+security definer
+set search_path = resultados_consultas, pg_temp
+as $$
+begin
+  if not resultados_consultas.pode_editar() then
+    raise exception 'sem permissao para editar os cards';
+  end if;
+  update resultados_consultas.cards c
+     set ordem = t.pos, atualizado_em = now()
+    from (
+      select (valor)::bigint as id, (indice - 1) as pos
+        from jsonb_array_elements_text(p_ids) with ordinality as e(valor, indice)
+    ) t
+   where c.id = t.id;
+end;
+$$;
+
+revoke execute on function public.cards_reordenar(jsonb) from public, anon;
+grant  execute on function public.cards_reordenar(jsonb) to authenticated;
+
+
+-- 8) CARGA INICIAL ----------------------------------------------------------
+-- Os cards que hoje estão fixos na index. Rode uma vez só; o `where not exists`
+-- evita duplicar se você executar o script de novo.
+
+insert into resultados_consultas.cards
+  (em_recentes, em_resultados, ordem, cor, icone, categoria, titulo, publico,
+   estado, destaque, href, nova_aba, prazo, cta)
+select * from (values
+  (true, false, 0, 'blue', 'documento', 'Materiais pedagógicos',
+   'Aquisição de jogos e materiais pedagógicos para a rede municipal',
+   'Profissionais da educação', 'aberta', false,
+   'https://docs.google.com/forms/d/1rtWBo7JcizSzW2JpeTZj6Drqdtu-NsNLV1cdCkoNuJw/viewform',
+   true, date '2026-08-31', 'Responder'),
+  (true, false, 1, 'green', 'escudo', 'Segurança escolar',
+   'Protocolo de Segurança e Paz para as Escolas Municipais de Ribeirão Preto',
+   'Comunidade escolar', 'aberta', false,
+   'https://docs.google.com/forms/d/1zX1UFU25Zs2oOXxdkpDnpfNOW33jp26hEbxwTooxxgk/viewform',
+   true, date '2026-08-31', 'Responder'),
+  (true, true, 2, 'purple', 'grafico', 'Vida funcional',
+   'Remoção e Atribuição de Aulas 2026/2027 — devolutivas',
+   'Profissionais da educação', 'resultado', true,
+   'divulga_atrib.html', false, null::date, 'Ver resultados'),
+  (true, false, 3, 'blue', 'lapis', 'Vida funcional',
+   'Resolução de acompanhamento de sala de aula',
+   'Profissionais da educação', 'breve', false,
+   null, false, null::date, 'Aguarde a abertura'),
+  (true, false, 4, 'gold', 'estrela', 'Avaliação do evento',
+   'Avaliação do Congresso Municipal de Educação — 2026',
+   'Participantes do Congresso', 'encerrada', false,
+   null, false, null::date, null)
+) as v(em_recentes, em_resultados, ordem, cor, icone, categoria, titulo, publico,
+       estado, destaque, href, nova_aba, prazo, cta)
+where not exists (select 1 from resultados_consultas.cards);
+
+
+-- 9) CONFERIR ---------------------------------------------------------------
+select id, ordem, cor, icone, titulo, estado, em_recentes, em_resultados, visivel
+  from resultados_consultas.cards
+ order by ordem, id;
+ then
     raise exception 'link invalido';
   end if;
 
