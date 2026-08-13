@@ -71,7 +71,8 @@ insert into resultados_consultas.acesso (email, nome) values
   ('desenv.sme@gmail.com',                       'Desenvolvimento SME'),
   ('matheusprospero@educacao.pmrp.sp.gov.br',    'Matheus Prospero'),
   ('christianoliveira@educacao.pmrp.sp.gov.br',  'Christian Oliveira'),
-  ('g.atribucao@educacao.pmrp.sp.gov.br',        'Atribuição (conta setorial)')
+  ('g.atribucao@educacao.pmrp.sp.gov.br',        'Atribuição (conta setorial)'),
+  ('gabinete@educacao.pmrp.sp.gov.br',           'Gabinete')
   -- ,('fulano@exemplo.com', 'Nome da Pessoa')
 on conflict (email) do update
   set nome = coalesce(excluded.nome, resultados_consultas.acesso.nome);
