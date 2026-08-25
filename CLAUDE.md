@@ -20,18 +20,34 @@ depois exige reescrita de histórico, força-push em todas as branches e abertur
 de chamado no suporte do GitHub para purgar referências em pull requests. Já
 aconteceu nesta rede e levou semanas.
 
-**Nunca versione:**
+Pior que isso: o site é publicado pelo **GitHub Pages a partir da raiz do
+repositório**. Todo arquivo commitado vira URL pública — `db/carga.sql` no Git é
+`smedigital.com.br/site/db/carga.sql` no navegador, baixável por qualquer um,
+sem passar pelo GitHub. Não existe "arquivo escondido no repositório".
 
-- `*.sql`, `*.csv`, `*.dump`, `*.xlsx` — script de carga e export carregam dado
-  real junto, quase sempre sem quem escreveu perceber. Estão no `.gitignore`.
+#### Regra dura: script SQL não entra no Git
 
-  A pasta `db/` existe só na máquina de quem trabalha: **nenhum script dela é
-  versionado**. Eles são entregues fora do repositório, executados no SQL Editor
-  do Supabase e ficam por lá. Os arquivos que estiveram versionados até
-  2026-08-25 carregavam 3.152 e-mails de servidores — e, enquanto estavam no
-  repositório, eram baixáveis direto pelo GitHub Pages. Se você precisar de um
-  deles, peça a quem executou; não os traga de volta para o Git.
+**Nunca versione `.sql`.** Nem migração, nem carga, nem "só o esquema", nem
+exemplo com dado fictício. Não há exceção a avaliar caso a caso — a regra existe
+justamente porque o caso a caso falha.
 
+Como funciona no lugar disso:
+
+- os scripts ficam em `db/`, que **existe só na máquina de quem trabalha** e é
+  barrado pelo `.gitignore`;
+- são entregues fora do repositório (anexo na conversa, e-mail, upload direto),
+  rodados no SQL Editor do Supabase, e vivem lá;
+- precisa de um script antigo? Peça a quem executou. Não o traga de volta.
+
+Isto não é hipótese. Até 2026-08-25 este repositório versionava 17 arquivos
+`.sql`; quatro deles somavam **3.152 e-mails de servidores da rede**, e ficaram
+baixáveis pela web enquanto estiveram lá. Foram retirados do `HEAD`; o histórico
+ainda os contém.
+
+**Também nunca versione:**
+
+- `*.csv`, `*.dump`, `*.xlsx`, `*.xls` — export carrega dado real junto, quase
+  sempre sem quem escreveu perceber. Estão no `.gitignore`.
 - Dado pessoal de qualquer natureza: nome, e-mail, RA, matrícula, CPF, telefone,
   endereço. Nem em código, nem em comentário, nem em dado de exemplo, nem em
   mensagem de commit.
@@ -44,6 +60,35 @@ banco, nunca em esconder essa chave.
 
 Os sistemas desta rede tratam **dados pessoais de crianças**, alguns de natureza
 sensível. Isso não é hipótese: é o conteúdo real da maioria destas bases.
+
+#### As três guardas, e o que fazer quando uma delas te barra
+
+1. **`.gitignore`** — barra `*.sql`, `*.csv`, `*.dump`, `*.xlsx`, `*.xls`.
+2. **`.claude/hooks/verificar-vazamento.sh`** — hook `PreToolUse`, bloqueia
+   `git commit` e `git push` que levem arquivo de dados, CPF, chave privada,
+   token `sbp_`, JWT `service_role` ou e-mail não institucional.
+3. **`.github/workflows/guarda-dados.yml`** — roda no GitHub a cada push e
+   falha se algum arquivo de dados estiver versionado. É a única que não depende
+   da máquina de ninguém.
+
+Quando uma guarda barra, **a resposta certa é tirar o arquivo do commit**, não
+contornar a guarda. `git commit --no-verify`, `git add -f` e
+`SME_PERMITIR_COMMIT=1` existem para falso positivo em arquivo que
+comprovadamente não tem dado pessoal — nunca para publicar um `.sql`. Na dúvida,
+pergunte antes de commitar; desfazer depois custa semanas.
+
+Falso positivo que se repete — um modelo em branco que a própria página oferece
+para download, por exemplo — vai para **`.guarda-permitidos`**, uma linha por
+caminho, com a justificativa escrita ao lado. As guardas 2 e 3 leem a mesma
+lista. Antes de acrescentar uma linha, **abra o arquivo** e procure nome,
+e-mail, RA, matrícula, CPF, telefone e endereço; se achar qualquer um, ele não
+entra na lista — sai do Git. A lista é para modelo vazio, nunca para dado com
+dono.
+
+Esta regra também está gravada como memória de usuário do perfil, em
+`~/.claude/CLAUDE.md`, e por isso vale em qualquer repositório desta rede —
+inclusive nos que ainda não têm as guardas instaladas. Ao criar um repositório
+novo, copie para ele o `.gitignore`, o hook e o workflow daqui.
 
 ### 2. Login é sempre pelo Controle de Acesso CENTRAL
 
