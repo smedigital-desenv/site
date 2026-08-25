@@ -100,8 +100,8 @@ function enviarQRParaToken(token) {
 // ── TESTE PARA UM E-MAIL ESPECÍFICO (o seu) ───────────────────
 // Envia SÓ para 'emailDestino', usando os dados de um inscrito real como
 // amostra. NÃO marca qr_enviado (não conta no envio). Use no editor:
-//   enviarQRTeste("desenv.sme@gmail.com")            -> pega um inscrito qualquer
-//   enviarQRTeste("desenv.sme@gmail.com", "40119")   -> usa um token específico
+//   enviarQRTeste("desenvsme@educacao.pmrp.sp.gov.br")            -> pega um inscrito qualquer
+//   enviarQRTeste("desenvsme@educacao.pmrp.sp.gov.br", "40119")   -> usa um token específico
 function enviarQRTeste(emailDestino, token) {
   if (!emailDestino) { Logger.log("Informe o e-mail de destino."); return; }
   var sel  = "&select=token,nome,email,palestra_id,palestras(nome,local,endereco)&limit=1";
@@ -120,8 +120,9 @@ function enviarQRTeste(emailDestino, token) {
 // Gancho de teste: selecione esta função no editor e clique em Executar (▶).
 // Envia o e-mail de teste para os endereços abaixo (sem marcar qr_enviado).
 function testarMeuEmail() {
-  enviarQRTeste("matheusprospero@gmail.com");
-  enviarQRTeste("julianabertoleti@educacao.pmrp.sp.gov.br");
+  // Endereço institucional da equipe. ⚠️ NÃO ponha e-mail de pessoa aqui:
+  // este repositório é público, e endereço de servidor é dado pessoal.
+  enviarQRTeste("desenvsme@educacao.pmrp.sp.gov.br");
 }
 
 // ── GATILHO ───────────────────────────────────────────────────

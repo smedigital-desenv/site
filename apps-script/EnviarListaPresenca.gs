@@ -189,7 +189,7 @@ function previewListasPresenca() {
 // ── ATALHO DE TESTE (rode ESTA função no botão "Executar") ───────────────────
 // O botão "Executar" do editor NÃO passa argumentos; por isso use este atalho.
 // Edite o e-mail e, se quiser, o nome de uma unidade específica, e rode.
-var LP_EMAIL_TESTE   = "desenv.sme@gmail.com";
+var LP_EMAIL_TESTE   = "desenvsme@educacao.pmrp.sp.gov.br";
 var LP_UNIDADE_TESTE = "";   // vazio = primeira escola encontrada; ou "NOME EXATO DA ESCOLA"
 function enviarListaPresencaTesteAgora() {
   enviarListaPresencaTeste(LP_EMAIL_TESTE, LP_UNIDADE_TESTE);
