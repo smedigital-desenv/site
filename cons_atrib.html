@@ -1108,7 +1108,7 @@ function iniciarPagina(){
 
   // Nome e unidade NÃO estão no arquivo estático: vêm do banco, pela função
   // public.consulta_respondentes(), que só devolve linhas para quem está na
-  // allowlist. Ver db/consulta-respondentes.sql.
+  // allowlist. Ver o script consulta-respondentes.sql (nao versionado).
   function carregarNomes(token){
     return fetch(SUPA_URL + "/rpc/consulta_respondentes", {
       method: "POST",
@@ -1214,7 +1214,7 @@ function iniciarPagina(){
   };
 
   // Checagem da allowlist via função public.tem_acesso_consulta() — ver
-  // db/consulta-acesso.sql. Fica em `public`, que é exposto por padrão, então
+  // consulta-acesso.sql (nao versionado). Fica em `public`, que é exposto por padrão, então
   // NÃO depende de "Exposed schemas". A função responde só true/false e a
   // tabela resultados_consultas.acesso nunca é alcançável pela API.
   function verificarAcesso(){

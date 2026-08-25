@@ -38,7 +38,9 @@ falha() { PROBLEMAS="${PROBLEMAS}- $1
 "; }
 
 # 1. Arquivo de dados proibido em repositório público
-ARQUIVOS_RUINS="$(git -C "$REPO" diff --cached --name-only | grep -iE '\.(sql|csv|dump|xlsx|xls)$' || true)"
+#    --diff-filter=d exclui as EXCLUSÕES: apagar um arquivo destes é a correção,
+#    não a falta. Sem isso, a guarda impede que se limpe um vazamento já feito.
+ARQUIVOS_RUINS="$(git -C "$REPO" diff --cached --name-only --diff-filter=d | grep -iE '\.(sql|csv|dump|xlsx|xls)$' || true)"
 if [ -n "$ARQUIVOS_RUINS" ]; then
   while IFS= read -r a; do
     falha "arquivo de dados proibido em repositório público: $a"

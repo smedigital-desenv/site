@@ -24,6 +24,14 @@ aconteceu nesta rede e levou semanas.
 
 - `*.sql`, `*.csv`, `*.dump`, `*.xlsx` — script de carga e export carregam dado
   real junto, quase sempre sem quem escreveu perceber. Estão no `.gitignore`.
+
+  A pasta `db/` existe só na máquina de quem trabalha: **nenhum script dela é
+  versionado**. Eles são entregues fora do repositório, executados no SQL Editor
+  do Supabase e ficam por lá. Os arquivos que estiveram versionados até
+  2026-08-25 carregavam 3.152 e-mails de servidores — e, enquanto estavam no
+  repositório, eram baixáveis direto pelo GitHub Pages. Se você precisar de um
+  deles, peça a quem executou; não os traga de volta para o Git.
+
 - Dado pessoal de qualquer natureza: nome, e-mail, RA, matrícula, CPF, telefone,
   endereço. Nem em código, nem em comentário, nem em dado de exemplo, nem em
   mensagem de commit.
