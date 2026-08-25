@@ -15,6 +15,10 @@
   "use strict";
 
   var D, REG, TEMAS, META, RESTRITO = false;
+  /** Questões de texto: as abertas (classificadas por assunto e presentes no
+   *  arquivo público) mais as restritas (que só chegam do banco após login —
+   *  usadas quando o próprio conteúdo da resposta é dado pessoal). */
+  var CAMPOS_TXT = [];
   var SCHEMA_RPC_NOMES = null;   // ex.: "respondentes_cal"
 
   /* ------------------------------------------------------------ utilidades */
@@ -82,12 +86,18 @@
     if (!cx) return;
     var comProposta = D.stats.geral.base;
     var lista = [
-      { n: META.total, l: "contribuições recebidas", h: "envios individuais do formulário" },
-      { n: comProposta, l: "com proposta concreta", h: pct(comProposta, META.total) + "% do total de envios" }
+      { n: META.total, l: META.rotulo_total || "contribuições recebidas",
+        h: "envios individuais do formulário" }
     ];
     if (META.unidades) {
-      lista.splice(1, 0, { n: META.unidades, l: "unidades escolares", h: "com ao menos uma contribuição" });
+      lista.push({ n: META.unidades, l: "unidades escolares",
+                   h: META.hint_unidades || "com ao menos uma contribuição" });
     }
+    if (META.abertas.length) {
+      lista.push({ n: comProposta, l: "com proposta concreta",
+                   h: pct(comProposta, META.total) + "% do total de envios" });
+    }
+    (META.kpis_extra || []).forEach(function (k) { lista.push(k); });
     // 4º indicador: a alternativa mais votada do destaque principal, se houver
     var dq = (D.destaques || [])[0];
     if (dq && D.perfil[dq.campo]) {
@@ -141,13 +151,15 @@
       var c = cartao(bl.titulo, bl.cap);
       cx.appendChild(c.card);
       barras(c.bars, bl.itens.map(function (it, i) {
+        var temMedia = typeof it.media === "number";
         return {
-          lab: it.lab, titulo: "Posição média: " + it.media.toFixed(2).replace(".", ","),
+          lab: it.lab,
+          titulo: temMedia ? "Posição média: " + it.media.toFixed(2).replace(".", ",") : it.lab,
           val: it.val, base: it.base,
-          txt: it.val + " · " + pct(it.val, it.base) + "% · média " +
-               it.media.toFixed(1).replace(".", ","),
+          txt: it.val + " · " + pct(it.val, it.base) + "%" +
+               (temMedia ? " · média " + it.media.toFixed(1).replace(".", ",") : ""),
           cor: i === 0 ? "green" : (i === 1 ? "navy" : CORES[i % CORES.length]),
-          modalTitulo: it.lab + " em 1º lugar", modalSub: bl.titulo,
+          modalTitulo: it.lab + (bl.sufixo || ""), modalSub: bl.titulo,
           filtro: RESTRITO ? function (r) { return r[it.campo] === bl.topo; } : null
         };
       }), bl.itens.length ? bl.itens[0].base : 0);
@@ -204,9 +216,17 @@
   }
 
   /* ------------------------------------------------------------- volume --- */
+  /** Esconde a <section> que envolve um elemento (consultas sem questões abertas). */
+  function esconderBloco(elem) {
+    var s = elem;
+    while (s && s.className !== "bloco" && s.id !== "temas") s = s.parentNode;
+    if (s && s.style) s.hidden = true;
+  }
+
   function montarVolume() {
     var cx = document.getElementById("volume");
     if (!cx) return;
+    if (!META.abertas.length) { esconderBloco(cx); return; }
     var itens = [];
     META.abertas.forEach(function (a, i) {
       itens.push({ lab: a.rotulo + " — preenchidas", val: META.preenchidas[a.chave],
@@ -232,6 +252,7 @@
   function montarTemas() {
     var cxTabs = document.getElementById("tabsTema");
     if (!cxTabs) return;
+    if (!META.abertas.length) { esconderBloco(cxTabs); return; }
     var escopos = [{ chave: "geral", rotulo: "Visão geral" }].concat(
       META.abertas.map(function (a) { return { chave: a.chave, rotulo: a.rotulo }; }));
     if (META.abertas.length < 2) escopos = [escopos[0]];      // uma questão só: aba única é ruído
@@ -289,6 +310,7 @@
   function montarNota() {
     var cx = document.getElementById("nota");
     if (!cx) return;
+    var temAbertas = META.abertas.length > 0;
     var bases = META.abertas.map(function (a) {
       return a.rotulo + ": " + D.stats[a.chave].base;
     }).join("; ");
@@ -296,13 +318,15 @@
       "<strong>Origem.</strong> Respostas do formulário da consulta, coletadas entre " +
         fmtData(META.inicio) + " e " + fmtData(META.fim) + ". Cada linha corresponde a um envio.",
       "<strong>Privacidade.</strong> " + (RESTRITO
-        ? "Esta página exibe a identificação dos respondentes e é restrita a e-mails autorizados. O texto das devolutivas é reproduzido integralmente, sem correção de grafia."
-        : "Esta página apresenta apenas dados agregados. Nome e unidade dos respondentes não são publicados."),
-      "<strong>Respostas com proposta.</strong> Cada resposta aberta foi marcada como propositiva ou não. " +
-        "Variações de “não tenho sugestão”, “nenhuma”, “ok” e campos com apenas pontuação foram excluídas das bases percentuais dos assuntos.",
-      "<strong>Classificação por assunto.</strong> Feita por reconhecimento de expressões-chave no texto de cada resposta. " +
-        "Uma mesma contribuição pode tratar de vários assuntos — por isso os percentuais somam mais de 100%.",
-      "<strong>Bases de cálculo.</strong> " + bases + "; visão geral: " + D.stats.geral.base + " respondentes.",
+        ? "Esta página exibe a identificação dos respondentes e é restrita a e-mails autorizados. O texto das respostas é reproduzido integralmente, sem correção de grafia."
+        : (META.restritas || []).length
+          ? "Esta página apresenta apenas dados agregados. O conteúdo das respostas — que aqui é composto de nomes de pessoas — não é publicado, nem consta do arquivo de dados desta página."
+          : "Esta página apresenta apenas dados agregados. Nome e unidade dos respondentes não são publicados."),
+      temAbertas ? "<strong>Respostas com proposta.</strong> Cada resposta aberta foi marcada como propositiva ou não. " +
+        "Variações de “não tenho sugestão”, “nenhuma”, “ok” e campos com apenas pontuação foram excluídas das bases percentuais dos assuntos." : "",
+      temAbertas ? "<strong>Classificação por assunto.</strong> Feita por reconhecimento de expressões-chave no texto de cada resposta. " +
+        "Uma mesma contribuição pode tratar de vários assuntos — por isso os percentuais somam mais de 100%." : "",
+      temAbertas ? "<strong>Bases de cálculo.</strong> " + bases + "; visão geral: " + D.stats.geral.base + " respondentes." : "",
       (Object.keys(META.aval_rotulos || {}).length
         ? "<strong>Bases variáveis.</strong> Parte das questões objetivas só foi exibida a determinados cargos ou segmentos, " +
           "e outras eram de preenchimento opcional. Por isso cada gráfico informa a própria base, que nem sempre é o total de envios."
@@ -325,9 +349,10 @@
       return (a.nome || "").localeCompare(b.nome || "", "pt-BR");
     });
     document.getElementById("modalTitulo").textContent = titulo;
+    var rot = META.rotulo_envios || ["contribuição", "contribuições"];
     document.getElementById("modalSub").textContent =
       (sub ? sub + " · " : "") + listaModal.length +
-      (listaModal.length === 1 ? " contribuição" : " contribuições");
+      " " + (listaModal.length === 1 ? rot[0] : rot[1]);
     document.getElementById("modalBusca").value = "";
     renderModal();
     focoAnterior = document.activeElement;
@@ -355,7 +380,7 @@
     vis.forEach(function (r) {
       var b = el("button", "pessoa");
       b.type = "button";
-      b.title = "Abrir a devolutiva #" + r.id;
+      b.title = "Abrir a " + nomeItem(1) + " #" + r.id;
       b.appendChild(el("span", "pid", "#" + r.id));
       b.appendChild(el("span", "pnome", r.nome || "(nome não informado)"));
       b.appendChild(el("span", "puni", r.unidade || "(unidade não informada)"));
@@ -370,6 +395,11 @@
   /** Quem não escreveu nada em nenhuma questão aberta não entra na listagem
    *  (só aparece se for aberto individualmente pelo modal). */
   var COM_TEXTO = [];
+  /** Como chamar cada linha da listagem: ["devolutiva", "devolutivas"]. */
+  function nomeItem(n) {
+    var r = META.rotulo_devs || ["devolutiva", "devolutivas"];
+    return n === 1 ? r[0] : r[1];
+  }
 
   function montarDevolutivas() {
     var cx = document.getElementById("filtros");
@@ -396,15 +426,17 @@
     selTema = document.getElementById("fTema");
     Object.keys(D.stats.geral.temas).forEach(function (k) { selTema.appendChild(new Option(TEMAS[k], k)); });
 
+    if (!Object.keys(D.stats.geral.temas).length) selTema.parentNode.hidden = true;
+
     selQ = document.getElementById("fQuestao");
-    META.abertas.forEach(function (a) { selQ.appendChild(new Option(a.rotulo, a.chave)); });
-    if (META.abertas.length < 2) selQ.parentNode.hidden = true;
+    CAMPOS_TXT.forEach(function (a) { selQ.appendChild(new Option(a.rotulo, a.chave)); });
+    if (CAMPOS_TXT.length < 2) selQ.parentNode.hidden = true;
 
     REG.forEach(function (r) {
-      r._busca = semAcento(META.abertas.map(function (a) { return r[a.chave]; }).join(" "));
+      r._busca = semAcento(CAMPOS_TXT.map(function (a) { return r[a.chave]; }).join(" "));
     });
     COM_TEXTO = REG.filter(function (r) {
-      return META.abertas.some(function (a) { return !!r[a.chave]; });
+      return CAMPOS_TXT.some(function (a) { return !!r[a.chave]; });
     });
 
     var timer;
@@ -421,6 +453,9 @@
       Object.keys(selPerfil).forEach(function (k) { selPerfil[k].value = ""; });
       aplicar();
     });
+
+    var rod = document.querySelector(".modal-rod");
+    if (rod) rod.textContent = "Clique em um nome para abrir a " + nomeItem(1) + " correspondente.";
 
     document.getElementById("modalBusca").addEventListener("input", renderModal);
     document.getElementById("modalX").addEventListener("click", fecharModal);
@@ -462,7 +497,7 @@
       if (q && r._busca.indexOf(q) < 0) return false;
       if (qs && !r[qs]) return false;
       if (tm) {
-        if (qs) return r["t_" + qs].indexOf(tm) >= 0;
+        if (qs) return (r["t_" + qs] || []).indexOf(tm) >= 0;
         return META.abertas.some(function (a) { return r["t_" + a.chave].indexOf(tm) >= 0; });
       }
       return true;
@@ -491,13 +526,13 @@
     if (pagina > maxPag) pagina = maxPag;
 
     document.getElementById("resInfo").textContent = idFiltro
-      ? "Exibindo apenas a devolutiva #" + idFiltro + " — use “Limpar filtros” para ver todas."
-      : (total === 0 ? "Nenhuma devolutiva encontrada com os filtros atuais."
-         : total + (total === 1 ? " devolutiva encontrada" : " devolutivas encontradas") +
+      ? "Exibindo apenas a " + nomeItem(1) + " #" + idFiltro + " — use “Limpar filtros” para ver todas."
+      : (total === 0 ? "Nenhuma " + nomeItem(1) + " encontrada com os filtros atuais."
+         : total + " " + nomeItem(total) + (total === 1 ? " encontrada" : " encontradas") +
            " · exibindo " + ((pagina - 1) * POR_PAGINA + 1) + "–" + Math.min(pagina * POR_PAGINA, total) +
            (total === COM_TEXTO.length && COM_TEXTO.length < META.total
-             ? " · os outros " + (META.total - COM_TEXTO.length) +
-               " envios não preencheram nenhum campo aberto" : ""));
+             ? " · os outros " + (META.total - COM_TEXTO.length) + " envios " +
+               (META.rotulo_vazio || "não preencheram nenhum campo aberto") : ""));
 
     if (!total) {
       box.appendChild(el("div", "card vazio", "Tente remover um filtro ou usar outro termo de busca."));
@@ -515,7 +550,7 @@
       });
       c.appendChild(h);
 
-      META.abertas.forEach(function (a, i) {
+      CAMPOS_TXT.forEach(function (a, i) {
         if (!r[a.chave] || (qs && qs !== a.chave)) return;
         var q = el("div", "dev-q " + (i === 1 ? "atr" : i === 2 ? "proj" : ""));
         q.appendChild(el("div", "qh", a.rotulo));
@@ -526,7 +561,7 @@
       });
 
       var ts = {};
-      META.abertas.forEach(function (a) { r["t_" + a.chave].forEach(function (t) { ts[t] = 1; }); });
+      META.abertas.forEach(function (a) { (r["t_" + a.chave] || []).forEach(function (t) { ts[t] = 1; }); });
       var chaves = Object.keys(ts);
       if (chaves.length) {
         var dt = el("div", "dev-temas");
@@ -577,6 +612,7 @@
       SCHEMA_RPC_NOMES = op.rpcNomes || null;
       D = window.DADOS_CONSULTA;
       META = D.meta; TEMAS = D.temas; REG = D.registros;
+      CAMPOS_TXT = META.abertas.concat(RESTRITO ? (META.restritas || []) : []);
       if (!RESTRITO) { montarTudo(); return Promise.resolve(); }
       return window.PORTAO.abrir(function (token) {
         return carregarNomes(token).then(function (ok) {
@@ -601,9 +637,12 @@
         if (!Array.isArray(linhas) || !linhas.length) return false;
         var porId = {};
         linhas.forEach(function (l) { porId[l.id] = l; });
+        // além de nome e unidade, a função pode devolver colunas de texto que
+        // não podem estar no arquivo público (ver META.restritas).
         REG.forEach(function (r) {
           var n = porId[r.id];
-          if (n) { r.nome = n.nome || ""; r.unidade = n.unidade || ""; }
+          if (!n) return;
+          Object.keys(n).forEach(function (k) { if (k !== "id") r[k] = n[k] || ""; });
         });
         return true;
       })
