@@ -129,6 +129,60 @@
     });
   }
 
+  /**
+   * Questão de ordenação (ex.: "classifique as modalidades de 1º a 4º lugar").
+   * Cada item é uma coluna do formulário; o gráfico mostra quantos a puseram em
+   * primeiro lugar, e a legenda traz a posição média.
+   */
+  function montarRanking() {
+    var cx = document.getElementById("destaque");
+    if (!cx || !(D.ranking || []).length) return;
+    D.ranking.forEach(function (bl) {
+      var c = cartao(bl.titulo, bl.cap);
+      cx.appendChild(c.card);
+      barras(c.bars, bl.itens.map(function (it, i) {
+        return {
+          lab: it.lab, titulo: "Posição média: " + it.media.toFixed(2).replace(".", ","),
+          val: it.val, base: it.base,
+          txt: it.val + " · " + pct(it.val, it.base) + "% · média " +
+               it.media.toFixed(1).replace(".", ","),
+          cor: i === 0 ? "green" : (i === 1 ? "navy" : CORES[i % CORES.length]),
+          modalTitulo: it.lab + " em 1º lugar", modalSub: bl.titulo,
+          filtro: RESTRITO ? function (r) { return r[it.campo] === bl.topo; } : null
+        };
+      }), bl.itens.length ? bl.itens[0].base : 0);
+    });
+  }
+
+  /**
+   * Questões fechadas de avaliação (o que a rede acha), separadas do perfil
+   * (quem a rede é). Só aparece se a consulta declarar `aval_rotulos`.
+   */
+  function montarAval() {
+    var sec = document.getElementById("secAvaliacoes");
+    var cx = document.getElementById("avaliacoes");
+    var rot = META.aval_rotulos || {};
+    var chaves = Object.keys(rot);
+    if (!cx || !chaves.length) { if (sec) sec.hidden = true; return; }
+    if (sec) sec.hidden = false;
+    var destacados = (D.destaques || []).map(function (d) { return d.campo; });
+    chaves.forEach(function (campo, idx) {
+      if (destacados.indexOf(campo) >= 0) return;           // já saiu no destaque
+      var dados = D.perfil[campo] || {};
+      var base = soma(dados);
+      if (!base) return;
+      var c = cartao(rot[campo], "Base: " + base + (base === 1 ? " resposta" : " respostas"));
+      cx.appendChild(c.card);
+      barras(c.bars, Object.keys(dados).map(function (k) {
+        return {
+          lab: curto(k, 52), titulo: k, val: dados[k], base: base,
+          modalTitulo: curto(k, 60), modalSub: rot[campo],
+          filtro: RESTRITO ? function (r) { return r[campo] === k; } : null
+        };
+      }), base, CORES[idx % 3]);
+    });
+  }
+
   function montarPerfil() {
     var cx = document.getElementById("perfil");
     if (!cx) return;
@@ -249,11 +303,15 @@
       "<strong>Classificação por assunto.</strong> Feita por reconhecimento de expressões-chave no texto de cada resposta. " +
         "Uma mesma contribuição pode tratar de vários assuntos — por isso os percentuais somam mais de 100%.",
       "<strong>Bases de cálculo.</strong> " + bases + "; visão geral: " + D.stats.geral.base + " respondentes.",
+      (Object.keys(META.aval_rotulos || {}).length
+        ? "<strong>Bases variáveis.</strong> Parte das questões objetivas só foi exibida a determinados cargos ou segmentos, " +
+          "e outras eram de preenchimento opcional. Por isso cada gráfico informa a própria base, que nem sempre é o total de envios."
+        : ""),
       "<strong>Limites.</strong> A consulta é de adesão voluntária e não constitui amostra estatística da rede. " +
         "O volume por cargo reflete quem se dispôs a responder."
     ];
     var ul = el("ul");
-    itens.forEach(function (t) { var li = el("li"); li.innerHTML = t; ul.appendChild(li); });
+    itens.filter(Boolean).forEach(function (t) { var li = el("li"); li.innerHTML = t; ul.appendChild(li); });
     cx.appendChild(ul);
   }
 
@@ -309,6 +367,9 @@
   /* ---------------------------------------------------------- devolutivas */
   var POR_PAGINA = 20, pagina = 1, filtrados = [], idFiltro = null;
   var busca, selTema, selQ, selPerfil = {};
+  /** Quem não escreveu nada em nenhuma questão aberta não entra na listagem
+   *  (só aparece se for aberto individualmente pelo modal). */
+  var COM_TEXTO = [];
 
   function montarDevolutivas() {
     var cx = document.getElementById("filtros");
@@ -341,6 +402,9 @@
 
     REG.forEach(function (r) {
       r._busca = semAcento(META.abertas.map(function (a) { return r[a.chave]; }).join(" "));
+    });
+    COM_TEXTO = REG.filter(function (r) {
+      return META.abertas.some(function (a) { return !!r[a.chave]; });
     });
 
     var timer;
@@ -389,7 +453,7 @@
   function filtrar() {
     if (idFiltro) return REG.filter(function (r) { return r.id === idFiltro; });
     var q = semAcento(busca.value.trim()), tm = selTema.value, qs = selQ.value;
-    return REG.filter(function (r) {
+    return COM_TEXTO.filter(function (r) {
       var ok = true;
       Object.keys(selPerfil).forEach(function (campo) {
         if (selPerfil[campo].value && r[campo] !== selPerfil[campo].value) ok = false;
@@ -430,7 +494,10 @@
       ? "Exibindo apenas a devolutiva #" + idFiltro + " — use “Limpar filtros” para ver todas."
       : (total === 0 ? "Nenhuma devolutiva encontrada com os filtros atuais."
          : total + (total === 1 ? " devolutiva encontrada" : " devolutivas encontradas") +
-           " · exibindo " + ((pagina - 1) * POR_PAGINA + 1) + "–" + Math.min(pagina * POR_PAGINA, total));
+           " · exibindo " + ((pagina - 1) * POR_PAGINA + 1) + "–" + Math.min(pagina * POR_PAGINA, total) +
+           (total === COM_TEXTO.length && COM_TEXTO.length < META.total
+             ? " · os outros " + (META.total - COM_TEXTO.length) +
+               " envios não preencheram nenhum campo aberto" : ""));
 
     if (!total) {
       box.appendChild(el("div", "card vazio", "Tente remover um filtro ou usar outro termo de busca."));
@@ -492,7 +559,8 @@
     if (h1) h1.textContent = META.titulo;
     var sub = document.getElementById("pSub");
     if (sub) sub.textContent = META.subtitulo;
-    montarKpis(); montarDestaque(); montarPerfil(); montarVolume(); montarTemas(); montarNota();
+    montarKpis(); montarDestaque(); montarRanking(); montarPerfil();
+    montarAval(); montarVolume(); montarTemas(); montarNota();
     if (RESTRITO) montarDevolutivas();
   }
 

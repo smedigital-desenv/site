@@ -6,8 +6,8 @@
   <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png?v=1">
   <link rel="icon" href="favicon.ico?v=1">
   <link rel="apple-touch-icon" href="apple-touch-icon.png?v=1">
-  <title>Calendário Escolar 2027 — completo | Secretaria Municipal de Educação</title>
-  <meta name="description" content="Contribuições da rede municipal sobre as duas propostas de calendário para 2027.">
+  <title>Trabalho Docente Coletivo (TDC) 2026 — completo | Secretaria Municipal de Educação</title>
+  <meta name="description" content="Avaliação da rede municipal sobre as modalidades de TDC e subsídios para a resolução de 2027.">
   <!-- Pagina restrita: nao indexar. -->
   <meta name="robots" content="noindex, nofollow">
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700;9..40,800&display=swap" rel="stylesheet">
@@ -77,7 +77,7 @@
     <div class="kpis" id="kpis"></div>
 
     <section class="bloco">
-      <div class="sec-h"><h2>Resultado principal</h2><span class="sub">A pergunta central da consulta</span></div>
+      <div class="sec-h"><h2>Resultado principal</h2><span class="sub">As duas perguntas centrais sobre a organização do TDC</span></div>
       <div class="grid2" id="destaque"></div>
     </section>
 
@@ -87,7 +87,7 @@
     </section>
 
     <section class="bloco" id="secAvaliacoes" hidden>
-      <div class="sec-h"><h2>O que a rede avaliou</h2><span class="sub">Respostas às demais questões objetivas</span></div>
+      <div class="sec-h"><h2>O que a rede avaliou</h2><span class="sub">Respostas às demais questões objetivas, por modalidade de TDC</span></div>
       <div class="grid2" id="avaliacoes"></div>
     </section>
 
@@ -160,10 +160,10 @@
 <script src="consulta.js"></script>
 <script>
   // Os dados anonimos e a identificacao so sao carregados apos a liberacao.
-  PORTAO_DADOS = "dados-cal.js";
+  PORTAO_DADOS = "dados-tdc.js";
 </script>
-<script src="dados-cal.js"></script>
-<script>CONSULTA.iniciar({ restrito: true, rpcNomes: "respondentes_cal" });</script>
+<script src="dados-tdc.js"></script>
+<script>CONSULTA.iniciar({ restrito: true, rpcNomes: "respondentes_tdc" });</script>
 <script>
 // ---- Acessibilidade: tamanho de fonte e alto contraste ----
 var PASSOS = [87.5, 100, 112.5, 125];
