@@ -218,6 +218,12 @@
     .nota h3{font-size:15.5px;font-weight:800;margin-bottom:10px;}
     .nota ul{padding-left:19px;display:flex;flex-direction:column;gap:7px;margin-top:8px;}
     .nota strong{color:var(--navy);}
+    /* A sintese usa a mesma caixa da nota metodologica, com mais presenca:
+       ela vem antes dos graficos e e a leitura principal da pagina. */
+    .card.resumo{border-left:4px solid var(--gold);font-size:14.5px;}
+    .card.resumo h3{font-size:17px;}
+    .card.resumo ul{gap:12px;margin-top:10px;}
+    body.contraste .card.resumo{border-left-color:#ffe066;}
 
     footer{background:var(--navy3);color:#93a9c9;text-align:center;padding:28px 22px;font-size:13.5px;}
     .fmark{color:var(--gold);font-weight:800;letter-spacing:.02em;margin-bottom:6px;}

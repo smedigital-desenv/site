@@ -117,6 +117,28 @@
     });
   }
 
+  /* -------------------------------------------------------------- síntese - */
+  /**
+   * Leitura rápida antes dos gráficos, para consultas com muitas questões.
+   * Cada item é um par [chamada em negrito, texto]. Sem `resumo`, a seção
+   * inteira some — as consultas antigas seguem como estavam.
+   */
+  function montarResumo() {
+    var sec = document.getElementById("secResumo");
+    var cx = document.getElementById("resumo");
+    var itens = META.resumo || [];
+    if (!cx || !itens.length) { if (sec) sec.hidden = true; return; }
+    if (sec) sec.hidden = false;
+    var ul = el("ul");
+    itens.forEach(function (par) {
+      var li = el("li");
+      li.appendChild(el("strong", null, par[0] + " "));
+      li.appendChild(document.createTextNode(par[1]));
+      ul.appendChild(li);
+    });
+    cx.appendChild(ul);
+  }
+
   /* ------------------------------------------------- destaque e perfil ---- */
   var CORES = ["navy", "purple", "green", "gold", "mut"];
 
@@ -594,7 +616,7 @@
     if (h1) h1.textContent = META.titulo;
     var sub = document.getElementById("pSub");
     if (sub) sub.textContent = META.subtitulo;
-    montarKpis(); montarDestaque(); montarRanking(); montarPerfil();
+    montarKpis(); montarResumo(); montarDestaque(); montarRanking(); montarPerfil();
     montarAval(); montarVolume(); montarTemas(); montarNota();
     if (RESTRITO) montarDevolutivas();
   }
