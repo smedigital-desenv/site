@@ -13,7 +13,7 @@ domínio. Ver contexto de segurança em [../SECURITY.md](../SECURITY.md).
 2. **APIs e Serviços → Tela de consentimento OAuth**:
    - Tipo: **Externo**
    - Nome do app: ex. **Validação de Presença — SME**
-   - E-mail de suporte e e-mail do desenvolvedor: institucional (ex. `desenv.sme@gmail.com`)
+   - E-mail de suporte e e-mail do desenvolvedor: institucional (`desenvsme@educacao.pmrp.sp.gov.br`)
    - Em **Testes**, só e-mails cadastrados como testadores entram; em **Produção**, qualquer
      conta Google pode iniciar o fluxo (mas a allowlist barra quem não é fiscal/gerente).
 3. **APIs e Serviços → Credenciais → Criar credenciais → ID do cliente OAuth**:
