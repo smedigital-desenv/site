@@ -192,13 +192,41 @@
    * Questões fechadas de avaliação (o que a rede acha), separadas do perfil
    * (quem a rede é). Só aparece se a consulta declarar `aval_rotulos`.
    */
+  /**
+   * Perguntas distintas que usam as MESMAS opções de resposta — "muito
+   * adequada / adequada / pouco adequada / inadequada", por exemplo — cabem
+   * num gráfico comparativo só: uma barra por pergunta, com o percentual da
+   * resposta positiva. Oito cartões idênticos viram um, e a comparação entre
+   * as perguntas, que antes exigia rolar a página, fica imediata.
+   * O detalhamento completo de cada uma vai na dica da barra.
+   */
+  function montarEscalas() {
+    var cx = document.getElementById("avaliacoes");
+    if (!cx || !(D.escalas || []).length) return;
+    D.escalas.forEach(function (bl) {
+      var c = cartao(bl.titulo, bl.cap);
+      c.card.className = "card chart largo";       // ocupa a linha inteira
+      cx.appendChild(c.card);
+      barras(c.bars, bl.itens.map(function (it, i) {
+        return {
+          lab: it.lab, titulo: it.detalhe, val: it.val, base: it.base,
+          txt: it.val + " de " + it.base + " · " + pct(it.val, it.base) + "%",
+          cor: i === 0 ? "green" : (i === bl.itens.length - 1 ? "gold" : "navy"),
+          modalTitulo: it.lab + (bl.sufixo || ""), modalSub: bl.titulo,
+          filtro: RESTRITO ? function (r) { return it.valores.indexOf(r[it.campo]) >= 0; } : null
+        };
+      }), 0);
+    });
+  }
+
   function montarAval() {
     var sec = document.getElementById("secAvaliacoes");
     var cx = document.getElementById("avaliacoes");
     var rot = META.aval_rotulos || {};
     var chaves = Object.keys(rot);
-    if (!cx || !chaves.length) { if (sec) sec.hidden = true; return; }
+    if (!cx || !(chaves.length || (D.escalas || []).length)) { if (sec) sec.hidden = true; return; }
     if (sec) sec.hidden = false;
+    montarEscalas();
     var destacados = (D.destaques || []).map(function (d) { return d.campo; });
     chaves.forEach(function (campo, idx) {
       if (destacados.indexOf(campo) >= 0) return;           // já saiu no destaque
@@ -249,14 +277,24 @@
     var cx = document.getElementById("volume");
     if (!cx) return;
     if (!META.abertas.length) { esconderBloco(cx); return; }
+    // Com muitas questões, duas barras por questão viram um paredão ilegível:
+    // acima de seis, mostra só a que interessa — a com proposta concreta — e
+    // deixa o total preenchido na dica da barra.
+    var resumido = META.abertas.length > 6;
     var itens = [];
     META.abertas.forEach(function (a, i) {
-      itens.push({ lab: a.rotulo + " — preenchidas", val: META.preenchidas[a.chave],
-                   base: META.total, cor: "mut",
-                   modalTitulo: a.rotulo + " — preenchidas", modalSub: "Responderam algo",
-                   filtro: RESTRITO ? function (r) { return !!r[a.chave]; } : null });
-      itens.push({ lab: a.rotulo + " — com proposta concreta", val: D.stats[a.chave].base,
-                   base: META.total, cor: CORES[i % 3],
+      if (!resumido) {
+        itens.push({ lab: a.rotulo + " — preenchidas", val: META.preenchidas[a.chave],
+                     base: META.total, cor: "mut",
+                     modalTitulo: a.rotulo + " — preenchidas", modalSub: "Responderam algo",
+                     filtro: RESTRITO ? function (r) { return !!r[a.chave]; } : null });
+      }
+      itens.push({ lab: a.rotulo + (resumido ? "" : " — com proposta concreta"),
+                   val: D.stats[a.chave].base, base: META.total, cor: CORES[i % 3],
+                   titulo: resumido ? META.preenchidas[a.chave] + " responderam algo; " +
+                           D.stats[a.chave].base + " trouxeram proposta" : null,
+                   txt: resumido ? D.stats[a.chave].base + " de " + META.preenchidas[a.chave] +
+                        " preenchidas" : null,
                    modalTitulo: a.rotulo + " — com proposta", modalSub: "Trouxeram sugestão, crítica ou justificativa",
                    filtro: RESTRITO ? function (r) { return r["t_" + a.chave].length > 0; } : null });
     });
