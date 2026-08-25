@@ -85,10 +85,26 @@ e-mail, RA, matrícula, CPF, telefone e endereço; se achar qualquer um, ele nã
 entra na lista — sai do Git. A lista é para modelo vazio, nunca para dado com
 dono.
 
-Esta regra também está gravada como memória de usuário do perfil, em
-`~/.claude/CLAUDE.md`, e por isso vale em qualquer repositório desta rede —
-inclusive nos que ainda não têm as guardas instaladas. Ao criar um repositório
-novo, copie para ele o `.gitignore`, o hook e o workflow daqui.
+#### Como a regra chega a todo aparelho
+
+O texto canônico está em **`.claude/memoria-perfil.md`**, aqui no repositório.
+Ele é o mesmo em três lugares, e cada um cobre um caminho de acesso:
+
+| Onde | Alcance | Como instalar |
+| --- | --- | --- |
+| `~/.claude/CLAUDE.md` da máquina | Todo repositório, naquele computador | Copiar o arquivo uma vez |
+| **Setup script do ambiente de nuvem** | Toda sessão de nuvem, **de qualquer aparelho** — navegador, celular, desktop, `claude --cloud`, rotinas | claude.ai/code → Environments → Setup script |
+| `CLAUDE.md` de cada repositório | Quem trabalha naquele repositório | Replicar esta seção |
+
+O setup script é o que resolve "qualquer computador ou celular": ele roda como
+root antes de o Claude Code iniciar e grava a memória em `~/.claude/CLAUDE.md`
+dentro do container. Como o ambiente é do perfil, e não do aparelho, vale
+igualmente no celular e no navegador. O resultado entra no snapshot do
+ambiente, então roda uma vez e fica; ao mudar o texto, o cache se reconstrói
+sozinho na sessão seguinte.
+
+Ao criar um repositório novo nesta rede, copie para ele o `.gitignore`, o hook,
+o workflow e esta seção.
 
 ### 2. Login é sempre pelo Controle de Acesso CENTRAL
 
