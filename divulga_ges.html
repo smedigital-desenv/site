@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png?v=1">
+  <link rel="icon" href="favicon.ico?v=1">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png?v=1">
+  <title>Decreto dos Gestores Escolares | Secretaria Municipal de Educação</title>
+  <meta name="description" content="Contribuições ao texto do Decreto que regulamenta a Lei Complementar nº 3.166/2023 — ingresso, lotação, designação, redesignação, substituição, atividade gratificada e Plano Anual de Gestão Escolar.">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700;9..40,800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="consulta.css">
+</head>
+<body>
+
+<header class="gov-top">
+  <div class="wrap">
+    <div class="gov-brand">
+      <img class="gov-logo" src="pmrp.png" alt="Prefeitura da Cidade de Ribeirão Preto">
+    </div>
+    <div class="gov-actions">
+      <div class="gov-a11y">
+        <button type="button" onclick="ajustarFonte(-1)" aria-label="Diminuir fonte">A-</button>
+        <button type="button" onclick="ajustarFonte(1)" aria-label="Aumentar fonte">A+</button>
+        <button type="button" class="contrast" onclick="alternarContraste()" aria-label="Alto contraste"><span></span><span></span></button>
+      </div>
+    </div>
+  </div>
+</header>
+
+<section class="phero">
+  <div class="phero-deco" aria-hidden="true">
+    <svg viewBox="0 0 440 340" fill="none">
+      <g stroke="#f6b91e" stroke-opacity=".28" stroke-width="1.5">
+        <path d="M70 60 L200 120 L150 240 L300 180 L380 90"/>
+        <path d="M200 120 L260 250 L150 240"/><path d="M300 180 L340 280"/>
+      </g>
+      <g fill="#f6b91e">
+        <circle cx="70" cy="60" r="5" fill-opacity=".9"/><circle cx="200" cy="120" r="7"/>
+        <circle cx="150" cy="240" r="5" fill-opacity=".8"/><circle cx="300" cy="180" r="6" fill-opacity=".9"/>
+        <circle cx="380" cy="90" r="4" fill-opacity=".7"/><circle cx="260" cy="250" r="4.5" fill-opacity=".7"/>
+        <circle cx="340" cy="280" r="4" fill-opacity=".6"/>
+      </g>
+    </svg>
+  </div>
+  <div class="wrap">
+    <nav class="breadcrumb"><a href="index.html">Consultas Públicas</a> › Resultados</nav>
+    <div class="phero-txt">
+      <span class="eyebrow">Secretaria Municipal de Educação</span>
+      <h1 id="pTitulo">—</h1>
+      <p id="pSub">—</p>
+      <div class="phero-meta">
+        <span class="pill"><b id="pTotal">—</b>&nbsp;contribuições</span>
+        <span class="pill ghost" id="pPeriodo">—</span>
+        <span class="pill ghost">Consulta encerrada</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<main>
+  <div class="wrap">
+    <div class="kpis" id="kpis"></div>
+
+    <section class="bloco" id="secResumo" hidden>
+      <div class="sec-h"><h2>Síntese dos resultados</h2><span class="sub">Percentuais sobre os 42 respondentes</span></div>
+      <div class="card nota resumo"><h3>O que as 42 contribuições dizem</h3><div id="resumo"></div></div>
+    </section>
+
+    <section class="bloco">
+      <div class="sec-h"><h2>A que parte da minuta as contribuições se referem</h2><span class="sub">Agrupado pelos capítulos do próprio decreto</span></div>
+      <div class="grid2" id="destaque"></div>
+    </section>
+
+    <section class="bloco">
+      <div class="sec-h"><h2>Quem participou</h2><span class="sub">Perfil declarado pelos respondentes</span></div>
+      <div class="grid2" id="perfil"></div>
+    </section>
+
+    <section class="bloco" id="secAvaliacoes" hidden>
+      <div class="sec-h"><h2>Escopo das contribuições</h2><span class="sub">A consulta é sobre o decreto; a Lei Complementar não está em consulta</span></div>
+      <div class="grid2" id="avaliacoes"></div>
+    </section>
+
+    <section class="bloco">
+      <div class="sec-h"><h2>Volume das contribuições</h2><span class="sub">Quanto de cada questão trouxe proposta</span></div>
+      <div id="volume"></div>
+    </section>
+
+    <section class="bloco" id="temas">
+      <div class="sec-h"><h2>Assuntos mais frequentes</h2><span class="sub">Ranking dos temas citados nas contribuições</span></div>
+      <div class="tabs" role="tablist" id="tabsTema"></div>
+      <div class="card temas">
+        <div id="listaTemas"></div>
+        <p class="tema-hint" id="temaHint"></p>
+      </div>
+    </section>
+
+    <section class="bloco">
+      <div class="sec-h"><h2>Nota metodológica</h2></div>
+      <div class="card nota"><h3>Como estes números foram apurados</h3><div id="nota"></div></div>
+    </section>
+  </div>
+</main>
+
+<footer>
+  <div class="fmark">Secretaria Municipal de Educação</div>
+  Prefeitura de Ribeirão Preto · Transparência e diálogo por uma educação de qualidade.
+</footer>
+<script src="config.js"></script>
+<script src="dados-ges.js"></script>
+<script src="consulta.js"></script>
+<script>CONSULTA.iniciar({ restrito: false });</script>
+<script>
+// ---- Acessibilidade: tamanho de fonte e alto contraste ----
+var PASSOS = [87.5, 100, 112.5, 125];
+var idx = parseInt(localStorage.getItem("fonte_idx") || "1", 10);
+function aplicarFonte(){ document.documentElement.style.fontSize = PASSOS[idx] + "%"; }
+function ajustarFonte(dir){
+  idx = Math.min(PASSOS.length - 1, Math.max(0, idx + dir));
+  localStorage.setItem("fonte_idx", idx);
+  aplicarFonte();
+}
+function alternarContraste(){
+  document.body.classList.toggle("contraste");
+  localStorage.setItem("contraste", document.body.classList.contains("contraste") ? "1" : "0");
+}
+aplicarFonte();
+if (localStorage.getItem("contraste") === "1") document.body.classList.add("contraste");
+</script>
+
+</body>
+</html>

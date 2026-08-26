@@ -397,13 +397,16 @@
       temAbertas ? "<strong>Classificação por assunto.</strong> Feita por reconhecimento de expressões-chave no texto de cada resposta. " +
         "Uma mesma contribuição pode tratar de vários assuntos — por isso os percentuais somam mais de 100%." : "",
       temAbertas ? "<strong>Bases de cálculo.</strong> " + bases + "; visão geral: " + D.stats.geral.base + " respondentes." : "",
-      (Object.keys(META.aval_rotulos || {}).length
+      // Só faz sentido onde os campos objetivos vêm do formulário e nem todos
+      // os respondentes viram todos. Consulta cujo bloco objetivo é derivado do
+      // texto desliga com `nota_bases: False`.
+      (META.nota_bases !== false && Object.keys(META.aval_rotulos || {}).length
         ? "<strong>Bases variáveis.</strong> Parte das questões objetivas só foi exibida a determinados cargos ou segmentos, " +
           "e outras eram de preenchimento opcional. Por isso cada gráfico informa a própria base, que nem sempre é o total de envios."
         : ""),
       "<strong>Limites.</strong> A consulta é de adesão voluntária e não constitui amostra estatística da rede. " +
         "O volume por cargo reflete quem se dispôs a responder."
-    ];
+    ].concat(META.nota_extra || []);
     var ul = el("ul");
     itens.filter(Boolean).forEach(function (t) { var li = el("li"); li.innerHTML = t; ul.appendChild(li); });
     cx.appendChild(ul);
