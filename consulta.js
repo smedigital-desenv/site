@@ -279,6 +279,12 @@
     var cx = document.getElementById("volume");
     if (!cx) return;
     if (!META.abertas.length) { esconderBloco(cx); return; }
+    // Questão aberta única que todo mundo preencheu: as duas barras diriam
+    // exatamente o que os indicadores do topo já dizem — total de envios e
+    // quantos trouxeram proposta. Seção inteira vira repetição.
+    if (META.abertas.length === 1 && META.preenchidas[META.abertas[0].chave] === META.total) {
+      esconderBloco(cx); return;
+    }
     // Com muitas questões, duas barras por questão viram um paredão ilegível:
     // acima de seis, mostra só a que interessa — a com proposta concreta — e
     // deixa o total preenchido na dica da barra.
