@@ -173,6 +173,8 @@
     if (!cx || !(D.ranking || []).length) return;
     D.ranking.forEach(function (bl) {
       var c = cartao(bl.titulo, bl.cap);
+      // Muitos itens de rótulo longo não cabem numa coluna da grade.
+      if (bl.largo) c.card.className = "card chart largo";
       cx.appendChild(c.card);
       barras(c.bars, bl.itens.map(function (it, i) {
         var temMedia = typeof it.media === "number";
