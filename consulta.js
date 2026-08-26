@@ -98,8 +98,10 @@
                    h: pct(comProposta, META.total) + "% do total de envios" });
     }
     (META.kpis_extra || []).forEach(function (k) { lista.push(k); });
-    // 4º indicador: a alternativa mais votada do destaque principal, se houver
-    var dq = (D.destaques || [])[0];
+    // Último indicador: a alternativa mais votada do destaque principal. Sai de
+    // graça na maioria das consultas, mas transforma uma resposta em manchete —
+    // por isso a consulta pode desligá-lo com kpi_destaque: False.
+    var dq = META.kpi_destaque === false ? null : (D.destaques || [])[0];
     if (dq && D.perfil[dq.campo]) {
       var ent = Object.keys(D.perfil[dq.campo]).map(function (k) { return [k, D.perfil[dq.campo][k]]; });
       ent.sort(function (a, b) { return b[1] - a[1]; });
