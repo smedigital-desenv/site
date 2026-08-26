@@ -801,9 +801,21 @@
     var temRes = c.estado === "resultado" &&
                  (res.descricao || res.url_publico || res.url_completo || resultadoDoCard);
 
+    // Card sem vinculo cujo resumo publico aponta para um resultado JA
+    // cadastrado: adota o existente em vez de criar um duplicado. Acontece com
+    // card antigo, de quando o painel guardava a pagina de resultados no campo
+    // Link e nao registrava o vinculo.
+    var alvoRes = resultadoDoCard;
+    if (temRes && !alvoRes && res.url_publico){
+      var achado = resultados.filter(function(x){
+        return (x.url_publico || "").trim() === res.url_publico;
+      })[0];
+      if (achado) alvoRes = achado.id;
+    }
+
     var antes = temRes
       ? rpc("resultado_salvar", { p: {
-          id: resultadoDoCard,
+          id: alvoRes,
           titulo: c.titulo.replace(/\s+—\s+devolutivas\s*$/i, ""),
           descricao: res.descricao,
           url_publico: res.url_publico,
