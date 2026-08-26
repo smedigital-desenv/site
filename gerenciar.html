@@ -339,9 +339,9 @@
           </div>
 
           <div class="campo">
-            <label for="fHref">Link</label>
-            <input type="text" id="fHref" placeholder="https://… ou divulga_atrib.html">
-            <div class="dica">Deixe vazio para um card informativo, sem botão e sem link.</div>
+            <label for="fHref">Link do formulário</label>
+            <input type="text" id="fHref" placeholder="https://docs.google.com/forms/…">
+            <div class="dica">Guarde aqui o formulário, mesmo depois de encerrado. Vazio = card informativo, sem botão.</div>
           </div>
 
           <div class="dupla">
@@ -376,7 +376,7 @@
             <div class="campo">
               <label for="rcPublico">Resumo público <span class="selo publico">aberto</span></label>
               <input type="text" id="rcPublico" placeholder="divulga_atrib.html">
-              <div class="dica">Vira o link do card automaticamente, se ele ainda estiver vazio.</div>
+              <div class="dica">Enquanto o selo for "Resultado publicado", é para cá que o card leva — o link do formulário fica guardado e volta se o selo mudar.</div>
             </div>
             <div class="campo" style="margin-bottom:0;">
               <label for="rcCompleto">Resultados completos <span class="selo restrito">restrito</span></label>
@@ -529,16 +529,11 @@
       document.getElementById(id).addEventListener("change", previa);
     });
     document.getElementById("fEstado").addEventListener("change", alternarBlocoRes);
-    // Digitou o resumo público e o card ainda não tem link? Usa ele.
-    document.getElementById("rcPublico").addEventListener("input", function(){
-      var href = document.getElementById("fHref");
-      if (!href.value.trim() || href.dataset.auto === "1"){
-        href.value = this.value.trim();
-        href.dataset.auto = "1";
-        previa();
-      }
-    });
-    document.getElementById("fHref").addEventListener("input", function(){ this.dataset.auto = ""; });
+    document.getElementById("fEstado").addEventListener("change", ajustarCta);
+    // O resumo público não sobrescreve mais o link do formulário: ele é o
+    // destino do card enquanto o selo for "Resultado publicado", e o card
+    // volta ao formulário se o selo mudar. Só atualiza a prévia.
+    document.getElementById("rcPublico").addEventListener("input", previa);
     document.getElementById("btnNovo").addEventListener("click", function(){ limpar(); });
     document.getElementById("btnCancelar").addEventListener("click", function(){ limpar(); });
     document.getElementById("btnSalvar").addEventListener("click", salvar);
@@ -582,7 +577,14 @@
       met.push("<b>" + (abas.join(" + ") || "nenhuma aba") + "</b>");
       if (c.prazo) met.push((C.prazoVencido(c.prazo) ? "encerrou " : "até ") + C.fmtBR(c.prazo));
       if (!c.visivel) met.push("<b>oculto</b>");
-      if (!c.href) met.push("sem link");
+      if (!c.href) met.push("sem link do formulário");
+      // Selo de resultado sem resumo público vinculado: o card mostraria
+      // "Resultado publicado" e ainda assim levaria ao formulário. Quem
+      // cadastra precisa ver isso na lista, sem ter que abrir o card.
+      if (c.estado === "resultado"){
+        var r = resultados.filter(function(x){ return x.id === c.resultado_id; })[0];
+        if (!r || !r.url_publico) met.push("<b>sem resumo público</b>");
+      }
       meio.innerHTML = '<div class="tit"></div><div class="met">' +
                        met.map(function(m){ return "<span>" + m + "</span>"; }).join("") + "</div>";
       meio.querySelector(".tit").textContent = c.titulo;
@@ -623,6 +625,20 @@
 
   /* ---- formulário ---- */
   var corSel = "blue", iconeSel = "documento", resultadoDoCard = null;
+
+  /**
+   * "Responder" e "Ver resultados" são os padrões de cada selo. Trocar o selo
+   * troca o texto do botão — mas só quando ele ainda está no padrão do selo
+   * anterior; texto escrito à mão nunca é sobrescrito.
+   */
+  var CTA_PADRAO = { aberta: "Responder", resultado: "Ver resultados" };
+  function ajustarCta(){
+    var campo = document.getElementById("fCta");
+    var atual = campo.value.trim();
+    var novo  = CTA_PADRAO[document.getElementById("fEstado").value];
+    var eraPadrao = !atual || atual === CTA_PADRAO.aberta || atual === CTA_PADRAO.resultado;
+    if (novo && eraPadrao && atual !== novo){ campo.value = novo; previa(); }
+  }
 
   function alternarBlocoRes(){
     document.getElementById("blocoResultado").hidden =
@@ -703,6 +719,7 @@
 
   function previa(){
     var c = doForm();
+    c.url_resultado = document.getElementById("rcPublico").value.trim();
     if (!c.titulo) c.titulo = "Título do card";
     document.getElementById("previa").innerHTML = C.html(c);
   }
@@ -827,6 +844,10 @@
     return rpc("resultados_listar", {}).then(function(d){
       resultados = Array.isArray(d) ? d : [];
       listaRes();
+      // A lista de cards marca "sem resumo público" consultando `resultados`.
+      // As duas cargas correm em paralelo, entao redesenha os cards quando os
+      // resultados chegam — senao o aviso apareceria em todo card de resultado.
+      if (cards.length) lista();
     }).catch(function(e){
       avisar("<b>Não foi possível carregar os resultados.</b> " + e.message +
              " — confirme se o <b>resultados.sql</b> já foi executado no Supabase.", "erro");
@@ -908,13 +929,23 @@
     document.getElementById("fTitulo").value    = r.titulo + " — devolutivas";
     document.getElementById("fCategoria").value = "Resultados";
     document.getElementById("fPublico").value   = "Profissionais da educação";
-    document.getElementById("fHref").value      = r.url_publico || "";
+    // O Link continua sendo o do formulário — aqui ainda não se sabe qual é,
+    // então fica vazio para quem cadastra preencher. O destino do card vem do
+    // resumo público do resultado, preenchido logo abaixo.
+    document.getElementById("fHref").value      = "";
     document.getElementById("fCta").value       = "Ver resultados";
     document.getElementById("fEstado").value    = "resultado";
     document.getElementById("fResultados").checked = true;
     document.getElementById("fRecentes").checked   = true;
     document.getElementById("fDestaque").checked   = true;
     document.getElementById("fNovaAba").checked    = false;
+    // Preenche o bloco do resultado e guarda o vínculo: e dele que sai o
+    // destino do card. Sem isto o card sairia sem para onde ir.
+    resultadoDoCard = r.id;
+    document.getElementById("rcDescricao").value = r.descricao || "";
+    document.getElementById("rcPublico").value   = r.url_publico || "";
+    document.getElementById("rcCompleto").value  = r.url_completo || "";
+    alternarBlocoRes();
     corSel = "purple"; iconeSel = "grafico";
     montarCores(); montarIcones();
     previa();

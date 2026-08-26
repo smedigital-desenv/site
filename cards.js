@@ -90,7 +90,13 @@
   function html(card) {
     var vencido  = prazoVencido(card.prazo);
     var encerrado = vencido || card.estado === "encerrada";
-    var clicavel = !!card.href && !encerrado && card.estado !== "breve";
+
+    // O campo Link guarda sempre o formulário. Quando o selo é "Resultado
+    // publicado", o card leva ao resumo público do resultado vinculado — sem
+    // apagar o endereço do formulário, que volta se o selo mudar de novo.
+    var comResultado = card.estado === "resultado" && !!card.url_resultado;
+    var destino = comResultado ? card.url_resultado : card.href;
+    var clicavel = !!destino && !encerrado && card.estado !== "breve";
 
     var chips = "";
     if (card.publico) chips += '<span class="chip">' + esc(card.publico) + "</span>";
@@ -119,8 +125,10 @@
     } else if (encerrado && card.estado !== "resultado") {
       rodape = '<span class="c-status">' + svgIcone("relogio") + "Em análise</span>";
     } else if (clicavel) {
+      // Sem texto próprio, o botão segue o selo: consulta aberta convida a
+      // responder; resultado publicado, a ver os números.
       rodape = '<span class="c-cta' + (card.destaque ? " destaque" : "") + '">' +
-               esc(card.cta || "Acessar") +
+               esc(card.cta || (comResultado ? "Ver resultados" : "Responder")) +
                ' <svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>';
     }
 
@@ -136,7 +144,7 @@
     if (!clicavel) return '<div class="' + classe + '">' + corpo + "</div>";
 
     var alvo = card.nova_aba ? ' target="_blank" rel="noopener"' : "";
-    return '<a class="' + classe + '" href="' + esc(card.href) + '"' + alvo + ">" + corpo + "</a>";
+    return '<a class="' + classe + '" href="' + esc(destino) + '"' + alvo + ">" + corpo + "</a>";
   }
 
   /** Busca os cards visíveis. Rejeita a promise se a API falhar. */
